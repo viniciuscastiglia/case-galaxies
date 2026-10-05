@@ -73,7 +73,11 @@ O Vinicius está no primeiro projeto de AI Engineering. **Aprender é o objetivo
 - 30/09: material da liga adotado. Código da base pronto e testado (coletor, curadoria e esquema mínimo; 64 testes),
   seguindo o plano `docs/superpowers/plans/2026-09-30-base-de-shorts.md` (decisões da execução no apêndice dele).
   Falta a chave da API para avaliar os 112 candidatos, fazer a revisão dos canais, a primeira coleta e instalar o
-  agendamento (Task 7 do plano). Ainda não há repositório git: o Vinicius faz o primeiro commit.
+  agendamento (Task 7 do plano).
+- 05/10: chave da API criada; 112 candidatos avaliados (32 `sim`, 26 `revisar`, 54 `não`, muitos por handle
+  errado na lista manual). Primeira coleta dos 32: 44.494 vídeos, 10.949 Shorts, 6.772 rotulados. Repositório
+  privado `viniciuscastiglia/case-galaxies` criado. Pendentes: revisão dos 26 (depois da aula 1.4), expansão e
+  agendamento. Estudo: Conceitos básicos de LLM e aula 1.1 feitos (problema no README); próxima, aula 1.2.
 
 ## Comandos (atualize quando existirem)
 
