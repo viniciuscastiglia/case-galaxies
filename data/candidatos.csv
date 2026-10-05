@@ -1,0 +1,113 @@
+handle,nome,setor,tipo,fonte,observacao
+@oboticario,O Boticário,beleza,marca,lista manual,
+@natura,Natura,beleza,marca,lista manual,
+@eudora,Eudora,beleza,marca,lista manual,
+@avonbrasil,Avon Brasil,beleza,marca,lista manual,
+@quemdisseberenice,"Quem Disse, Berenice?",beleza,marca,lista manual,
+@vultcosmetica,Vult,beleza,marca,lista manual,
+@rubyrose,Ruby Rose,beleza,marca,lista manual,
+@salonline,Salon Line,beleza,marca,lista manual,cabelo
+@lolacosmetics,Lola Cosmetics,beleza,marca,lista manual,cabelo
+@sallve,Sallve,beleza,marca,lista manual,skincare
+@principiaskincare,Principia,beleza,marca,lista manual,skincare
+@creamyskincare,Creamy,beleza,marca,lista manual,skincare
+@wepink,WePink,beleza,marca,lista manual,
+@bocarosabeauty,Boca Rosa Beauty,beleza,marca,lista manual,
+@marimariamakeup,Mari Maria Makeup,beleza,marca,lista manual,
+@oceane,Océane,beleza,marca,lista manual,
+@dailus,Dailus,beleza,marca,lista manual,
+@granado,Granado,beleza,marca,lista manual,
+@trussprofessional,Truss Professional,beleza,marca,lista manual,cabelo
+@lorealparisbr,L'Oréal Paris Brasil,beleza,marca,lista manual,
+@maybellinebr,Maybelline NY Brasil,beleza,marca,lista manual,
+@niveabrasil,NIVEA Brasil,beleza,marca,lista manual,
+@dovebrasil,Dove Brasil,beleza,marca,lista manual,
+@sephorabrasil,Sephora Brasil,beleza,marca,lista manual,varejo
+@belezanaweb,Beleza na Web,beleza,marca,lista manual,varejo
+@epocacosmeticos,Época Cosméticos,beleza,marca,lista manual,varejo
+@marykaybrasil,Mary Kay Brasil,beleza,marca,lista manual,
+@jequiti,Jequiti,beleza,marca,lista manual,
+@hinodegroup,Hinode,beleza,marca,lista manual,
+@payotbrasil,Payot,beleza,marca,lista manual,
+@simpleorganic,Simple Organic,beleza,marca,lista manual,skincare
+@vizzelacosmeticos,Vizzela Cosméticos,beleza,marca,lista manual,
+@larocheposaybrasil,La Roche-Posay Brasil,beleza,marca,lista manual,skincare
+@garnierbrasil,Garnier Brasil,beleza,marca,lista manual,
+@skalacosmeticos,Skala Cosméticos,beleza,marca,lista manual,cabelo
+@widicare,Widi Care,beleza,marca,lista manual,cabelo
+@marimaria,Mari Maria,beleza,criador,lista manual,
+@bocarosa,Boca Rosa,beleza,criador,lista manual,Bianca Andrade
+@niinasecrets,Niina Secrets,beleza,criador,lista manual,
+@karenbachini,Karen Bachini,beleza,criador,lista manual,
+@camilacoelho,Camila Coelho,beleza,criador,lista manual,parte do conteúdo em inglês
+@francinyehlke,Franciny Ehlke,beleza,criador,lista manual,
+@julianagoes,Juliana Goes,beleza,criador,lista manual,
+@brunatavares,Bruna Tavares,beleza,criador,lista manual,também tem marca (BT)
+@alicesalazar,Alice Salazar,beleza,criador,lista manual,
+@pausaparafeminices,Pausa para Feminices,beleza,criador,lista manual,
+@dudariedel,Duda Riedel,beleza,criador,lista manual,beleza e lifestyle
+@karolpinheiro,Karol Pinheiro,beleza,criador,lista manual,beleza e lifestyle
+@rayzanicacio,Rayza Nicácio,beleza,criador,lista manual,cabelo
+@natalyneri,Nátaly Neri,beleza,criador,lista manual,
+@nahcardoso,Nah Cardoso,beleza,criador,lista manual,beleza e lifestyle
+@micarocha,Mica Rocha,beleza,criador,lista manual,
+@tacielealcolea,Taciele Alcolea,beleza,criador,lista manual,beleza e lifestyle
+@marisaad,Mari Saad,beleza,criador,lista manual,
+@thassianaves,Thássia Naves,beleza,criador,lista manual,beleza e moda
+@vicceridono,Vic Ceridono,beleza,criador,lista manual,Dia de Beauté
+@dudamolinos,Duda Molinos,beleza,criador,lista manual,maquiador
+@agustinfernandez,Agustin Fernandez,beleza,criador,lista manual,maquiador
+@vanessarozan,Vanessa Rozan,beleza,criador,lista manual,maquiadora
+@fiatbrasil,Fiat Brasil,automotivo,marca,lista manual,
+@chevroletbrasil,Chevrolet Brasil,automotivo,marca,lista manual,
+@volkswagendobrasil,Volkswagen do Brasil,automotivo,marca,lista manual,
+@toyotadobrasil,Toyota do Brasil,automotivo,marca,lista manual,
+@hyundaimotorbrasil,Hyundai Motor Brasil,automotivo,marca,lista manual,
+@renaultbrasil,Renault Brasil,automotivo,marca,lista manual,
+@jeepbrasil,Jeep Brasil,automotivo,marca,lista manual,
+@hondaautomoveis,Honda Automóveis,automotivo,marca,lista manual,
+@nissanbrasil,Nissan Brasil,automotivo,marca,lista manual,
+@peugeotbrasil,Peugeot Brasil,automotivo,marca,lista manual,
+@citroenbrasil,Citroën Brasil,automotivo,marca,lista manual,
+@bydbrasil,BYD Brasil,automotivo,marca,lista manual,
+@gwmbrasil,GWM Brasil,automotivo,marca,lista manual,
+@caoachery,CAOA Chery,automotivo,marca,lista manual,
+@mitsubishimotorsbrasil,Mitsubishi Motors Brasil,automotivo,marca,lista manual,
+@kiabrasil,Kia Brasil,automotivo,marca,lista manual,
+@bmwbrasil,BMW Brasil,automotivo,marca,lista manual,
+@mercedesbenzbrasil,Mercedes-Benz Brasil,automotivo,marca,lista manual,
+@audibrasil,Audi Brasil,automotivo,marca,lista manual,
+@volvocarbrasil,Volvo Car Brasil,automotivo,marca,lista manual,
+@rambrasil,Ram Brasil,automotivo,marca,lista manual,
+@fordbrasil,Ford Brasil,automotivo,marca,lista manual,
+@porschebrasil,Porsche Brasil,automotivo,marca,lista manual,
+@landroverbrasil,Land Rover Brasil,automotivo,marca,lista manual,
+@jacmotorsbrasil,JAC Motors Brasil,automotivo,marca,lista manual,
+@omodajaecoobrasil,Omoda Jaecoo Brasil,automotivo,marca,lista manual,
+@leapmotorbrasil,Leapmotor Brasil,automotivo,marca,lista manual,
+@kavakbrasil,Kavak Brasil,automotivo,marca,lista manual,varejo
+@localiza,Localiza,automotivo,marca,lista manual,serviço: aluguel de carros
+@webmotors,Webmotors,automotivo,marca,lista manual,varejo e portal: conferir tipo
+@autoesporte,Autoesporte,automotivo,criador,lista manual,revista
+@quatrorodas,Quatro Rodas,automotivo,criador,lista manual,revista
+@motor1brasil,Motor1.com Brasil,automotivo,criador,lista manual,portal
+@autopapo,AutoPapo,automotivo,criador,lista manual,portal
+@carplace,Carplace,automotivo,criador,lista manual,portal
+@acelerados,Acelerados,automotivo,criador,lista manual,
+@garagemdobellote,Garagem do Bellote,automotivo,criador,lista manual,
+@jornaldocarro,Jornal do Carro,automotivo,criador,lista manual,mídia
+@autosegredos,AutoSegredos,automotivo,criador,lista manual,portal
+@noticiasautomotivas,Notícias Automotivas,automotivo,criador,lista manual,portal
+@mobiauto,Mobiauto,automotivo,criador,lista manual,portal
+@icarros,iCarros,automotivo,criador,lista manual,portal
+@kbbbrasil,KBB Brasil,automotivo,criador,lista manual,portal
+@revistacarro,Revista Carro,automotivo,criador,lista manual,revista
+@fullpowertv,Fullpower TV,automotivo,criador,lista manual,
+@carroscomcamanzi,Carros com Camanzi,automotivo,criador,lista manual,
+@falandodecarro,Falando de Carro,automotivo,criador,lista manual,
+@garagem360,Garagem 360,automotivo,criador,lista manual,
+@vrum,Vrum,automotivo,criador,lista manual,mídia
+@carrochefe,Carro Chefe,automotivo,criador,lista manual,
+@sergioquintanilha,Sérgio Quintanilha,automotivo,criador,lista manual,jornalista
+@autoentusiastas,AutoEntusiastas,automotivo,criador,lista manual,
+@mundodoautomovelpcd,Mundo do Automóvel para PCD,automotivo,criador,lista manual,nicho PCD

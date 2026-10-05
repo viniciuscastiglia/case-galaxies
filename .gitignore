@@ -1,0 +1,25 @@
+# segredos
+.env
+
+# ambiente Python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+
+# dados e mídia: os termos do YouTube proíbem redistribuir (aula 1.8)
+data/*
+!data/canais.csv
+!data/candidatos.csv
+*.duckdb
+*.duckdb.wal
+*.parquet
+media/
+
+# experimentos e estado local
+mlruns/
+cota.json
+*.log
+.DS_Store
+.superpowers/
