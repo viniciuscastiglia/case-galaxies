@@ -76,8 +76,8 @@ O Vinicius está no primeiro projeto de AI Engineering. **Aprender é o objetivo
   agendamento (Task 7 do plano).
 - 05/10: chave da API criada; 112 candidatos avaliados (32 `sim`, 26 `revisar`, 54 `não`, muitos por handle
   errado na lista manual). Primeira coleta dos 32: 44.494 vídeos, 10.949 Shorts, 6.772 rotulados. Repositório
-  privado `viniciuscastiglia/case-galaxies` criado. Pendentes: revisão dos 26 (depois da aula 1.4), expansão e
-  agendamento. Estudo: Conceitos básicos de LLM e aula 1.1 feitos (problema no README); próxima, aula 1.2.
+  privado `viniciuscastiglia/case-galaxies` criado. Coleta diária agendada (launchd, 5h15). Pendentes: revisão dos 26
+  (depois da aula 1.4) e expansão. Estudo: Conceitos básicos de LLM, aulas 1.1 e 1.2 feitas; próxima, aula 1.3.
 
 ## Comandos (atualize quando existirem)
 

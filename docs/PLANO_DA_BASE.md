@@ -41,6 +41,20 @@ itens 3 a 6; os itens 1, 2 e 7 são conferidos na revisão humana.
 | SMTPD | apoio opcional, para praticar alvo em log e baselines | Shorts (a duração média é de ~30 min), marcas brasileiras, o período depois de 2025 |
 | MicroLens-100K | apoio opcional, para ensaiar a extração multimodal (semana 3) | YouTube, português, fracassos (só vídeos-semente com mais de 10 mil curtidas) |
 
+## O que a base não representa
+
+Lista do Vinicius em 05/10 (exercício da aula 1.3), com os complementos da revisão. Vai para o data card (aula 1.8).
+
+- **Vídeos longos:** só Shorts, por escopo.
+- **Canais com menos de 30 Shorts:** uma marca que acabou de começar a postar Shorts está fora do que o modelo viu.
+  Mitigação: previsões para canais com pouco histórico saem marcadas com baixa confiança (aula 5.4).
+- **Retenção, CTR e impressões:** só o dono do canal vê. Não podem ser features nem aparecer na explicação.
+- **O período depois de ~19/09/2026:** mudanças no algoritmo ou nas tendências depois do corte de rótulos (drift,
+  aula 1.2).
+- **Outros setores, países e idiomas:** só beleza e automotivo, canais brasileiros, em português.
+- **Canais pequenos:** a lista inicial foi feita de memória e favorece canais grandes (viés de sobrevivência, risco 3).
+- **Mídia paga:** a API não diz se um Short foi impulsionado, então parte das curtidas pode vir de anúncio.
+
 ## Custo em cota
 
 | Etapa | Unidades | Quando |
