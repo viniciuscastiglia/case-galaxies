@@ -74,10 +74,15 @@ O Vinicius está no primeiro projeto de AI Engineering. **Aprender é o objetivo
   seguindo o plano `docs/superpowers/plans/2026-09-30-base-de-shorts.md` (decisões da execução no apêndice dele).
   Falta a chave da API para avaliar os 112 candidatos, fazer a revisão dos canais, a primeira coleta e instalar o
   agendamento (Task 7 do plano).
-- 05/10: chave da API criada; 112 candidatos avaliados (32 `sim`, 26 `revisar`, 54 `não`, muitos por handle
-  errado na lista manual). Primeira coleta dos 32: 44.494 vídeos, 10.949 Shorts, 6.772 rotulados. Repositório
-  privado `viniciuscastiglia/case-galaxies` criado. Coleta diária agendada (launchd, 5h15). Pendentes: revisão dos 26
-  (depois da aula 1.4) e expansão. Estudo: Conceitos básicos de LLM, aulas 1.1 e 1.2 feitas; próxima, aula 1.3.
+- 05/10: chave da API criada e coleta diária agendada (launchd, 5h15). Primeira coleta dos 32 canais: 44.494
+  vídeos, 10.949 Shorts, 6.772 rotulados. Revisão humana (aula 1.4): 52 canais incluídos (Localiza fora pelo
+  critério 1; Garagem do Bellote dentro após contagem completa). Repositório privado criado. Estudo: Conceitos
+  básicos de LLM e aulas 1.1 a 1.4 feitas (problema no README, exercício da 1.2 em `estudos/`, "o que a base não
+  representa" no plano da base).
+- Próximo (06/10): conferir a coleta dos 20 canais novos; rodar `expandir` e `avaliar`; busca de canais
+  (estratégia 4 da aula 1.4) para criadores pequenos, com termos do Vinicius; nova revisão; decisões do plano (teto
+  de 400, motos, 10 marcas). Proposta em aberto: congelar a base de treino por volta de 08/10 e seguir coletando
+  para o teste final. Estudo: aulas 1.5 (teach-back do coletor), 1.6, 1.7, 1.8 e, se der, 2.1.
 
 ## Comandos (atualize quando existirem)
 
