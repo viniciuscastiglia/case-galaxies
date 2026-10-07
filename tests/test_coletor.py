@@ -1,6 +1,7 @@
 import json
 from datetime import date, datetime, timedelta, timezone
 
+import httplib2
 import pandas as pd
 import pytest
 from tenacity import wait_none
@@ -43,6 +44,27 @@ def test_retry_em_erro_transitorio_conta_a_tentativa_que_falhou():
     cli = Cliente(None, arquivo=None, espera=wait_none())
     assert cli.chamar(Req(fn)) == {"items": []}
     assert sum(cli.gasto.values()) == 2  # a tentativa que falhou também custou
+
+
+@pytest.mark.parametrize(
+    "falha",
+    [
+        TimeoutError("The read operation timed out"),  # a falha da coleta de 06/10
+        ConnectionResetError(54, "Connection reset by peer"),
+        httplib2.ServerNotFoundError("Unable to find the server at www.googleapis.com"),
+    ],
+)
+def test_falha_de_rede_e_transitoria(falha):
+    respostas = [falha, {"items": []}]
+
+    def fn():
+        r = respostas.pop(0)
+        if isinstance(r, Exception):
+            raise r
+        return r
+
+    cli = Cliente(None, arquivo=None, espera=wait_none())
+    assert cli.chamar(Req(fn)) == {"items": []}
 
 
 def test_quota_exceeded_para_sem_retry():
@@ -245,6 +267,19 @@ def test_falha_num_canal_nao_derruba_os_outros(tmp_path):
     resumo = coletar(cli, con, ["HCtopico000000000000000", CANAL_ID])
     assert resumo["canais_ok"] == 1 and resumo["videos_novos"] == 60
     assert "HCtopico000000000000000" in resumo["falhas"]
+
+
+def test_timeout_persistente_num_canal_nao_derruba_os_outros(tmp_path):
+    lento = "UCcanalLento000000000000"
+    yt = _canal_lumina()
+    yt.paginas["UU" + lento[2:]] = TimeoutError("The read operation timed out")
+    executou, original = [], yt._playlistItems  # o retry repete o execute(), não o list()
+    yt._playlistItems = lambda kw: executou.append(kw["playlistId"]) or original(kw)
+    cli = Cliente(yt, arquivo=None, espera=wait_none())
+    resumo = coletar(cli, abrir_base(tmp_path / "t.duckdb"), [lento, CANAL_ID])
+    assert resumo["canais_ok"] == 1 and resumo["videos_novos"] == 60
+    assert "TimeoutError" in resumo["falhas"][lento]
+    assert executou.count("UU" + lento[2:]) == 5  # refez antes de desistir do canal
 
 
 def test_cota_no_meio_para_sem_corromper_e_retoma_sem_duplicar(tmp_path):

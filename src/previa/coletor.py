@@ -23,6 +23,7 @@ import duckdb
 import isodate
 import pandas as pd
 from googleapiclient.errors import HttpError
+from httplib2 import ServerNotFoundError
 from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential_jitter
 
 PT = ZoneInfo("America/Los_Angeles")  # a cota zera à meia-noite do horário do Pacífico
@@ -53,8 +54,15 @@ def motivo(e: HttpError) -> str:
         return ""
 
 
+# Falhas de rede acontecem antes de existir resposta HTTP: timeout de leitura, conexão
+# derrubada, DNS fora do ar (o Mac acordando sem rede). Também são transitórias.
+ERROS_DE_REDE = (TimeoutError, ConnectionError, ServerNotFoundError)
+
+
 def transitorio(e: BaseException) -> bool:
-    """Vale tentar de novo? Erros 5xx, 429 e rate limit, sim; cota esgotada, não."""
+    """Vale tentar de novo? Falhas de rede, erros 5xx, 429 e rate limit, sim; cota esgotada, não."""
+    if isinstance(e, ERROS_DE_REDE):
+        return True
     if not isinstance(e, HttpError):
         return False
     return e.status_code >= 500 or e.status_code == 429 or motivo(e) == "rateLimitExceeded"
@@ -404,7 +412,7 @@ def coletar(cli, con, channel_ids: list[str]) -> dict:
             try:
                 resumo["videos_novos"] += coletar_canal(cli, con, cid)
                 resumo["canais_ok"] += 1
-            except (HttpError, ValueError) as e:
+            except (HttpError, ValueError, *ERROS_DE_REDE) as e:
                 resumo["falhas"][cid] = sem_chave(repr(e))
         resumo["snapshots_jovens"] = atualizar_snapshots(cli, con)
         resumo["renovacao"] = renovar_vencidos(cli, con)
