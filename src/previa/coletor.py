@@ -13,6 +13,7 @@ exportação (aula 1.4).
 import json
 import os
 import re
+import socket
 import sys
 import traceback
 from datetime import datetime, timezone
@@ -57,6 +58,23 @@ def motivo(e: HttpError) -> str:
 # Falhas de rede acontecem antes de existir resposta HTTP: timeout de leitura, conexão
 # derrubada, DNS fora do ar (o Mac acordando sem rede). Também são transitórias.
 ERROS_DE_REDE = (TimeoutError, ConnectionError, ServerNotFoundError)
+
+
+def preferir_ipv4() -> None:
+    """Põe os endereços IPv4 na frente na resolução de nomes, com o IPv6 de reserva.
+
+    O httplib2 tenta os endereços em ordem e espera o timeout inteiro de cada um. Em 08/10 a
+    rota IPv6 até o Google caiu: cada chamada esperava quatro timeouts antes de chegar ao IPv4.
+    O curl não sofre com isso (tenta os dois em paralelo), por isso a checagem de rede passava."""
+    if hasattr(socket.getaddrinfo, "__wrapped__"):
+        return
+    original = socket.getaddrinfo
+
+    def ipv4_primeiro(*args, **kwargs):
+        return sorted(original(*args, **kwargs), key=lambda info: info[0] != socket.AF_INET)
+
+    ipv4_primeiro.__wrapped__ = original
+    socket.getaddrinfo = ipv4_primeiro
 
 
 def transitorio(e: BaseException) -> bool:
@@ -431,6 +449,7 @@ def main() -> int:
             file=sys.stderr,
         )
         return 2
+    preferir_ipv4()
     yt = build("youtube", "v3", developerKey=chave, cache_discovery=False)
     cli, con = Cliente(yt), abrir_base()
     inicio = datetime.now(timezone.utc)

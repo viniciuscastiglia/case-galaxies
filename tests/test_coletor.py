@@ -21,6 +21,7 @@ from previa.coletor import (
     listar_ids,
     parse_video,
     playlist_uploads,
+    preferir_ipv4,
     renovar_vencidos,
     salvar,
     salvar_canais,
@@ -370,3 +371,17 @@ def test_main_nao_vaza_a_chave_em_erro_inesperado(tmp_path, monkeypatch, capsys)
     saida = capsys.readouterr()
     assert "AIzaSEGREDO" not in saida.out + saida.err
     assert "key=***" in saida.err
+
+
+def test_preferir_ipv4_poe_o_ipv4_na_frente_e_mantem_o_ipv6_de_reserva(monkeypatch):
+    """Em 08/10 a rota IPv6 até o Google caiu: o httplib2 tenta os endereços em ordem e esperava
+    o timeout de cada IPv6 antes de chegar ao IPv4 (minutos por chamada)."""
+    import socket
+
+    v6 = (socket.AF_INET6, socket.SOCK_STREAM, 6, "", ("2001:4860:4847:400::", 443, 0, 0))
+    v4 = (socket.AF_INET, socket.SOCK_STREAM, 6, "", ("172.217.115.4", 443))
+    monkeypatch.setattr(socket, "getaddrinfo", lambda *a, **k: [v6, v4])
+    preferir_ipv4()
+    preferir_ipv4()  # chamar de novo não embrulha duas vezes
+    assert socket.getaddrinfo("youtube.googleapis.com", 443) == [v4, v6]
+    assert socket.getaddrinfo.__wrapped__.__name__ == "<lambda>"
