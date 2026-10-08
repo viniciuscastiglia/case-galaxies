@@ -151,5 +151,20 @@ class FakeYT:
         return self.secoes.get(kw["channelId"], {"items": []})
 
     def _search(self, kw):
-        cid = self.buscas.get(kw["q"])
-        return {"items": [{"id": {"kind": "youtube#channel", "channelId": cid}}] if cid else []}
+        """buscas[q] é um channel_id ou uma lista deles (um item por resultado, como a API:
+        com type=video, cada item é um vídeo e o canal vem em snippet.channelId)."""
+        achados = self.buscas.get(kw["q"]) or []
+        if isinstance(achados, str):
+            achados = [achados]
+        tipo = kw.get("type", "channel")
+        return {
+            "items": [
+                {
+                    "id": {"kind": "youtube#video", "videoId": f"v{i}"}
+                    if tipo == "video"
+                    else {"kind": "youtube#channel", "channelId": cid},
+                    "snippet": {"channelId": cid},
+                }
+                for i, cid in enumerate(achados)
+            ]
+        }

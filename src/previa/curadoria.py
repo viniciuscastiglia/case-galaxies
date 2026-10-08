@@ -29,6 +29,7 @@ from previa.coletor import (
     listar_ids,
     parse_video,
     playlist_uploads,
+    preferir_ipv4,
     sem_chave,
 )
 
@@ -135,6 +136,114 @@ def buscar_por_nome(cli_busca, nome: str) -> str | None:
     )
     itens = cli_busca.chamar(req).get("items", [])
     return itens[0]["id"]["channelId"] if itens else None
+
+
+def buscar_por_termo(cli_busca, termo: str, modo: str, hoje: datetime) -> list[str]:
+    """Estratégia 4 da aula 1.4: search.list só para descobrir canais, no balde de 100 chamadas
+    por dia. Modo 'canal' busca canais pelo termo. Modo 'video' busca vídeos curtos dos últimos
+    90 dias sobre o termo e devolve quem os postou: acha canais menores e que já estão ativos."""
+    if modo not in ("canal", "video"):
+        raise ValueError(f"modo de busca desconhecido: {modo!r} (use 'canal' ou 'video')")
+    params = {
+        "part": "snippet",
+        "q": termo,
+        "regionCode": "BR",
+        "relevanceLanguage": "pt",
+        "maxResults": 50,
+    }
+    if modo == "video":
+        desde = (hoje - timedelta(days=ATIVIDADE_DIAS)).strftime("%Y-%m-%dT00:00:00Z")
+        params |= {"type": "video", "videoDuration": "short", "publishedAfter": desde}
+    else:
+        params["type"] = "channel"
+    itens = cli_busca.chamar(cli_busca.yt.search().list(**params)).get("items", [])
+    return list(dict.fromkeys(it["snippet"]["channelId"] for it in itens))
+
+
+def _passaria(r: dict) -> bool:
+    """Pré-filtro com os metadados do channels.list (1 unidade a cada 50 canais): quem já reprova
+    aqui não gasta as até 21 unidades da avaliação completa."""
+    pais_ok = _vazio(r.get("pais")) or r["pais"] == "BR"
+    return (
+        pais_ok
+        and not _vazio(r.get("handle"))
+        and not _vazio(r.get("inscritos"))
+        and r["n_videos"] >= MIN_SHORTS
+    )
+
+
+COLUNAS_BUSCAS = [
+    "termo",
+    "setor",
+    "modo",
+    "buscado_em",
+    "resultados",
+    "ja_conhecidos",
+    "pre_filtrados",
+    "novos",
+]
+
+
+def descobrir_por_busca(
+    cli,
+    cli_busca,
+    termos: pd.DataFrame,
+    planilha: pd.DataFrame,
+    candidatos: pd.DataFrame,
+    ja_buscados: pd.DataFrame,
+    hoje: datetime,
+) -> tuple[pd.DataFrame, pd.DataFrame]:
+    """termos: colunas termo, setor, modo. Devolve os candidatos novos e o registro de cada busca
+    (vai para o data card: a busca também tem viés de seleção). Pula os termos já buscados e para
+    quando o balde de busca, a cota geral ou a rede falham: o que já foi buscado fica."""
+    feitos = set(zip(ja_buscados["termo"], ja_buscados["modo"], strict=True))
+    ids_vistos = set(planilha["channel_id"].dropna())
+    handles_vistos = set(candidatos["handle"].dropna().map(normalizar_handle))
+    handles_vistos |= set(planilha["handle"].dropna().map(normalizar_handle))
+    novos, registro = [], []
+    for t in termos.to_dict("records"):
+        if (t["termo"], t["modo"]) in feitos:
+            continue
+        try:
+            achados = buscar_por_termo(cli_busca, t["termo"], t["modo"], hoje)
+            ineditos = [c for c in achados if c not in ids_vistos]
+            canais = atualizar_em_lote(cli, ineditos).to_dict("records") if ineditos else []
+        except (CotaEsgotada, OSError, httplib2.HttpLib2Error):
+            break  # amanhã continua: o termo não entrou no registro
+        ids_vistos |= set(ineditos)
+        conhecidos_por_handle, aprovados = 0, 0
+        for r in canais:
+            h = None if _vazio(r.get("handle")) else normalizar_handle(r["handle"])
+            if h in handles_vistos:
+                conhecidos_por_handle += 1
+            elif _passaria(r):
+                handles_vistos.add(h)
+                aprovados += 1
+                novos.append(
+                    {
+                        "handle": h,
+                        "nome": r["titulo"],
+                        "setor": t["setor"],
+                        "tipo": "",
+                        "fonte": f"busca:{t['modo']}",
+                        "observacao": f"termo: {t['termo']}",
+                    }
+                )
+        conhecidos = len(achados) - len(ineditos) + conhecidos_por_handle
+        registro.append(
+            {
+                "termo": t["termo"],
+                "setor": t["setor"],
+                "modo": t["modo"],
+                "buscado_em": hoje.date().isoformat(),
+                "resultados": len(achados),
+                "ja_conhecidos": conhecidos,
+                "pre_filtrados": len(achados) - conhecidos - aprovados,
+                "novos": aprovados,
+            }
+        )
+    colunas = ["handle", "nome", "setor", "tipo", "fonte", "observacao"]
+    return pd.DataFrame(novos, columns=colunas), pd.DataFrame(registro, columns=COLUNAS_BUSCAS)
 
 
 def faixa(inscritos) -> str | None:
@@ -321,6 +430,11 @@ def expandir(
     return pd.DataFrame(novos, columns=colunas).drop_duplicates("handle")
 
 
+def _cliente_busca(yt) -> Cliente:
+    """search.list tem balde próprio de 100 chamadas por dia (aula 1.4): 90, para sobrar margem."""
+    return Cliente(yt, limite=90, arquivo=DADOS / "cota_busca.json")
+
+
 def _executar(args, yt, cli, hoje: datetime) -> None:
     caminho_cand, caminho_plan = DADOS / "candidatos.csv", DADOS / "canais.csv"
     candidatos = pd.read_csv(caminho_cand, dtype=str).fillna("")
@@ -334,9 +448,28 @@ def _executar(args, yt, cli, hoje: datetime) -> None:
         pd.concat([candidatos, novos], ignore_index=True).to_csv(caminho_cand, index=False)
         print(f"{len(novos)} candidatos novos anexados a {caminho_cand}")
         return
-    cli_busca = None
-    if args.buscar_faltantes:
-        cli_busca = Cliente(yt, limite=90, arquivo=DADOS / "cota_busca.json")
+    if args.acao == "buscar":
+        caminho_reg = DADOS / "buscas.csv"
+        ja = (
+            pd.read_csv(caminho_reg, dtype=str)
+            if caminho_reg.exists()
+            else pd.DataFrame(columns=COLUNAS_BUSCAS)
+        )
+        termos = pd.read_csv(DADOS / "termos_busca.csv", dtype=str)
+        novos, registro = descobrir_por_busca(
+            cli, _cliente_busca(yt), termos, planilha, candidatos, ja, hoje
+        )
+        pd.concat([candidatos, novos], ignore_index=True).to_csv(caminho_cand, index=False)
+        pd.concat([ja, registro], ignore_index=True).to_csv(caminho_reg, index=False)
+        print(registro.to_string(index=False))
+        buscados = pd.concat([ja, registro])
+        feitos = set(zip(buscados["termo"], buscados["modo"], strict=True))
+        faltam = sum(par not in feitos for par in zip(termos["termo"], termos["modo"], strict=True))
+        print(f"{len(novos)} candidatos novos anexados a {caminho_cand}")
+        if faltam > 0:
+            print(f"{faltam} termos ficaram para a próxima rodada (balde de busca, cota ou rede)")
+        return
+    cli_busca = _cliente_busca(yt) if args.buscar_faltantes else None
     pendentes = novos_candidatos(candidatos, planilha)
     avaliados = avaliar_candidatos(cli, pendentes, hoje, cli_busca)
     planilha = pd.concat([planilha, avaliados], ignore_index=True).reindex(columns=COLUNAS)
@@ -355,7 +488,7 @@ def main(argv=None) -> int:
     from googleapiclient.discovery import build
 
     parser = argparse.ArgumentParser(prog="python -m previa.curadoria")
-    parser.add_argument("acao", choices=["avaliar", "expandir"])
+    parser.add_argument("acao", choices=["avaliar", "expandir", "buscar"])
     parser.add_argument(
         "--buscar-faltantes",
         action="store_true",
@@ -369,6 +502,7 @@ def main(argv=None) -> int:
             file=sys.stderr,
         )
         return 2
+    preferir_ipv4()
     yt = build("youtube", "v3", developerKey=chave, cache_discovery=False)
     cli, hoje = Cliente(yt), datetime.now(timezone.utc)
     try:

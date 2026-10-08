@@ -10,7 +10,9 @@ from previa.curadoria import (
     atualizar_em_lote,
     avaliar_canal,
     avaliar_candidatos,
+    buscar_por_termo,
     canais_em_destaque,
+    descobrir_por_busca,
     estratificar,
     expandir,
     handles_em_textos,
@@ -315,3 +317,134 @@ def test_expandir_aguenta_canal_em_destaque_sem_handle(tmp_path):
     )
     novos = expandir(Cliente(yt, arquivo=None), con, planilha, pd.DataFrame({"handle": []}))
     assert novos["handle"].tolist() == ["@destaque"]
+
+
+# --- busca de canais por termo (estratégia 4 da aula 1.4) --------------------------------
+
+
+def test_buscar_por_termo_modo_canal_devolve_canais_sem_repetir():
+    yt = FakeYT(buscas={"maquiagem barata": ["UCa", "UCb", "UCa"]})
+    achados = buscar_por_termo(Cliente(yt, arquivo=None), "maquiagem barata", "canal", HOJE)
+    assert achados == ["UCa", "UCb"]
+    _, kw = yt.chamadas[0]
+    assert kw["type"] == "channel"
+    assert (kw["regionCode"], kw["relevanceLanguage"], kw["maxResults"]) == ("BR", "pt", 50)
+
+
+def test_buscar_por_termo_modo_video_acha_quem_postou_shorts_recentes():
+    yt = FakeYT(buscas={"cronograma capilar": ["UCa", "UCa", "UCb"]})
+    achados = buscar_por_termo(Cliente(yt, arquivo=None), "cronograma capilar", "video", HOJE)
+    assert achados == ["UCa", "UCb"]
+    _, kw = yt.chamadas[0]
+    assert (kw["type"], kw["videoDuration"]) == ("video", "short")
+    assert kw["publishedAfter"] == "2026-07-02T00:00:00Z"  # 90 dias: o critério de atividade
+
+
+def _termos(*linhas):
+    return pd.DataFrame(linhas, columns=["termo", "setor", "modo"])
+
+
+def test_descobrir_por_busca_ignora_conhecidos_e_quem_nao_passaria_nos_criterios():
+    conhecido, novo, portugues, poucos, oculto = (f"UC{n:0>22}" for n in "abcde")
+    yt = FakeYT(
+        buscas={"maquiagem barata": [conhecido, novo, portugues, poucos, oculto]},
+        canais={
+            novo: canal(novo, handle="@NovaCriadora", pais=None),
+            portugues: canal(portugues, handle="@tuga", pais="PT"),
+            poucos: canal(poucos, handle="@poucos", n_videos="12"),
+            oculto: canal(oculto, handle="@oculto", oculto=True),
+        },
+    )
+    planilha = pd.DataFrame({"channel_id": [conhecido], "handle": ["@conhecido"]})
+    novos, registro = descobrir_por_busca(
+        Cliente(yt, arquivo=None),
+        Cliente(yt, arquivo=None),
+        _termos(("maquiagem barata", "beleza", "video")),
+        planilha,
+        pd.DataFrame({"handle": []}),
+        pd.DataFrame(columns=["termo", "modo"]),
+        HOJE,
+    )
+    assert novos.to_dict("records") == [
+        {
+            "handle": "@novacriadora",
+            "nome": "Lumina Beauty",
+            "setor": "beleza",
+            "tipo": "",
+            "fonte": "busca:video",
+            "observacao": "termo: maquiagem barata",
+        }
+    ]
+    linha = registro.iloc[0]
+    assert (linha["resultados"], linha["ja_conhecidos"], linha["pre_filtrados"]) == (5, 1, 3)
+    assert linha["novos"] == 1 and linha["buscado_em"] == "2026-09-30"
+
+
+def test_descobrir_por_busca_nao_repete_termo_nem_candidato():
+    novo = "UCnovo000000000000000000"
+    yt = FakeYT(
+        buscas={"skincare": [novo], "rotina de skincare": [novo]},
+        canais={novo: canal(novo, handle="@nova")},
+    )
+    ja_buscados = pd.DataFrame({"termo": ["skincare"], "modo": ["canal"]})
+    novos, registro = descobrir_por_busca(
+        Cliente(yt, arquivo=None),
+        Cliente(yt, arquivo=None),
+        _termos(("skincare", "beleza", "canal"), ("rotina de skincare", "beleza", "canal")),
+        pd.DataFrame({"channel_id": [], "handle": []}),
+        pd.DataFrame({"handle": ["@nova"]}),
+        ja_buscados,
+        HOJE,
+    )
+    assert yt.n("search") == 1  # "skincare" já tinha sido buscado
+    assert novos.empty and registro["ja_conhecidos"].tolist() == [1]
+
+
+def test_balde_de_busca_esgotado_devolve_o_que_ja_foi_buscado():
+    a, b = "UCa00000000000000000000a", "UCb00000000000000000000b"
+    yt = FakeYT(
+        buscas={"termo a": [a], "termo b": [b]},
+        canais={a: canal(a, handle="@a"), b: canal(b, handle="@b")},
+    )
+    novos, registro = descobrir_por_busca(
+        Cliente(yt, arquivo=None),
+        Cliente(yt, limite=1, arquivo=None),
+        _termos(("termo a", "beleza", "canal"), ("termo b", "beleza", "canal")),
+        pd.DataFrame({"channel_id": [], "handle": []}),
+        pd.DataFrame({"handle": []}),
+        pd.DataFrame(columns=["termo", "modo"]),
+        HOJE,
+    )
+    assert novos["handle"].tolist() == ["@a"]
+    assert registro["termo"].tolist() == ["termo a"]
+
+
+def test_main_buscar_anexa_candidatos_e_registra_as_buscas(tmp_path, monkeypatch):
+    import previa.curadoria as curadoria
+
+    monkeypatch.chdir(tmp_path)
+    dados = tmp_path / "data"
+    dados.mkdir()
+    (dados / "candidatos.csv").write_text(
+        "handle,nome,setor,tipo,fonte,observacao\n@luminabeauty,Lumina,beleza,marca,lista manual,\n"
+    )
+    (dados / "termos_busca.csv").write_text("termo,setor,modo\nskincare,beleza,canal\n")
+    monkeypatch.setenv("YOUTUBE_API_KEY", "AIzaSEGREDO")
+    novo = {
+        "handle": "@nova",
+        "nome": "Nova",
+        "setor": "beleza",
+        "tipo": "",
+        "fonte": "busca:canal",
+        "observacao": "termo: skincare",
+    }
+    feito = {"termo": "skincare", "setor": "beleza", "modo": "canal", "novos": 1}
+
+    def falso(cli, cli_busca, termos, planilha, candidatos, ja_buscados, hoje):
+        assert termos["termo"].tolist() == ["skincare"] and ja_buscados.empty
+        return pd.DataFrame([novo]), pd.DataFrame([feito])
+
+    monkeypatch.setattr(curadoria, "descobrir_por_busca", falso)
+    assert curadoria.main(["buscar"]) == 0
+    assert pd.read_csv(dados / "candidatos.csv")["handle"].tolist() == ["@luminabeauty", "@nova"]
+    assert pd.read_csv(dados / "buscas.csv")["termo"].tolist() == ["skincare"]

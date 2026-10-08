@@ -7,11 +7,12 @@ CAMINHO = Path(__file__).parents[1] / "data" / "candidatos.csv"
 
 def checar_candidatos(df: pd.DataFrame) -> None:
     """A lista manual segue o mix do plano; as linhas da expansão (colab, destaque) chegam com
-    setor e tipo vazios, que a revisão humana preenche na planilha de curadoria."""
+    setor e tipo vazios, e as da busca por termo, com o setor do termo; a revisão preenche o resto
+    na planilha de curadoria."""
     assert list(df.columns) == ["handle", "nome", "setor", "tipo", "fonte", "observacao"]
     assert df["handle"].str.startswith("@").all()
     assert df["handle"].str.lower().is_unique
-    assert set(df["fonte"]) <= {"lista manual", "colab", "destaque"}
+    assert set(df["fonte"]) <= {"lista manual", "colab", "destaque", "busca:canal", "busca:video"}
     manual = df[df["fonte"] == "lista manual"]
     assert set(manual["setor"]) == {"beleza", "automotivo"}
     assert set(manual["tipo"]) == {"marca", "criador"}

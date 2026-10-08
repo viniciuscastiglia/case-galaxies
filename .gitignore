@@ -12,6 +12,8 @@ __pycache__/
 data/*
 !data/canais.csv
 !data/candidatos.csv
+!data/termos_busca.csv
+!data/buscas.csv
 *.duckdb
 *.duckdb.wal
 *.parquet
