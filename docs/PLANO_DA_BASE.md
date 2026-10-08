@@ -33,6 +33,55 @@ itens 3 a 6; os itens 1, 2 e 7 são conferidos na revisão humana.
 6. **Inscritos visíveis:** o canal não esconde o número de inscritos.
 7. **Exclusões:** canais de cortes ou reuploads, compilações, agregadores e conteúdo infantil.
 
+## Expansão por busca (08/10)
+
+Decisão do Claude, delegada pelo Vinicius em 08/10. Com 52 canais, a base estava abaixo da meta (60+) e sem nenhum
+criador de beleza com menos de 100 mil inscritos. As estratégias gratuitas da aula 1.4 (handles citados nas
+descrições e canais em destaque) renderam 30 candidatos e nenhuma inclusão: a maioria dos @ citados é do Instagram.
+
+- **Estratégia 4 da aula 1.4:** `python -m previa.curadoria buscar` lê `data/termos_busca.csv` e usa o `search.list`
+  só para descobrir canais, no balde próprio de 100 chamadas por dia. Cada busca fica em `data/buscas.csv`.
+- **Termos de nicho, não genéricos:** o ranking de relevância favorece canais grandes. "Maquiagem" devolve as
+  gigantes que já estão na base; "maquiagem de farmácia" ou "cabelo cacheado finalização" puxam criadores menores.
+- **Modo vídeo** (fora da caixa, dentro da regra da aula): busca vídeos curtos dos últimos 90 dias sobre o termo e
+  fica com o canal de quem postou. Acha quem posta Shorts com frequência, que é o que os critérios 3 e 4 pedem.
+- **Pré-filtro com metadados** (1 unidade a cada 50 canais): país diferente de BR, inscritos ocultos ou menos de 30
+  vídeos no total não passariam nos critérios, e não gastam a avaliação completa (até 21 unidades por canal).
+
+**Regra de seleção**, escrita antes de ver quem passou na avaliação:
+
+1. Só entra quem passa nos critérios automáticos (3 a 6) e na revisão (1, 2 e 7), feita pela descrição do canal e
+   pelos títulos dos uploads recentes.
+2. Teto do plano: até 70 canais, cerca de metade em cada setor (até 35 por setor).
+3. Prioridade das vagas: criadores de beleza entre 10 mil e 1 milhão de inscritos (a lacuna principal), depois
+   criadores de automotivo entre 10 e 100 mil, depois o que equilibrar setor × tipo × faixa.
+4. Dentro de um estrato: no máximo 3 canais vindos do mesmo termo, para variar os nichos, e a ordem da busca como
+   desempate. Curtidas e visualizações nunca entram na escolha.
+5. Quem passa mas fica sem vaga vira `não` com o motivo "reserva". A reserva serve para os criativos de teste da
+   demo, que o briefing pede de canais fora do treino.
+
+**Resultado (08/10).** 24 termos (18 de beleza, 6 de automotivo), 24 chamadas de busca e ~8.500 unidades da cota
+geral na avaliação.
+
+| Etapa | Canais |
+| :--- | ---: |
+| Candidatos novos da busca, depois do pré-filtro | 614 |
+| Reprovados nos critérios automáticos (53 com menos de 30 Shorts, 34 inativos, 11 com curtidas ocultas) | 98 |
+| Passaram nos critérios automáticos | 516 |
+| Revistos (os 3 primeiros de cada termo nos estratos prioritários) | 65 |
+| Recusados na revisão: inglês, fora do setor, compilações, divulgação de apostas | 22 |
+| **Incluídos** | **18** |
+| Reserva revista / reserva sem revisão | 25 / 451 |
+
+Na prática, a regra 4 virou uma divisão das 13 vagas de beleza por nicho (maquiagem 4, pele 3, cabelo 3, perfumaria
+2, cuidados masculinos 1) e por faixa (6 entre 100 mil e 1 milhão, 7 entre 10 e 100 mil), na ordem da busca. Essa
+divisão foi decidida depois da revisão, sem olhar curtidas. As 5 vagas de automotivo foram para 4 criadores entre 10 e
+100 mil e uma loja de estética automotiva, porque a célula de marcas de automotivo nessa faixa tinha só 1 canal.
+
+A base passou de 52 para **70 canais, 35 por setor**. Os criadores de beleza foram de 7 para 20, e a faixa de 10 a 100
+mil, que estava vazia, agora tem 7 criadores de beleza. A primeira coleta dos 18 canais novos fica para a coleta
+diária de 09/10, com a cota cheia.
+
 ## Fontes
 
 | Fonte | Papel | O que não representa |
@@ -53,6 +102,8 @@ Lista do Vinicius em 05/10 (exercício da aula 1.3), com os complementos da revi
   aula 1.2).
 - **Outros setores, países e idiomas:** só beleza e automotivo, canais brasileiros, em português.
 - **Canais pequenos:** a lista inicial foi feita de memória e favorece canais grandes (viés de sobrevivência, risco 3).
+  A busca de 08/10 trouxe criadores entre 10 e 100 mil inscritos, mas ainda não há nenhum criador com menos de 10 mil.
+  A própria busca tem viés: o ranking de relevância do YouTube decide quem aparece primeiro.
 - **Mídia paga:** a API não diz se um Short foi impulsionado, então parte das curtidas pode vir de anúncio.
 
 ## Custo em cota
@@ -85,3 +136,6 @@ A cota diária é de 10 mil unidades. O coletor para sozinho em 9 mil, para sobr
 3. **Viés de sobrevivência:** uma lista de memória favorece canais grandes. Mitigação: expansão por colabs e destaques,
    e a coluna `fonte`, que permite medir depois se o modelo erra mais nos canais de uma origem.
 4. **Mac dormindo às 05h15.** Mitigação: o launchd roda a coleta quando o Mac acorda, e a coleta é idempotente.
+5. **Rede:** em 08/10 a rota IPv6 até o Google parou de responder, e cada chamada da API esperava quatro timeouts
+   antes de tentar o IPv4 (o `curl` da checagem de rede não sofre com isso). Mitigação: `preferir_ipv4()` no início
+   do coletor e da curadoria, com o IPv6 de reserva.
