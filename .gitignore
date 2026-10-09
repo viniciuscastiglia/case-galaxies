@@ -21,6 +21,7 @@ media/
 
 # experimentos e estado local
 mlruns/
+mlflow.db
 cota.json
 *.log
 .DS_Store
