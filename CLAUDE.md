@@ -55,8 +55,10 @@ O Vinicius está no primeiro projeto de AI Engineering. **Aprender é o objetivo
 1. **O número vem sempre do modelo.** O LLM orquestra, extrai atributos e explica; um teste prova que o número do
    agente é o número do modelo.
 2. **Sem vazamento.** Feature só com o que existe antes da publicação: histórico do canal só com posts anteriores
-   (`shift` + `expanding`); PCA, escalas e encoders ajustados só no treino; inscritos do dia da coleta fora das
-   features de treino; views, curtidas e comentários do próprio vídeo nunca viram feature.
+   **e maduros** (publicados ao menos 30 dias antes; `shift` + `expanding` sozinhos ainda vazam o alvo imaturo,
+   aula 2.2), calculado sobre todos os posts do canal, nunca só os do teto; PCA, escalas e encoders ajustados só
+   no treino; inscritos do dia da coleta fora das features de treino; views, curtidas e comentários do próprio
+   vídeo nunca viram feature; o período de teste só abre na avaliação final (`carregar_base(final=True)`).
 3. **Validação temporal** (holdout com gap e walk-forward) e **por canal** para "cliente novo". KFold aleatório nunca
    é métrica final.
 4. **Paridade treino/uso:** a mesma função calcula cada feature no treino e na previsão.
@@ -89,6 +91,24 @@ O Vinicius está no primeiro projeto de AI Engineering. **Aprender é o objetivo
   desliga em 30/10 (apagamento). Pendente até 30/10: inscritos da API versionados em `data/canais.csv`. Para o
   módulo 3: experimento sobre a idade do rótulo (variável de controle × janela da mediana), viés 3 do data card.
   Próximo estudo: 2.1.
+- 08/10 (noite): conferência do material da liga contra o repositório (módulos 1 e 2 inteiros, hub, trechos de 3 a
+  6). Feito: ambiente do módulo 2 (lightgbm, mlflow, pyyaml; Homebrew 7.0.9 e `libomp` instalados; os passos 2
+  a 4 da aula 2.1 reproduzem os números da aula na base sintética); exportação
+  **sem teto** (22.172 Shorts; o teto vira parâmetro do experimento); coluna `duplicate_group` (573 grupos, 974
+  cópias, concentradas em Principia e Mundo do Automóvel para PCD, com títulos de código de anúncio); trava do
+  teste em `configs/avaliacao.yaml` (provisória: desde 01/04/2026); `previa.sintetico.gerar_base()` para os
+  exercícios do módulo 2. Agenda: **até 11/10** (depois da 2.4), decidir o teto e o peso dos canais nas métricas
+  intra-canal (num teste desde 01/04, Mobiauto, Mundo do Automóvel para PCD e Principia somam 61% dos pares do
+  par-a-par); a regra das duplicatas; a data de início do treino (236 rotulados são de antes de set/2020). **12/10**
+  congelar. **Até 16/10** conferir 50 classificações de Short a olho (aula 1.5). **19 a 26/10** medir a maturação
+  com 2 a 3 semanas entre snapshots (aula 1.7; hoje só há 1 a 3 dias) e escolher a lacuna (aula 3.5).
+  Pendências pequenas da conferência: no README, o `TODO` do porquê do alvo e "posts anteriores **e maduros**"
+  (texto do Vinicius, no exercício da 2.2); critério de sucesso com o cenário "canal novo no futuro" (aula 2.3) e
+  a cobertura do intervalo; escolher a convenção de faixas (quantis do canal, aula 1.6, × cortes fixos, aula
+  2.4); o exercício da 1.7 (`auditar_datas`) junto com a tabela de auditoria da 2.2.
+- 09/10: estudo das métricas da 2.1 (MAE em log, Spearman global e intra-canal), com teach-back em
+  `estudos/aula_2_1_metricas.md`. O que funcionou: construir a "régua" do log com curtidas (cada dobra = +0,69) e
+  o exemplo de dois canais (modelo que só sabe o canal: global 0,88, intra 0). Próximo: exercício da 2.1.
 - Ritmo combinado em 08/10 (~1 semana atrás no núcleo de ML): ~2 aulas por dia, cada uma com a peça implementada.
   08–09/10 módulo 1; 10–13/10 módulos 2 e 3 → **marco: GBM batendo o baseline no teste temporal até 13/10**;
   14–16/10 `prever_criativo` + MCP mínimo; 17–20/10 intervalo, SHAP e multimodal numa amostra; 21–23/10 docs e
@@ -107,6 +127,10 @@ uv run python -m previa.curadoria buscar   # busca por termo (data/termos_busca.
 ./scripts/coletar.sh                       # coleta diária (carrega o .env; log em data/logs/coleta.log)
 ```
 
+Nos experimentos, a base entra por `previa.dados.carregar_base()`, que não devolve o período de teste
+(`configs/avaliacao.yaml`); `carregar_base(final=True)` abre o teste, avisa e registra em
+`data/logs/teste_aberto.log`. Os exercícios do módulo 2 usam `from previa.sintetico import gerar_base`.
+
 Nunca mostre a chave em saída de terminal ou log. Erros da API do Google trazem a URL com `key=`; use
 `previa.coletor.sem_chave` antes de imprimir qualquer mensagem de erro.
 
@@ -121,7 +145,8 @@ Nunca mostre a chave em saída de terminal ou log. Erros da API do Google trazem
 - Mac M4 com 16 GB de RAM e ~52 GB livres: mídia em fluxo (baixa, extrai, apaga).
 - yt-dlp: só do IP de casa, com Deno instalado e `yt-dlp[default]`, em ritmo lento.
 - MediaPipe aborta no Apple Silicon: detecção de rosto no Colab ou no Kaggle.
-- `mlflow ui`: a porta 5000 é do AirPlay, use `--port 5001`. O LightGBM pode pedir `libomp`.
+- `mlflow ui`: a porta 5000 é do AirPlay, use `--port 5001`. O LightGBM precisa do `libomp` (Homebrew, desde
+  08/10; se um venv novo reclamar, `brew install libomp`).
 - A cota do YouTube zera à meia-noite do Pacífico: 4h de Brasília até 01/11, 5h depois.
 
 ## Calendário
