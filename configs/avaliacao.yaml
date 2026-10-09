@@ -1,0 +1,8 @@
+# Avaliação (aulas 1.2, 2.3 e 2.5). Lido por previa.dados.carregar_base.
+#
+# TRAVA PROVISÓRIA (08/10/2026): tudo o que foi publicado a partir de teste_inicio (00h UTC)
+# fica fora do desenvolvimento até a avaliação final (carregar_base(final=True)).
+# A reserva é de sobra de propósito: na aula 2.3, o Vinicius escolhe as datas definitivas de
+# treino, gap, calibração e teste, e a trava se ajusta, porque nenhuma métrica terá sido
+# olhada neste período.
+teste_inicio: "2026-04-01"
