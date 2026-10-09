@@ -11,6 +11,7 @@ from previa.coletor import (
     CotaEsgotada,
     abrir_base,
     atualizar_snapshots,
+    auditoria_de_retencao,
     buscar_canais,
     buscar_videos,
     coletar,
@@ -385,3 +386,60 @@ def test_preferir_ipv4_poe_o_ipv4_na_frente_e_mantem_o_ipv6_de_reserva(monkeypat
     preferir_ipv4()  # chamar de novo não embrulha duas vezes
     assert socket.getaddrinfo("youtube.googleapis.com", 443) == [v4, v6]
     assert socket.getaddrinfo.__wrapped__.__name__ == "<lambda>"
+
+
+def test_auditoria_de_retencao_acha_quem_passou_de_30_dias_sem_refresh(tmp_path):
+    """Regra dos 30 dias (III.E.4.d, aula 1.8): conta o snapshot MAIS RECENTE de cada vídeo."""
+    con = abrir_base(tmp_path / "t.duckdb")
+    agora = datetime(2026, 10, 20, 12, tzinfo=timezone.utc)
+    salvar(
+        con,
+        [
+            parse_video(
+                video("velhoAAAAAA", "2026-08-01T12:00:00Z", "PT30S"), agora - timedelta(days=31)
+            )
+        ],
+    )
+    salvar(
+        con,
+        [
+            parse_video(
+                video("renovadoAAA", "2026-08-01T12:00:00Z", "PT30S"), agora - timedelta(days=40)
+            )
+        ],
+    )
+    salvar(
+        con,
+        [
+            parse_video(
+                video("renovadoAAA", "2026-08-01T12:00:00Z", "PT30S"), agora - timedelta(days=2)
+            )
+        ],
+    )
+    assert auditoria_de_retencao(con, agora=agora) == ["velhoAAAAAA"]
+
+
+def _main_com(monkeypatch, tmp_path, vencidos):
+    import previa.coletor as coletor
+    import previa.esquema as esquema
+
+    monkeypatch.chdir(tmp_path)
+    (tmp_path / "data").mkdir()
+    (tmp_path / "data" / "canais.csv").write_text(f"channel_id,incluido\n{CANAL_ID},sim\n")
+    monkeypatch.setenv("YOUTUBE_API_KEY", "AIzaSEGREDO")
+    resumo = {"falhas": {}, "parou_por_cota": None}
+    monkeypatch.setattr(coletor, "coletar", lambda *a, **k: dict(resumo))
+    monkeypatch.setattr(coletor, "exportar_rotulados", lambda con: 7)
+    monkeypatch.setattr(esquema, "exportar_base_minima", lambda con: 7)
+    monkeypatch.setattr(coletor, "auditoria_de_retencao", lambda con: vencidos)
+    return coletor.main()
+
+
+def test_main_valida_a_base_minima_a_cada_execucao(tmp_path, monkeypatch, capsys):
+    assert _main_com(monkeypatch, tmp_path, vencidos=[]) == 0
+    linha = capsys.readouterr().out
+    assert '"base_minima": 7' in linha and '"retencao_vencidos": 0' in linha
+
+
+def test_main_falha_alto_se_algum_dado_passou_de_30_dias(tmp_path, monkeypatch):
+    assert _main_com(monkeypatch, tmp_path, vencidos=["velhoAAAAAA"]) == 1

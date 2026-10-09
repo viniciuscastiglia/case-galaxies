@@ -16,7 +16,7 @@ import re
 import socket
 import sys
 import traceback
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
@@ -406,6 +406,21 @@ def renovar_vencidos(cli, con, prazo_dias: int = 25) -> dict:
     return {"renovados": len(voltaram), "apagados": len(sumiram)}
 
 
+def auditoria_de_retencao(con, prazo_dias: int = 30, agora=None) -> list[str]:
+    """Regra dos 30 dias (III.E.4.d, aula 1.8): vídeos cujo snapshot mais recente passou do
+    prazo. Deve vir vazia, porque renovar_vencidos renova com 25 dias; se não vier (a coleta
+    parou por cota antes da renovação, ou o Mac ficou dias desligado), a execução falha alto."""
+    corte = (agora or datetime.now(timezone.utc)) - timedelta(days=prazo_dias)
+    return [
+        r[0]
+        for r in con.execute(
+            "SELECT video_id FROM snapshots GROUP BY video_id HAVING max(collected_at) < ?"
+            " ORDER BY video_id",
+            [corte],
+        ).fetchall()
+    ]
+
+
 def ler_canais(caminho=DADOS / "canais.csv") -> list[str]:
     """IDs dos canais com incluido == 'sim' na planilha de curadoria (aula 1.4)."""
     planilha = pd.read_csv(caminho, dtype=str)
@@ -442,6 +457,8 @@ def coletar(cli, con, channel_ids: list[str]) -> dict:
 def main() -> int:
     from googleapiclient.discovery import build
 
+    from previa import esquema  # aqui dentro: o esquema importa o coletor
+
     chave = os.environ.get("YOUTUBE_API_KEY")
     if not chave:
         print(
@@ -456,6 +473,9 @@ def main() -> int:
     try:
         resumo = coletar(cli, con, ler_canais())
         resumo["rotulados"] = exportar_rotulados(con)
+        # pandera a cada exportação (aula 1.8): erro aqui se corrige na coleta, não na validação
+        resumo["base_minima"] = esquema.exportar_base_minima(con)
+        resumo["retencao_vencidos"] = len(auditoria_de_retencao(con))
     except Exception:  # erro inesperado: registra sem a chave e sai com falha
         print(inicio.isoformat(), sem_chave(traceback.format_exc()), file=sys.stderr)
         return 1
@@ -463,7 +483,7 @@ def main() -> int:
     print(inicio.isoformat(), json.dumps(resumo, ensure_ascii=False))
     if resumo["parou_por_cota"]:
         return 3
-    return 1 if resumo["falhas"] else 0
+    return 1 if resumo["falhas"] or resumo["retencao_vencidos"] else 0
 
 
 if __name__ == "__main__":
