@@ -82,16 +82,24 @@ O Vinicius está no primeiro projeto de AI Engineering. **Aprender é o objetivo
 - 08/10: expansão de canais delegada ao Claude. Comando `buscar` (estratégia 4 da aula 1.4, modos canal e vídeo):
   24 termos, 614 candidatos, 18 incluídos na revisão. Base: **70 canais, 35 por setor**; criadores de beleza de 7
   para 20. Funil e decisões no `docs/PLANO_DA_BASE.md` ("Expansão por busca"). Correção de rede: `preferir_ipv4()`
-  (a rota IPv6 até o Google caiu). Nada commitado ainda.
+  (a rota IPv6 até o Google caiu). Commitado (3 commits).
 - Próximo (09/10): conferir a primeira coleta dos 18 canais novos (coleta das 5h15); congelar a base de treino em
-  12/10; decisões do plano ainda abertas (teto de 400, motos). Estudo: aulas 1.5 a 1.8 e 2.1.
+  12/10; decisões do plano ainda abertas (teto de 400, motos). **Módulo 1 fechado em 08/10:** `docs/DATA_CARD.md`
+  v0.1 com os vieses do Vinicius; a coleta diária valida a base mínima com pandera, audita a regra dos 30 dias e
+  desliga em 30/10 (apagamento). Pendente até 30/10: inscritos da API versionados em `data/canais.csv`. Para o
+  módulo 3: experimento sobre a idade do rótulo (variável de controle × janela da mediana), viés 3 do data card.
+  Próximo estudo: 2.1.
+- Ritmo combinado em 08/10 (~1 semana atrás no núcleo de ML): ~2 aulas por dia, cada uma com a peça implementada.
+  08–09/10 módulo 1; 10–13/10 módulos 2 e 3 → **marco: GBM batendo o baseline no teste temporal até 13/10**;
+  14–16/10 `prever_criativo` + MCP mínimo; 17–20/10 intervalo, SHAP e multimodal numa amostra; 21–23/10 docs e
+  demo. Fora: VLM (camada 2), LangGraph completo, módulo 7. Se o marco escorregar, corta-se o multimodal.
 
 ## Comandos (atualize quando existirem)
 
 ```bash
 uv sync                                    # ambiente: Python 3.12 e versões da Stack 2026
 uv run pytest
-uv run ruff check . && uv run ruff format .
+uv run ruff check . && uv run ruff format src tests   # estudos/ fica com a formatação do Vinicius
 set -a; source .env; set +a                # carrega a YOUTUBE_API_KEY no terminal
 uv run python -m previa.curadoria avaliar --buscar-faltantes   # avalia candidatos novos -> data/canais.csv
 uv run python -m previa.curadoria expandir # candidatos novos por colabs e canais em destaque
