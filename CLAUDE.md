@@ -97,15 +97,7 @@ O Vinicius está no primeiro projeto de AI Engineering. **Aprender é o objetivo
   **sem teto** (22.172 Shorts; o teto vira parâmetro do experimento); coluna `duplicate_group` (573 grupos, 974
   cópias, concentradas em Principia e Mundo do Automóvel para PCD, com títulos de código de anúncio); trava do
   teste em `configs/avaliacao.yaml` (provisória: desde 01/04/2026); `previa.sintetico.gerar_base()` para os
-  exercícios do módulo 2. Agenda: **até 11/10** (depois da 2.4), decidir o teto e o peso dos canais nas métricas
-  intra-canal (num teste desde 01/04, Mobiauto, Mundo do Automóvel para PCD e Principia somam 61% dos pares do
-  par-a-par); a regra das duplicatas; a data de início do treino (236 rotulados são de antes de set/2020). **12/10**
-  congelar. **Até 16/10** conferir 50 classificações de Short a olho (aula 1.5). **19 a 26/10** medir a maturação
-  com 2 a 3 semanas entre snapshots (aula 1.7; hoje só há 1 a 3 dias) e escolher a lacuna (aula 3.5).
-  Pendências pequenas da conferência: no README, o `TODO` do porquê do alvo e "posts anteriores **e maduros**"
-  (texto do Vinicius, no exercício da 2.2); critério de sucesso com o cenário "canal novo no futuro" (aula 2.3) e
-  a cobertura do intervalo; escolher a convenção de faixas (quantis do canal, aula 1.6, × cortes fixos, aula
-  2.4); o exercício da 1.7 (`auditar_datas`) junto com a tabela de auditoria da 2.2.
+  exercícios do módulo 2. O que falta está na tabela "Pendências da conferência", abaixo.
 - 09/10: estudo das métricas da 2.1 (MAE em log, Spearman global e intra-canal), com teach-back em
   `estudos/aula_2_1_metricas.md`. O que funcionou: construir a "régua" do log com curtidas (cada dobra = +0,69) e
   o exemplo de dois canais (modelo que só sabe o canal: global 0,88, intra 0). Próximo: exercício da 2.1.
@@ -113,6 +105,24 @@ O Vinicius está no primeiro projeto de AI Engineering. **Aprender é o objetivo
   08–09/10 módulo 1; 10–13/10 módulos 2 e 3 → **marco: GBM batendo o baseline no teste temporal até 13/10**;
   14–16/10 `prever_criativo` + MCP mínimo; 17–20/10 intervalo, SHAP e multimodal numa amostra; 21–23/10 docs e
   demo. Fora: VLM (camada 2), LangGraph completo, módulo 7. Se o marco escorregar, corta-se o multimodal.
+
+### Pendências da conferência de 08/10 (atualize; apague a linha quando fechar)
+
+| Pendência | Quando | Quem | Detalhe |
+| :--- | :--- | :--- | :--- |
+| Teto e peso dos canais nas métricas intra-canal | até 11/10, depois da 2.4 | Vinicius | num teste desde 01/04, Mobiauto, Mundo do Automóvel para PCD e Principia somam 61% dos pares do par-a-par (79% na janela de 14 dias); os 3 não têm linha no treino |
+| Regra das duplicatas | até 11/10 | Vinicius | `duplicate_group` já marca; manter uma cópia ou deixar as cópias do mesmo lado do split (aula 2.2). Principia e Mundo do Automóvel para PCD têm títulos de código de anúncio: decidir por critério escrito (aula 1.4), nunca pelas curtidas |
+| Data de início do treino | até 11/10 | Vinicius | 236 rotulados são de antes de set/2020 e 273 de antes de jul/2021: vídeos verticais curtos, não Shorts |
+| Datas definitivas do teste, do gap e da calibração | na 2.3 | Vinicius | ajustar `configs/avaliacao.yaml`; a trava atual (01/04/2026) é provisória |
+| Congelar a base de treino | 12/10 | Claude | versão e hash (aula 2.5) |
+| Conferir 50 classificações de Short a olho | até 16/10 | Claude monta a lista; Vinicius confere | anotar a concordância no data card (aula 1.5) |
+| Mediana madura no código das features | módulo 3 | Vinicius | princípio 2; o tamanho da lacuna sai da maturação (aula 3.5) |
+| Medir a maturação | 19 a 26/10, antes de 30/10 | Claude mede; Vinicius escolhe a lacuna | 2 a 3 semanas entre snapshots (aula 1.7); hoje há só 1 a 3 dias, então o "confirmado" do data card ainda não vale |
+| `HIPOTESES.md` | na 2.5 | Claude monta o modelo; Vinicius escreve | hipótese com métrica e limiar antes de rodar |
+| README: porquê do alvo e "posts anteriores **e maduros**" | no exercício da 2.2 | Vinicius | o texto é dele |
+| README: critério de sucesso | na 2.3 | Vinicius | incluir "canal novo no futuro" e a cobertura do intervalo |
+| Convenção de faixas | na 2.4 | Vinicius | quantis do canal (aula 1.6) × cortes fixos (aula 2.4) |
+| Exercício da 1.7 (`auditar_datas`) | junto com o da 2.2 | Vinicius | vira a tabela de auditoria das features |
 
 ## Comandos (atualize quando existirem)
 
