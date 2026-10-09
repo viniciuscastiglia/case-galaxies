@@ -54,6 +54,8 @@ class BaseShorts(pa.DataFrameModel):
     subscribers_at_collection: Series[pd.Int64Dtype] = pa.Field(ge=0, nullable=True)
     collected_at: Series[pd.DatetimeTZDtype] = pa.Field(dtype_kwargs={"unit": "us", "tz": "UTC"})
     sector: Series[str] = pa.Field(isin=SETORES)
+    # post_id da primeira cópia do mesmo criativo (o próprio post_id quando não há cópia)
+    duplicate_group: Series[str] = pa.Field(str_matches=r"^[A-Za-z0-9_-]{11}$")
 
     @pa.dataframe_check
     def coleta_depois_da_publicacao(cls, df: pd.DataFrame) -> Series[bool]:
@@ -67,6 +69,18 @@ class BaseShorts(pa.DataFrameModel):
     class Config:
         strict = True  # coluna extra ou faltando = erro
         coerce = True  # converte tipos quando possível (ex.: "2410" -> 2410)
+
+
+def grupo_de_duplicatas(rotulados: pd.DataFrame) -> pd.Series:
+    """Duplicatas e reuploads (aula 2.2, família 5): título normalizado (caixa e espaços) e
+    duração iguais marcam o mesmo criativo, inclusive entre canais. Cada post recebe o
+    video_id da primeira cópia publicada. Só marca: a regra (manter uma cópia ou deixar as
+    cópias do mesmo lado do split) é decisão do experimento."""
+    titulo = rotulados["title"].fillna("").str.lower().str.split().str.join(" ")
+    chave = titulo + "|" + rotulados["duration_s"].astype(str)
+    ordem = rotulados.assign(chave=chave).sort_values(["published_at", "video_id"])
+    primeira = ordem.groupby("chave")["video_id"].first()
+    return chave.map(primeira)
 
 
 def montar_base_minima(
@@ -89,6 +103,7 @@ def montar_base_minima(
             "subscribers_at_collection": base["subscribers"].astype("Int64"),
             "collected_at": base["collected_at"],
             "sector": base["channel_id"].map(setores),
+            "duplicate_group": grupo_de_duplicatas(base),
         }
     )
 

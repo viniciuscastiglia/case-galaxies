@@ -15,7 +15,7 @@ cada Short é o primeiro snapshot com 30 dias ou mais.
 | Marcas | pelo menos 10 por setor **[decisão do Vinicius]** | O cliente da Galaxies é a marca (aula 1.4) |
 | Faixas de inscritos | nenhuma faixa vazia entre 10 mil e 1 milhão, em cada setor | A Lumina tem 180 mil inscritos; sem canais desse porte, a previsão vira extrapolação |
 | Volume | 5 a 15 mil Shorts rotulados | Abaixo de 5 mil, o teste temporal fica pequeno demais (aula 1.3) |
-| Teto por canal | 400 Shorts rotulados mais recentes **[decisão do Vinicius]** | Um canal que posta 5 Shorts por dia não pode dominar a base (aula 1.4) |
+| Teto por canal | 400 Shorts rotulados mais recentes **[decisão do Vinicius]**; desde 08/10 aplicado nas linhas de treino, não na exportação | Um canal que posta 5 Shorts por dia não pode dominar a base (aula 1.4) |
 | Rótulo | primeiro snapshot com 30 dias ou mais | Curtidas ainda crescem nas primeiras semanas (aula 1.7) |
 | Setor automotivo | carros, picapes e SUVs: montadoras, varejo e serviços, revistas e criadores; motos ficam fora **[decisão do Vinicius]** | Setor homogêneo e coerente com o que a rubrica do VLM vai perguntar (carro em cena, interior, direção) |
 

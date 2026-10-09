@@ -18,6 +18,7 @@ def _rotulados():
             "published_at": pd.to_datetime(["2026-08-01T22:00:05Z", "2026-08-03T19:00:00Z"]),
             "title": ["1 produto, 20 segundos", "Pele natural em 5 passos"],
             "description": ["Base nova #shorts", ""],
+            "duration_s": [22.0, 55.0],
             "likes": pd.array([2410, 880], dtype="Int64"),
             "age_days": [31.2, 30.5],
             "collected_at": pd.to_datetime(["2026-09-01T03:10:00Z"] * 2),
@@ -41,6 +42,48 @@ def test_base_minima_tem_o_esquema_do_briefing_e_valida():
     assert base.loc[0, "media_ref"] == "https://www.youtube.com/shorts/Lm9Qk2VbT0s"
     assert base.loc[0, "caption"] == "1 produto, 20 segundos\nBase nova #shorts"
     assert base.loc[0, "subscribers_at_collection"] == 180000
+
+
+def test_copias_do_mesmo_criativo_ganham_o_id_da_primeira_copia():
+    """Aula 2.2, família 5 (duplicatas): título normalizado + duração iguais marcam o mesmo
+    criativo, inclusive entre canais (a marca e o influenciador). Só marca, não apaga."""
+    outro = "UCdef456Garagem2200000000"
+    rotulados = pd.DataFrame(
+        {
+            "video_id": ["bbbbbbbbbbb", "kkkkkkkkkkk", "ccccccccccc", "ddddddddddd"],
+            "channel_id": [CANAL_ID, CANAL_ID, outro, CANAL_ID],
+            "published_at": pd.to_datetime(
+                [
+                    "2023-10-24T12:00:00Z",
+                    "2023-09-04T12:00:00Z",
+                    "2023-09-10T12:00:00Z",
+                    "2023-09-05T12:00:00Z",
+                ]
+            ),
+            "title": [
+                "  natura  essencial ATO ",
+                "Natura Essencial Ato",
+                "Natura Essencial Ato",
+                "Natura Essencial Ato",
+            ],
+            "description": [""] * 4,
+            "duration_s": [16.0, 16.0, 16.0, 30.0],
+            "likes": pd.array([10, 20, 30, 40], dtype="Int64"),
+            "age_days": [700.0, 750.0, 745.0, 749.0],
+            "collected_at": pd.to_datetime(["2026-10-05T08:00:00Z"] * 4),
+        }
+    )
+    base = montar_base_minima(
+        rotulados, {CANAL_ID: "beleza", outro: "beleza"}, _inscritos().iloc[0:0]
+    )
+    BaseShorts.validate(base, lazy=True)
+    grupos = dict(zip(base["post_id"], base["duplicate_group"], strict=True))
+    assert grupos == {
+        "kkkkkkkkkkk": "kkkkkkkkkkk",  # a primeira cópia
+        "bbbbbbbbbbb": "kkkkkkkkkkk",  # mesmo título com outra caixa e espaços
+        "ccccccccccc": "kkkkkkkkkkk",  # outro canal, mesmo criativo
+        "ddddddddddd": "ddddddddddd",  # mesmo título, outra duração: outro vídeo
+    }
 
 
 def test_pandera_pega_duplicata_e_setor_invalido():
@@ -84,6 +127,19 @@ def test_exportar_base_minima_de_uma_base_real_valida_e_grava(tmp_path):
     base = pd.read_parquet(destino)
     assert set(base["sector"]) == {"beleza"}
     assert (base["subscribers_at_collection"] == 180000).all()
+
+
+def test_exportar_base_minima_nao_aplica_o_teto_por_canal(tmp_path):
+    """O teto (aula 1.4) decide as linhas de treino, não de quais posts sai o histórico do
+    canal: ele vira parâmetro do experimento, e a base exportada leva todos os rotulados."""
+    con = abrir_base(tmp_path / "t.duckdb")
+    coletado = datetime(2026, 9, 10, 12, tzinfo=timezone.utc)
+    lote = [video(f"v{i:010d}", "2026-08-01T12:00:00Z", "PT22S") for i in range(401)]
+    salvar(con, [parse_video(item, coletado) for item in lote])
+    salvar_canais(con, [canal()], coletado)
+    planilha = tmp_path / "canais.csv"
+    planilha.write_text(f"channel_id,setor,incluido\n{CANAL_ID},beleza,sim\n")
+    assert exportar_base_minima(con, planilha, tmp_path / "base_minima.parquet") == 401
 
 
 def test_exportar_base_minima_deixa_fora_canais_excluidos_na_revisao(tmp_path):

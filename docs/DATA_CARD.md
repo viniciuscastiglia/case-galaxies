@@ -25,7 +25,8 @@
 ## Volume
 
 11.203 Shorts rotulados de 52 canais, todos validados no esquema mínimo. A base inteira tem 78.353 vídeos, 23.246
-deles Shorts; vira rótulo o Short com 30 dias ou mais, até 400 por canal.
+deles Shorts; vira rótulo o Short com 30 dias ou mais, até 400 por canal (contagem com o teto; a exportação sem
+teto, de 08/10, tem 22.172; veja "Coleta").
 
 Shorts rotulados por setor e faixa de inscritos:
 
@@ -77,7 +78,12 @@ rm -f data/shorts.duckdb data/*.parquet data/cota*.json && rm -rf data/logs medi
 - **Regra de Short:** até 60 s se publicado antes de 15/10/2024, até 180 s depois (quando o limite mudou para 3
   minutos), e não horizontal: largura menor ou igual à altura no player, com formato desconhecido contando como
   Short.
-- **Teto por canal:** 400 Shorts rotulados mais recentes. 12 canais estão no teto.
+- **Teto por canal:** desde 08/10, a exportação leva todos os Shorts rotulados (22.172 na reexportação desse dia).
+  O teto (400 no plano, ainda em aberto) passa a valer só para as linhas de treino, como parâmetro do experimento:
+  o histórico do canal precisa de todos os posts (paridade treino/uso). Com o teto de 400, 12 canais ficavam nele.
+- **Duplicatas:** a coluna `duplicate_group` marca cópias do mesmo criativo (título normalizado e duração iguais),
+  com o ID da primeira cópia. Na reexportação de 08/10: 573 grupos e 974 cópias, quase todas de dois canais. Nada
+  é apagado; a regra fica para o experimento (aula 2.2).
 - **Versão:** `src/previa/coletor.py` no git. Mudanças relevantes: retry de rede (06/10), preferência por IPv4 e
   busca por termo (08/10), validação e auditoria a cada coleta (08/10).
 - **Cota:** de 110 a 140 unidades por dia na coleta diária, de um limite de 10 mil. Picos: 3.805 na primeira coleta

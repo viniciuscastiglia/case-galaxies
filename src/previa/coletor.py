@@ -6,8 +6,8 @@ incremental (para quando a página já é conhecida), resiliente (retry só em e
 para em quotaExceeded) e testável sem chave (tests/fakes.py).
 
 Acréscimos em relação à aula: foto diária dos canais (Monte sua base, passo 5), renovação
-dos dados com mais de 25 dias (aula 1.8, regra dos 30 dias) e teto de Shorts por canal na
-exportação (aula 1.4).
+dos dados com mais de 25 dias (aula 1.8, regra dos 30 dias) e teto opcional de Shorts por
+canal (aula 1.4), desligado na exportação: o teto é parâmetro do experimento.
 """
 
 import json
@@ -234,7 +234,8 @@ WITH rotulos AS (
     QUALIFY row_number() OVER (PARTITION BY video_id ORDER BY s.age_days) = 1
 )
 SELECT * FROM rotulos
-QUALIFY row_number() OVER (PARTITION BY channel_id ORDER BY published_at DESC) <= $teto
+QUALIFY $teto IS NULL
+     OR row_number() OVER (PARTITION BY channel_id ORDER BY published_at DESC) <= $teto
 ORDER BY channel_id, published_at
 """
 
@@ -320,14 +321,21 @@ def salvar_canais(con, itens: list[dict], coletado_em: datetime) -> None:
     con.unregister("canais_novos")
 
 
-def consultar_rotulados(con, idade_min: int = 30, teto_por_canal: int = 400) -> pd.DataFrame:
+def consultar_rotulados(
+    con, idade_min: int = 30, teto_por_canal: int | None = None
+) -> pd.DataFrame:
     """Um rótulo por Short: o primeiro snapshot com pelo menos `idade_min` dias.
-    Teto: os `teto_por_canal` Shorts rotulados mais recentes de cada canal (aula 1.4)."""
+    Teto opcional: os `teto_por_canal` Shorts rotulados mais recentes de cada canal (aula 1.4).
+    A exportação não aplica o teto: ele decide as linhas de treino, e o histórico do canal
+    precisa de todos os posts (paridade treino/uso)."""
     return con.execute(SQL_ROTULADOS, {"idade_min": idade_min, "teto": teto_por_canal}).df()
 
 
 def exportar_rotulados(
-    con, destino=DADOS / "shorts_rotulados.parquet", idade_min: int = 30, teto_por_canal: int = 400
+    con,
+    destino=DADOS / "shorts_rotulados.parquet",
+    idade_min: int = 30,
+    teto_por_canal: int | None = None,
 ) -> int:
     rotulados = consultar_rotulados(con, idade_min, teto_por_canal)
     Path(destino).parent.mkdir(parents=True, exist_ok=True)
