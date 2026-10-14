@@ -26,3 +26,6 @@ cota.json
 *.log
 .DS_Store
 .superpowers/
+
+# Claude Code: configurações pessoais (as do projeto ficam em .claude/settings.json)
+.claude/settings.local.json

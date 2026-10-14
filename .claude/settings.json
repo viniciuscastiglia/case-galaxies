@@ -1,0 +1,21 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(uv run pytest:*)",
+      "Bash(uv run ruff check:*)",
+      "Bash(uv run ruff format src tests)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git branch)",
+      "Bash(git branch --show-current)",
+      "Bash(git -C ~/autoestudos pull:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Bash(cat .env)",
+      "Bash(cat ./.env)"
+    ]
+  }
+}
