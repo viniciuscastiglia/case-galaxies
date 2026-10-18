@@ -3,10 +3,33 @@
 Os testes rodam sem chave: FakeYT imita yt.<recurso>().list(...).execute().
 """
 
+import io
+import zlib
+
 import httplib2
+import numpy as np
 from googleapiclient.errors import HttpError
+from PIL import Image
 
 CANAL_ID = "UCabc123LuminaBeauty0000"
+
+
+def thumbnail(semente, brilho=0):
+    """JPEG 480x360 como o hqdefault de um Short: faixas pretas dos lados e a arte vertical no
+    meio. A mesma semente dá a mesma arte; `brilho` imita a mesma arte com outra exposição."""
+    rng = np.random.default_rng(semente)
+    blocos = (rng.integers(30, 200, size=(8, 9)) + brilho).astype(np.uint8)
+    arte = Image.fromarray(blocos).resize((202, 360), Image.NEAREST)
+    quadro = Image.new("L", (480, 360), 0)
+    quadro.paste(arte, (139, 0))
+    buf = io.BytesIO()
+    quadro.convert("RGB").save(buf, "JPEG", quality=90)
+    return buf.getvalue()
+
+
+def thumbnail_por_id(video_id):
+    """Uma arte diferente por vídeo: o `baixar` falso dos testes que não tratam de duplicatas."""
+    return thumbnail(zlib.crc32(video_id.encode()))
 
 
 def video(vid, publicado, dur, likes="2410", w="608", h="1080", canal_id=CANAL_ID):

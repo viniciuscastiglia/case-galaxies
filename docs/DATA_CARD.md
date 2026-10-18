@@ -81,9 +81,14 @@ rm -f data/shorts.duckdb data/*.parquet data/cota*.json && rm -rf data/logs medi
 - **Teto por canal:** desde 08/10, a exportação leva todos os Shorts rotulados (22.172 na reexportação desse dia).
   O teto (400 no plano, ainda em aberto) passa a valer só para as linhas de treino, como parâmetro do experimento:
   o histórico do canal precisa de todos os posts (paridade treino/uso). Com o teto de 400, 12 canais ficavam nele.
-- **Duplicatas:** a coluna `duplicate_group` marca cópias do mesmo criativo (título normalizado e duração iguais),
-  com o ID da primeira cópia. Na reexportação de 08/10: 573 grupos e 974 cópias, quase todas de dois canais. Nada
-  é apagado; a regra fica para o experimento (aula 2.2).
+- **Duplicatas (decisão #1 de 14/10, implementada em 15/10):** a coluna `duplicate_group` leva o ID da primeira
+  cópia publicada do mesmo criativo: título normalizado e duração iguais **e** thumbnail com dHash de 64 bits a até
+  10 bits da cópia mais antiga, inclusive entre canais desde 17/10 (`src/previa/duplicatas.py`, aula 2.2). Na exportação de 15/10: 285
+  grupos e 307 cópias (185 da Mundo do Automóvel para PCD e 91 da Principia), contra 675 grupos e 1.137 cópias só
+  com título e duração; nenhuma entre canais. Nada é apagado: só a primeira cópia vira linha de treino e de teste
+  (`linhas_do_modelo`), e o histórico do canal usa todas. Os hashes ficam em `data/thumb_hash.parquet` (1.812
+  thumbnails; a imagem nunca é gravada), apagado em 30/10. Uma thumbnail que falha vira aviso, e o post fica pela
+  regra de título e duração até a próxima exportação.
 - **Versão:** `src/previa/coletor.py` no git. Mudanças relevantes: retry de rede (06/10), preferência por IPv4 e
   busca por termo (08/10), validação e auditoria a cada coleta (08/10).
 - **Cota:** de 110 a 140 unidades por dia na coleta diária, de um limite de 10 mil. Picos: 3.805 na primeira coleta

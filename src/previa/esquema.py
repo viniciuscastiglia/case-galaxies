@@ -8,6 +8,7 @@ import pandera.pandas as pa
 from pandera.typing import Series
 from pydantic import AwareDatetime, BaseModel, Field, model_validator
 
+from previa import duplicatas
 from previa.coletor import DADOS, consultar_rotulados, ler_canais
 
 SETORES = ["moda", "beleza", "automotivo"]
@@ -71,24 +72,13 @@ class BaseShorts(pa.DataFrameModel):
         coerce = True  # converte tipos quando possível (ex.: "2410" -> 2410)
 
 
-def grupo_de_duplicatas(rotulados: pd.DataFrame) -> pd.Series:
-    """Duplicatas e reuploads (aula 2.2, família 5): título normalizado (caixa e espaços) e
-    duração iguais marcam o mesmo criativo, inclusive entre canais. Cada post recebe o
-    video_id da primeira cópia publicada. Só marca: a regra (manter uma cópia ou deixar as
-    cópias do mesmo lado do split) é decisão do experimento."""
-    titulo = rotulados["title"].fillna("").str.lower().str.split().str.join(" ")
-    chave = titulo + "|" + rotulados["duration_s"].astype(str)
-    ordem = rotulados.assign(chave=chave).sort_values(["published_at", "video_id"])
-    primeira = ordem.groupby("chave")["video_id"].first()
-    return chave.map(primeira)
-
-
 def montar_base_minima(
-    rotulados: pd.DataFrame, setores: dict[str, str], inscritos: pd.DataFrame
+    rotulados: pd.DataFrame, setores: dict[str, str], inscritos: pd.DataFrame, hashes=None
 ) -> pd.DataFrame:
     """Shorts rotulados (consultar_rotulados) no esquema mínimo, com o setor da planilha e os
     inscritos do dia do rótulo (canais_snapshots). Os inscritos ficam para estratificação e
-    análise de erros, fora das features de treino (aula 1.7)."""
+    análise de erros, fora das features de treino (aula 1.7). `hashes` são os dHash das
+    thumbnails (duplicatas.hashes_das_thumbnails), usados na regra das duplicatas."""
     base = rotulados.assign(collected_date=rotulados["collected_at"].dt.date)
     base = base.merge(inscritos, on=["channel_id", "collected_date"], how="left")
     return pd.DataFrame(
@@ -103,13 +93,17 @@ def montar_base_minima(
             "subscribers_at_collection": base["subscribers"].astype("Int64"),
             "collected_at": base["collected_at"],
             "sector": base["channel_id"].map(setores),
-            "duplicate_group": grupo_de_duplicatas(base),
+            "duplicate_group": duplicatas.grupo_de_duplicatas(base, hashes),
         }
     )
 
 
 def exportar_base_minima(
-    con, caminho_canais=DADOS / "canais.csv", destino=DADOS / "base_minima.parquet"
+    con,
+    caminho_canais=DADOS / "canais.csv",
+    destino=DADOS / "base_minima.parquet",
+    cache=duplicatas.CACHE,
+    baixar=None,
 ) -> int:
     planilha = pd.read_csv(caminho_canais, dtype=str)
     setores = dict(zip(planilha["channel_id"], planilha["setor"], strict=False))
@@ -120,7 +114,9 @@ def exportar_base_minima(
     rotulados = consultar_rotulados(con)
     # só os canais que seguem incluídos: a revisão pode excluir um canal depois da coleta
     rotulados = rotulados[rotulados["channel_id"].isin(set(ler_canais(caminho_canais)))]
-    base = montar_base_minima(rotulados, setores, inscritos)
+    # thumbnails só dos posts com cópia de título e duração; o cache baixa só as novas
+    hashes = duplicatas.hashes_das_thumbnails(duplicatas.candidatos(rotulados), cache, baixar)
+    base = montar_base_minima(rotulados, setores, inscritos, hashes)
     BaseShorts.validate(base, lazy=True)  # erro aqui: corrija na coleta, não na validação
     base.to_parquet(destino, index=False)
     return len(base)

@@ -1,0 +1,6 @@
+# Regra das duplicatas (aula 2.2, família 5). Lido por previa.duplicatas.ler_limiar.
+#
+# Decisão #1 de 14/10/2026 (docs/DECISOES.md): mesmo canal, título normalizado e duração iguais
+# E a mesma thumbnail. Controle de 14/10: artes diferentes do mesmo canal têm distância mediana
+# de 32 bits, e 99% ficam acima de 20.
+limiar_bits: 10   # dHash de 64 bits: até 10 bits da cópia mais antiga é a mesma arte
