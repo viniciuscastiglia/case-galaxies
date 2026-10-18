@@ -21,7 +21,7 @@ O próprio material trata como dispensáveis o GBDoZero, a comparação das trê
 
 ## 3.1 Árvores de decisão por dentro
 
-45 min · ML · leitura profunda · prática: depois de 23/10
+45 min · ML · leitura rápida (corte de 15/10, #24) · prática: depois de 23/10
 
 - **Conceitos.**
   - Split guloso por ganho de SSE; a folha é a média do alvo.
@@ -43,7 +43,7 @@ O próprio material trata como dispensáveis o GBDoZero, a comparação das trê
 
 ## 3.2 Bagging vs. boosting
 
-40 min · ML · leitura profunda · prática: depois de 23/10
+40 min · ML · leitura rápida (corte de 15/10, #24) · prática: depois de 23/10
 
 - **Conceitos.**
   - Viés² e variância medidos: árvore rasa 0,695/0,017; funda 0,365/0,426; RF 0,329/0,036; GB 0,310/0,028.
@@ -67,7 +67,7 @@ O próprio material trata como dispensáveis o GBDoZero, a comparação das trê
 
 ## 3.3 Gradient boosting passo a passo
 
-50 min · ML · leitura profunda · prática: depois de 23/10 (a regra entra na M4)
+50 min · ML · leitura rápida (corte de 15/10, #24) · prática: depois de 23/10 (a regra entra na M4)
 
 - **Conceitos.**
   - Os 5 passos de Friedman; o resíduo é o gradiente negativo.
@@ -167,7 +167,7 @@ O próprio material trata como dispensáveis o GBDoZero, a comparação das trê
 
 ## 3.6 Features de texto
 
-50 min · ML + AI Eng · leitura profunda · prática: **o Vinicius decide** as features; o Claude implementa
+50 min · ML + AI Eng · leitura rápida (corte de 15/10, #24) · prática: **o Vinicius decide** as features; o Claude implementa
 
 - **Conceitos.**
   - Três caminhos: 9 features manuais (forma); TF-IDF+SVD (vocabulário do treino); embeddings+PCA (significado,

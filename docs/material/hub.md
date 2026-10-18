@@ -5,7 +5,8 @@ Stack 2026, leituras, templates, autoavaliação, troubleshooting, glossário e 
 
 ## Visão geral (`index.mdx`)
 
-- **Datas:** kickoff em 23/09/2026; entrega em **23/10/2026**.
+- **Datas:** kickoff em 23/09/2026; entrega em **23/10/2026**. Em 15/10, a liga antecipou a entrega para **21/10, até
+  23h59** (aviso no grupo); a apresentação fica em 23/10. O hub e o TAPI ainda dizem 23/10.
 - **Pergunta norteadora:** é possível prever, antes da publicação, como um público real vai reagir a um criativo, e
   com que margem de erro?
 

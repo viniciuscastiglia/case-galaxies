@@ -73,7 +73,7 @@ Prévia ele entra na versão mínima (A6).
 
 ## 6.2 LangGraph em 2026
 
-55 min · AI Eng · leitura profunda · prática: **Vinicius escreve A6**
+55 min · AI Eng · leitura rápida (corte de 15/10, #24) · prática: o Claude escreve a A6 (corte de 15/10, #24); o Vinicius faz teach-back
 
 - **Conceitos.**
   - Pergunta fechada → grafo fixo; pergunta aberta → ReAct. O LLM decide *quais* criativos, nunca *como* o número
@@ -101,7 +101,7 @@ Prévia ele entra na versão mínima (A6).
 
 ## 6.3 As cinco tools do agente
 
-60 min · AI Eng + ML · leitura profunda · prática: o Vinicius escreve as descrições dentro da A2; o Claude escreve os
+60 min · AI Eng + ML · leitura rápida (corte de 15/10, #24) · prática: o Vinicius escreve as descrições dentro da A2; o Claude escreve os
 corpos
 
 - **Conceitos.**
@@ -131,7 +131,7 @@ corpos
 
 ## 6.4 Comparáveis: retrieval de criativos
 
-50 min · ML + retrieval · leitura profunda · prática: **Vinicius escreve A5**
+50 min · ML + retrieval · leitura rápida (corte de 15/10, #24) · prática: o Claude escreve a A5 (corte de 15/10, #24); o Vinicius faz teach-back
 
 - **Conceitos.**
   - Recuperar, depois prever (MMRA).

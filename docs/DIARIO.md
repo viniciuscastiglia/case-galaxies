@@ -3,6 +3,27 @@
 Histórico das sessões. As entradas novas ficam no topo, com 3 a 5 linhas por sessão (`/fechar-sessao`). O plano
 vivo está em `docs/ROTEIRO.md` e as decisões em `docs/DECISOES.md`.
 
+## 16 e 17/10 · M1 fechada e revisão do bloco
+
+- A M1 está pronta: o Vinicius escreveu `split_treino_cal_teste` e `canal_novo_no_futuro`. Na base de
+  desenvolvimento: treino 20.579, gap 1.025, calibração 1.882 e teste 0 (trava). No "canal novo no futuro" com a
+  calibração, os grupos saem desiguais (180 a 679 Shorts; o grupo 3 perde 8.454 linhas de treino): reportar cada fold.
+- Teach-back aprovado. A correção: os ajustes do modelo vêm do walk-forward dentro do treino; a calibração só mede os
+  erros do modelo fechado, para o intervalo (M6). Na dúvida de sintaxe, funcionou dar a linha inteira de um bloco e
+  deixá-lo escrever os outros; quatro reexplicações seguidas, com tabelas, não funcionaram.
+- `/code-review` do bloco: M1 sem bug; corrigidos o fallback das duplicatas, o retry do download (httpx), o cache
+  atômico e o `walk_forward` com a base inteira (`folds_de_desenvolvimento`). O Vinicius estendeu a regra das
+  duplicatas para entre canais (aula 2.2). Base real: 314 cópias em 291 grupos, sem nenhuma mudança.
+- Atraso de ~1 dia na Fase 1. Próxima sessão: o corte (decisão dele), depois a 2.4 e a M2.
+
+## 14 e 15/10 · Decisões da Fase 1 e duplicatas
+
+- Decididas a #1 (duplicatas por título, duração e thumbnail; controle: 668 pares de vídeos diferentes do mesmo canal
+  têm dHash a distância mediana de 32 bits, e 99% ficam acima de 20; 10 pares da Principia conferidos à mão, todos
+  certos), a #2 (treino desde 01/07/2021), a #3 (datas) e a #4 (canais fora da base para o golden set).
+- 15/10: a liga antecipou a entrega para 21/10; corte #24 aplicado. As duplicatas foram implementadas: 307 cópias em
+  285 grupos. Detalhes em `docs/DECISOES.md`. (Entrada escrita em 17/10, a partir do caderno de decisões.)
+
 ## 13/10 · Reta final: material mapeado e trabalho reorganizado
 
 - O Claude leu o material da liga por inteiro: hub, as 47 aulas, RAG e EDD. O Vinicius vai ler tudo também, em duas

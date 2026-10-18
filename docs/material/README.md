@@ -49,18 +49,21 @@ O cabeçalho de cada cartão diz o tempo oficial, o eixo, a velocidade de leitur
 - **rápida:** "No projeto Galaxies", "Erros comuns" e "Resumo", com o resto depois da entrega;
 - **depois de 23/10:** o módulo 7.
 
-## Ordem de leitura até 23/10
+## Ordem de leitura até 21/10
 
 Os tempos oficiais do material incluem interativos e exercícios. Só lendo, conte uns 75% deles.
 
 | Fase | Datas | Leitura | Tempo oficial |
 | :--- | :--- | :--- | :--- |
-| 1 | 14–15/10 | 2.3, 2.4, 2.5, 2.6 + EDD (8) + RAG (8) | 210 min + ~130 min |
-| 2 | 16–17/10 | 3.1 a 3.6 + 6.1 | 300 + 50 min |
-| 3 | 18/10 | 6.5, 6.2, 6.3 (+ Function calling, revisão) | 175 min |
-| 4 | 19–20/10 | 4.1, 4.4, 4.8 (profunda), 4.2, 4.3, 4.5–4.7 (rápida), 5.1–5.4 | 400 + 175 min |
-| 5 | 21–22/10 | 5.5, 5.6, 5.7, 6.4, 6.6 | 240 min |
-| 6 | 23/10 | 6.7 | 45 min |
+| 1 | 14–16/10 | 2.3, 2.4, 2.5, 2.6 + RAG (8, rápidas) | 210 min + ~65 min |
+| 2 | 17–18/10 | 3.4, 3.5, 6.1 (profunda); 3.1–3.3, 3.6 (rápida) | 300 + 50 min |
+| 3 | 18–19/10 | 6.5 + EDD 2–6 (profunda); 6.2, 6.3, EDD 1, 7, 8 (rápida) | 175 + ~65 min |
+| 4 | 19–20/10 | 4.8, 5.2, 5.3 (profunda); 4.1–4.7, 5.1, 5.4 (rápida) | 400 + 175 min |
+| 5 | 19–21/10 | 5.6, 5.7, 6.6 (profunda); 5.5, 6.4 (rápida) | 240 min |
+| 6 | 21/10 | 6.7 (rápida) | 45 min |
+
+Velocidades replanejadas em 15/10 pela entrega em 21/10 (decisão #24): leitura profunda só nas aulas que sustentam uma
+peça do Vinicius.
 | depois | a partir de 24/10 | módulo 7; a parte rápida do módulo 4; os exercícios adiados | 240 min + |
 
 ## Pré-requisitos entre trilhas (declarados no cabeçalho das aulas)

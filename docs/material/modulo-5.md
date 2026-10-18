@@ -20,7 +20,7 @@ juiz são extras.
 
 ## 5.1 Por que um número só não basta
 
-40 min · ML · leitura profunda · prática: entra na M6
+40 min · ML · leitura rápida (corte de 15/10, #24) · prática: entra na M6
 
 - **Conceitos.**
   - A previsão pontual é a mediana (q0,5); o intervalo de 80% é [q0,1; q0,9]. Os 80% são escolha de produto; o
@@ -103,7 +103,7 @@ juiz são extras.
 
 ## 5.4 Sinal de baixa confiança
 
-40 min · ML + contrato · leitura profunda · prática: o Vinicius decide as regras e os limiares; o Claude implementa
+40 min · ML + contrato · leitura rápida (corte de 15/10, #24) · prática: o Vinicius decide as regras e os limiares; o Claude implementa
 
 - **Conceitos.**
   - O intervalo calibrado na média não cobre a incerteza epistêmica.
@@ -138,7 +138,7 @@ juiz são extras.
 
 ## 5.5 Shapley values: a intuição
 
-40 min · ML · leitura profunda · prática: depois de 23/10 (o exercício leva 30 min)
+40 min · ML · leitura rápida (corte de 15/10, #24) · prática: depois de 23/10 (o exercício leva 30 min)
 
 - **Conceitos.**
   - Os jogadores são as features; v(∅) é o valor base; φ é a contribuição marginal média.

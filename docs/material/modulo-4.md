@@ -35,7 +35,7 @@ sistema.
 
 ## 4.1 Anatomia de um Short e o pipeline multimodal
 
-45 min · encanamento + produto · leitura profunda · prática: Claude
+45 min · encanamento + produto · leitura rápida (corte de 15/10, #24) · prática: Claude
 
 - **Conceitos.**
   - 9:16 equivale a 0,5625. `ffprobe` lê os metadados sem decodificar; corrija a rotação.
@@ -104,7 +104,7 @@ sistema.
 
 ## 4.4 Embeddings visuais: CLIP e SigLIP 2
 
-50 min · ML + AI Eng · leitura profunda · prática: Claude; o Vinicius valida as sondas, se der
+50 min · ML + AI Eng · leitura rápida (corte de 15/10, #24) · prática: Claude; o Vinicius valida as sondas, se der
 
 - **Conceitos.**
   - CLIP usa softmax no lote; SigLIP usa sigmoide por par. O SigLIP 2 é multilíngue e Apache-2.0.

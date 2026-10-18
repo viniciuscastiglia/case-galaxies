@@ -7,14 +7,16 @@ decisões pendentes). No fim, rode `/fechar-sessao`.
 
 O **Prévia** prevê, antes da publicação, as curtidas de um YouTube Short de beleza ou automotivo de um canal
 brasileiro, com intervalo, ranking entre criativos e explicação. É exposto como função Python e servidor MCP para a
-persona da Galaxies, o time de marketing da marca via Agente Nexus. Entrega em **23/10/2026**.
+persona da Galaxies, o time de marketing da marca via Agente Nexus. Entrega em **21/10/2026, até 23h59**;
+apresentação em 23/10.
 
 O briefing oficial é o TAPI (`escopo_projeto.md`), que é o nome do documento, não do sistema. O desenho anterior
 (`docs/arquivo/PROJECT_v0.md`) é só consulta.
 
 ## Agora
 
-- **Reta final de 14 a 23/10**, em 6 fases. Fase, próximo passo e bloqueios: o "Agora" do `docs/ROTEIRO.md`.
+- **Reta final de 14 a 21/10** (entrega até 23h59; 22 e 23/10 são de preparo da apresentação), em 6 fases. Fase,
+  próximo passo e bloqueios: o "Agora" do `docs/ROTEIRO.md`.
 - **Base pronta:** 70 canais (35 por setor) e ~31 mil Shorts rotulados; coleta diária (launchd, 5h15) até 30/10.
   Ainda não há modelo nem agente.
 
@@ -23,7 +25,8 @@ O briefing oficial é o TAPI (`escopo_projeto.md`), que é o nome do documento, 
 - **O Vinicius decide e escreve o coração.** São sempre dele: o alvo; as datas e o esquema de validação; quais
   features entram; o critério de sucesso e as hipóteses; os recortes da base e do multimodal; as regras de
   confiança; o contrato da tool; o que vai ao README e à demo. Ele escreve as peças "Vinicius escreve" do ROTEIRO
-  (M1–M4, M6, M8, M9, A1, A2 e A4–A8).
+  (M1–M4, M6, M8, M9, A1, A2, A4, A7 e A8; A5, A6 e o bootstrap da M9 passaram para o Claude no corte de
+  15/10). Um corte tira estudo ou escrita do Vinicius, nunca escopo do produto.
 - **O Claude faz o resto e traz as decisões.** Encanamento, pandas de apoio, testes, integração, infraestrutura e
   documentação de apoio. Decide sozinho o que é encanamento e registra em `docs/DECISOES.md`. Nunca toma uma decisão
   da lista acima no lugar do Vinicius.
@@ -54,7 +57,7 @@ O protocolo:
 ## Como trabalhar com o Vinicius
 
 - **Objetivos, nesta ordem:** aprender ML e AI Engineering (os eixos da carreira dele); ser o protagonista que
-  explica o projeto inteiro; entregar em 23/10.
+  explica o projeto inteiro; entregar em 21/10 e apresentar em 23/10.
 - **`TODO(human)` só nas peças "Vinicius escreve" do ROTEIRO.** Antes, explicar com um exemplo, deixar o pandas de
   apoio pronto e o teste-contrato escrito. Depois, revisar uma coisa por vez, abrindo com o que está certo.
 - **Analogias que funcionam:** o caso Lumina A vs. B do material; laudo de imóvel (canal = bairro, criativo = casa);
@@ -95,7 +98,8 @@ O protocolo:
 
 ## Fluxo de trabalho (Claude Code + superpowers)
 
-- **Uma sessão, um bloco do ROTEIRO.** `/clear` entre blocos: o estado mora nos documentos, não na conversa.
+- **Uma sessão, um bloco do ROTEIRO.** Entre blocos, `/fechar-sessao` e depois `exit` (o Vinicius sai e abre uma
+  sessão nova; `/clear` faz o mesmo): o estado mora nos documentos, não na conversa.
 - **Bloco novo:** plan mode e `/aula`, depois `superpowers:brainstorming` (*bounded*: um desenho curto no chat espera
   o "ok"; *architectural*: spec), depois `superpowers:writing-plans`. No plano, "Global Constraints" recebe os
   princípios e os números da aula, e "Review Focus" recebe os erros comuns. Execução: `superpowers:executing-plans`
@@ -127,8 +131,8 @@ uv run mlflow ui --port 5001               # a porta 5000 é do AirPlay
 ```
 
 Nos experimentos, a base entra por `previa.dados.carregar_base()`, que não devolve o período de teste
-(`configs/avaliacao.yaml`). `carregar_base(final=True)` abre o teste, avisa e registra em
-`data/logs/teste_aberto.log`. A base sintética da liga está em `from previa.sintetico import gerar_base`.
+(`configs/avaliacao.yaml`), e os folds por `previa.splits.folds_de_desenvolvimento(df, cfg)`, só dentro do treino.
+`carregar_base(final=True)` abre o teste, avisa e registra em `data/logs/teste_aberto.log`. A base sintética da liga está em `from previa.sintetico import gerar_base`.
 
 Nunca mostre chaves em saída de terminal ou log. Erros da API do Google trazem a URL com `key=`; use
 `previa.coletor.sem_chave` antes de imprimir qualquer mensagem de erro.
@@ -158,4 +162,5 @@ Nunca mostre chaves em saída de terminal ou log. Erros da API do Google trazem 
 
 ## Datas
 
-23/10, entrega. 19 a 22/10, medição da maturação. 30/10, apagamento dos dados brutos e fim da coleta diária.
+21/10, entrega até 23h59 (antecipada de 23/10 pela liga, aviso no grupo em 15/10). 23/10, apresentação. 19 e 20/10,
+medição da maturação. 30/10, apagamento dos dados brutos e fim da coleta diária.
