@@ -1,8 +1,22 @@
-# Avaliação (aulas 1.2, 2.3 e 2.5). Lido por previa.dados.carregar_base.
+# Avaliação (aulas 1.2, 2.3 e 2.5). Lido por previa.dados.carregar_base e previa.splits.ler_avaliacao.
 #
-# TRAVA PROVISÓRIA (08/10/2026): tudo o que foi publicado a partir de teste_inicio (00h UTC)
-# fica fora do desenvolvimento até a avaliação final (carregar_base(final=True)).
-# A reserva é de sobra de propósito: na aula 2.3, o Vinicius escolhe as datas definitivas de
-# treino, gap, calibração e teste, e a trava se ajusta, porque nenhuma métrica terá sido
-# olhada neste período.
+# Datas decididas em 15/10/2026 (docs/DECISOES.md, #2 e #3), com o teste nunca aberto.
+# Ordem: treino -> gap -> calibração -> teste. Datas em 00h UTC; os fins são exclusivos.
+#
+# TRAVA: tudo o que foi publicado a partir de teste_inicio fica fora do desenvolvimento até a
+# avaliação final (carregar_base(final=True)).
 teste_inicio: "2026-04-01"
+treino_inicio: "2021-07-01"   # antes disso, o Shorts não existia no Brasil (#2)
+gap_dias: 30                  # maturidade do alvo e contágio na fronteira (aula 2.3)
+cal_inicio: "2026-02-01"      # o treino vai até cal_inicio - gap_dias = 02/01/2026
+teste_fim: "2026-09-15"       # exclusivo: o teste vai até 14/09, o último Short maduro
+
+# Desenvolvimento: 4 folds trimestrais em 2025, dentro do bloco de treino (erro comum 4)
+walk_forward:
+  n_folds: 4
+  inicio: "2025-01-01"
+
+# "Canal novo no futuro": 4 grupos de canais, cada canal é novo uma vez
+canal_novo:
+  n_grupos: 4
+  seed: 0
