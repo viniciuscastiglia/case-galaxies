@@ -1,0 +1,10 @@
+# Conferência de 50 classificações de Short (decisão #19; aula 1.5). Lido por previa.conferencia.
+#
+# A regra do coletor (60 s antes de 15/10/2024, 180 s depois, +1 s, e não horizontal) é conferida
+# com os próprios olhos; a concordância vai para o data card.
+seed: 0
+estratos:                          # quantos Shorts de cada estrato entram na lista
+  short_antes_ate_60s: 10          # Short pela regra, publicado antes de 15/10/2024
+  short_depois_ate_60s: 15         # Short pela regra, depois da mudança, até 60 s
+  short_depois_61_a_180s: 15       # Short pela regra só por causa do limite de 3 min
+  nao_short_vertical_na_borda: 10  # vertical, mas até 30 s acima do limite da época: a regra diz "não"
