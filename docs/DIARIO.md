@@ -3,6 +3,21 @@
 Histórico das sessões. As entradas novas ficam no topo, com 3 a 5 linhas por sessão (`/fechar-sessao`). O plano
 vivo está em `docs/ROTEIRO.md` e as decisões em `docs/DECISOES.md`.
 
+## 18 e 19/10 (manhã) · M2, critério de sucesso e o pipeline do modelo
+
+- Decididos: o bloco 1 (10 decisões, 18/10), a #6 (manchete pesando cada canal pelo nº de Shorts; a Salon Line tinha
+  53% dos pares), a #5 (ganho ≥ +3 pontos com IC sem o zero, e IC sem o zero no canal novo), a #26 (o raciocínio é do
+  Vinicius, o código é do Claude: o esqueleto com buraco não ensinava) e as decisões em duas mensagens. M2 e
+  teach-back fechados: a mediana madura dá 49,7% (IC 49,2 a 50,1) porque empata A e B; a da 2.1 cai a 45,6% pela
+  regressão à média.
+- Do Claude: M3, runner com MLflow e M4 (alvo relativo, decisão de 05/10, depois de uma correção), texto, comparáveis
+  (A5), SHAP, modelo de uso com paridade, golden set (30 Shorts de 6 canais de fora), CI, maturação (0% de
+  crescimento depois de 21 dias), `auditar_datas`, a lista da #19, o pipeline de mídia da amostra (só do IP de casa)
+  e uma revisão independente (sem vazamento; 13 correções com teste). 251 testes.
+- Rodando: rubrica do VLM (819 de 1.400; o free tier corta em ~500 pedidos por dia) e thumbnails (8,9 mil de 31 mil).
+  Os runs das H1 a H6 estão lacrados até as hipóteses (o último lote: `192a4f36` a `09275208`).
+- Próxima sessão: o `HIPOTESES.md`, com os problemas da H3, da H5 e das H8/H9 antes; depois marco 1 e A1.
+
 ## 16 e 17/10 · M1 fechada e revisão do bloco
 
 - A M1 está pronta: o Vinicius escreveu `split_treino_cal_teste` e `canal_novo_no_futuro`. Na base de

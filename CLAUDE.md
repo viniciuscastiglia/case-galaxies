@@ -18,7 +18,8 @@ O briefing oficial é o TAPI (`escopo_projeto.md`), que é o nome do documento, 
 - **Reta final de 14 a 21/10** (entrega até 23h59; 22 e 23/10 são de preparo da apresentação), em 6 fases. Fase,
   próximo passo e bloqueios: o "Agora" do `docs/ROTEIRO.md`.
 - **Base pronta:** 70 canais (35 por setor) e ~31 mil Shorts rotulados; coleta diária (launchd, 5h15) até 30/10.
-  Ainda não há modelo nem agente.
+- **Modelo (19/10):** GBM com alvo relativo ao canal, avaliado no walk-forward de 2025 e no "canal novo" pelo
+  runner (`previa.experimento`, MLflow); modelo de uso em `previa.modelo`. Ainda não há intervalo (M6) nem agente.
 
 ## Papéis
 
@@ -26,13 +27,15 @@ O briefing oficial é o TAPI (`escopo_projeto.md`), que é o nome do documento, 
   features entram; o critério de sucesso e as hipóteses; os recortes da base e do multimodal; as regras de
   confiança; o contrato da tool; o que vai ao README e à demo. Ele escreve as peças "Vinicius escreve" do ROTEIRO
   (M1–M4, M6, M8, M9, A1, A2, A4, A7 e A8; A5, A6 e o bootstrap da M9 passaram para o Claude no corte de
-  15/10). Um corte tira estudo ou escrita do Vinicius, nunca escopo do produto.
+  15/10; o prompt da A4, o teste de injeção da A7 e o rascunho do README, no de 18/10, quando a leitura virou
+  dirigida). Um corte tira estudo ou escrita do Vinicius, nunca escopo do produto.
 - **O Claude faz o resto e traz as decisões.** Encanamento, pandas de apoio, testes, integração, infraestrutura e
   documentação de apoio. Decide sozinho o que é encanamento e registra em `docs/DECISOES.md`. Nunca toma uma decisão
   da lista acima no lugar do Vinicius.
-- **Como trazer uma decisão:** contexto em 1 ou 2 linhas (com a Lumina ou um exemplo da base), 2 ou 3 opções, a
-  recomendação com a aula que a sustenta e o custo de errar. Uma por vez, em texto no chat, nunca em pop-up. A
-  resposta vai para `docs/DECISOES.md`.
+- **Como trazer uma decisão (desde 19/10, em duas mensagens):** primeiro, só o problema, com um exemplo concreto (a
+  Lumina ou um número da base), e o Vinicius raciocina sobre ele; depois, as 2 ou 3 opções, a recomendação com a
+  aula que a sustenta e o custo de errar. Uma por vez, em texto no chat, nunca em pop-up. A resposta vai para
+  `docs/DECISOES.md`.
 
 ## Protocolo do material da liga (prioridade máxima)
 
@@ -58,8 +61,11 @@ O protocolo:
 
 - **Objetivos, nesta ordem:** aprender ML e AI Engineering (os eixos da carreira dele); ser o protagonista que
   explica o projeto inteiro; entregar em 21/10 e apresentar em 23/10.
-- **`TODO(human)` só nas peças "Vinicius escreve" do ROTEIRO.** Antes, explicar com um exemplo, deixar o pandas de
-  apoio pronto e o teste-contrato escrito. Depois, revisar uma coisa por vez, abrindo com o que está certo.
+- **Peças "Vinicius escreve" (desde 19/10, #26): o raciocínio é dele, o código é do Claude.** O Claude traz um caso
+  minúsculo com números (um canal com 3 posts, por exemplo); o Vinicius resolve à mão e escreve os passos em
+  português; o Claude escreve o código a partir dos passos (com eles nos comentários, e o caso vira teste); o
+  Vinicius roda no mesmo caso e confere o número. Nunca um esqueleto com buraco para preencher. Ele pode escrever o
+  código quando quiser, partindo do caso à mão. Na revisão, uma coisa por vez, abrindo com o que está certo.
 - **Analogias que funcionam:** o caso Lumina A vs. B do material; laudo de imóvel (canal = bairro, criativo = casa);
   restaurante (maître = LLM, que nunca cozinha); estudar × fazer a prova (treino × previsão). O guia de estudos
   antigo (Claude Doc) está congelado: a trilha da liga é o material de estudo.
@@ -104,9 +110,9 @@ O protocolo:
   o "ok"; *architectural*: spec), depois `superpowers:writing-plans`. No plano, "Global Constraints" recebe os
   princípios e os números da aula, e "Review Focus" recebe os erros comuns. Execução: `superpowers:executing-plans`
   por padrão; `subagent-driven-development` para encanamento longo e independente, como o multimodal.
-- **`TODO(human)` é parada obrigatória.** Isso sobrepõe a "execução contínua" das skills: o executor para, explica e
-  espera.
-- **TDD:** o teste vem primeiro; na peça do Vinicius, o teste é o enunciado.
+- **O caso à mão é parada obrigatória.** Isso sobrepõe a "execução contínua" das skills: o executor apresenta o
+  caso e espera os passos do Vinicius antes de escrever a peça.
+- **TDD:** o teste vem primeiro; na peça do Vinicius, o caso que ele resolveu à mão é um dos testes.
 - **Branches, não worktrees.** `feat/<bloco>` no checkout principal, porque `data/` e `.env` são ignorados pelo git e
   não existiriam num worktree. Merge local (`finishing-a-development-branch`). Commit e push só quando o Vinicius
   pedir.
@@ -128,6 +134,12 @@ uv run python -m previa.curadoria expandir # candidatos novos por colabs e canai
 uv run python -m previa.curadoria buscar   # busca por termo (data/termos_busca.csv) -> candidatos + data/buscas.csv
 ./scripts/coletar.sh                       # coleta diária (carrega o .env; log em data/logs/coleta.log)
 uv run mlflow ui --port 5001               # a porta 5000 é do AirPlay
+uv run python -m previa.experimento configs/experimentos/opcao_a_texto.yaml   # um experimento (MLflow)
+uv run python -m previa.experimento comparar RUN_A RUN_B   # ganho de B sobre A, pareado por canal
+uv run python -m previa.baselines janela   # a manchete da #6 para os baselines
+uv run python -m previa.vlm rodar          # rubrica do VLM (precisa do .env; ~500 pedidos por dia)
+uv run python -m previa.thumbs             # thumbnails da base (retoma do cache)
+uv run python -m previa.midia amostra      # frames, cortes e áudio da amostra: SÓ do IP de casa
 ```
 
 Nos experimentos, a base entra por `previa.dados.carregar_base()`, que não devolve o período de teste
@@ -159,6 +171,11 @@ Nunca mostre chaves em saída de terminal ou log. Erros da API do Google trazem 
 - **transformers 5:** o vetor sai em `.pooler_output`.
 - **Gemini:** `resp.parsed` vira `None` em silêncio; valide com Pydantic.
 - **Cota do YouTube:** zera à meia-noite do Pacífico, 4h de Brasília até 01/11 e 5h depois.
+- **Gemini free tier:** corta em ~500 pedidos por dia, antes das 8 h de vídeo; sem timeout, uma conexão morta trava
+  a rodada (o cliente usa 300 s).
+- **shap 0.52:** o modo intervencional não aceita splits categóricos do LightGBM (o setor é código 0/1); no Mac Intel,
+  o numba dele não resolve com o numpy 2.5 (o uv só resolve Apple Silicon e Linux).
+- **faster-whisper 1.2.1 + PyAV 19:** passe o áudio como array (o `decode_audio` quebra).
 
 ## Datas
 
