@@ -1,0 +1,11 @@
+# Features do canal e do tempo (aula 3.5). Lido por previa.features.
+#
+# Lacuna de 30 dias: o histórico só usa posts publicados ao menos 30 dias antes (princípio 2,
+# decisão #11), até a medição da maturação; a H3 do HIPOTESES.md mede 0, 7 e 30.
+lacuna_dias: 30
+fuso_local: "America/Sao_Paulo"
+
+texto:                    # decisão #9 (aula 3.6): só o título; a descrição padrão vira identificador de canal
+  modelo: "sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2"   # 384 dimensões, CPU
+  versao: 1
+  pca: 16                 # ajustado só no treino de cada fold, no runner

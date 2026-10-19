@@ -1,0 +1,28 @@
+# H7, thumbnail (#12; 4.4 e 4.8): + PCA de 16 do embedding da capa (ajustado no treino de cada
+# fold) e as sondas relativas. Controle: opcao_a_texto.yaml. Roda quando as thumbnails terminarem.
+nome: h7-thumb
+hipotese: H7
+descricao: "H7: a Opção A completa + a capa (SigLIP 2 com PCA de 16 e as 10 sondas relativas)"
+features: [hist_n, hist_mediana, hist_media, hist_desvio, hist_med5, hist_med20, tendencia,
+           dias_desde_ultimo, posts_30d, hora_local, dia_semana_local, feriado, idade_canal_dias,
+           duracao_s, setor,
+           txt_caracteres, txt_palavras, txt_hashtags, txt_emojis, txt_pergunta, txt_cta, txt_numeros, txt_frac_maiusculas, txt_ingles, txt_termos_setor,
+           sonda_*]
+lacuna_dias: 30       # princípio 2 e decisão #11; a H3 mede 0 e 7
+val_dias: 180         # validação temporal do early stopping: os últimos 6 meses do treino (3.4)
+seed: 0
+max_arvores: 5000     # alto, com early stopping (3.4: 3.000 a 5.000)
+paciencia: 100        # 3.4: 50 a 200 rodadas
+lgbm:
+  objective: regression
+  learning_rate: 0.05
+  num_leaves: 15
+  min_data_in_leaf: 20
+  feature_fraction: 0.9
+  bagging_fraction: 0.8
+  bagging_freq: 1     # sem isto, o bagging_fraction não faz nada (3.4, erro comum 2)
+  lambda_l2: 1.0
+pca:
+  titulo: 16
+  thumb: 16
+extras: [sondas_thumb]

@@ -1,0 +1,23 @@
+# H1 do HIPOTESES.md, primeira rodada do marco 1 (aulas 2.5, 3.4 e 3.5). Lido por previa.experimento.
+#
+# Opção A sem texto: o bloco de texto (#9) entra na H4. Hiperparâmetros: os de partida da 3.4.
+nome: opcao-a-sem-texto
+hipotese: H1
+descricao: "GBM da Opção A (histórico, cadência, calendário, duração e setor) contra a mediana madura; sem texto ainda"
+features: [hist_n, hist_mediana, hist_media, hist_desvio, hist_med5, hist_med20, tendencia,
+           dias_desde_ultimo, posts_30d, hora_local, dia_semana_local, feriado, idade_canal_dias,
+           duracao_s, setor]
+lacuna_dias: 30       # princípio 2 e decisão #11; a H3 mede 0 e 7
+val_dias: 180         # validação temporal do early stopping: os últimos 6 meses do treino (3.4)
+seed: 0
+max_arvores: 5000     # alto, com early stopping (3.4: 3.000 a 5.000)
+paciencia: 100        # 3.4: 50 a 200 rodadas
+lgbm:
+  objective: regression
+  learning_rate: 0.05
+  num_leaves: 15
+  min_data_in_leaf: 20
+  feature_fraction: 0.9
+  bagging_fraction: 0.8
+  bagging_freq: 1     # sem isto, o bagging_fraction não faz nada (3.4, erro comum 2)
+  lambda_l2: 1.0
