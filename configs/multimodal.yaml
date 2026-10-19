@@ -1,0 +1,35 @@
+# Multimodal (aulas 4.1, 4.2, 4.7 e 4.8). Lido por previa.amostra e previa.vlm.
+#
+# Decisões #12 e #13 de 18/10/2026 (docs/DECISOES.md).
+amostra:
+  por_canal: 20   # Shorts por canal, proporcional aos blocos treino, calibração e teste do canal
+  seed: 0
+
+vlm:
+  modelo: "gemini-3.5-flash-lite"   # o da aula 4.7
+  versao: 1                         # mudou prompt ou schema: suba a versão e reprocesse tudo (erro comum 6)
+  limite_segundos_dia: 28800        # free tier: 8 h de vídeo do YouTube por dia do Pacífico (4h de Brasília)
+  intervalo_s: 4                    # pausa mínima entre pedidos, para ficar abaixo do limite por minuto
+  timeout_s: 300                    # por pedido; depois de 6 tentativas, vira erro do vídeo (3 seguidas param)
+  reteste_n: 50                     # teste-reteste (versão 2) nos primeiros 50 da ordem sorteada
+
+siglip:                             # embeddings visuais (aula 4.4); só no processo do previa.visual
+  ckpt: "google/siglip2-base-patch16-224"   # ~1,5 GB, 768 dimensões, CPU (~20 thumbnails/s no M4)
+  versao: 1                         # mudou o recorte, o modelo ou as sondas: suba a versão
+  lote: 256
+  sondas:                           # a lista inicial da 4.4 para beleza, automotivo e "todos"; a validar
+    rosto: "um close do rosto de uma pessoa"
+    maquiagem: "uma pessoa aplicando maquiagem"
+    batom: "um close de batom nos lábios"
+    produto_beleza: "um produto de beleza na mão"
+    carro_estrada: "um carro em movimento na estrada"
+    interior_carro: "o interior de um carro, com painel e volante"
+    roda: "um close da roda de um carro"
+    texto: "texto grande escrito na tela"
+    logo: "um logotipo com o nome de uma marca"
+    falando: "uma pessoa falando para a câmera"
+
+midia:                              # frames, cortes e áudio da amostra (aulas 4.2, 4.3 e 4.5)
+  whisper: "small"                  # 4.5: "tiny" só para testar; "small" no projeto (CPU, int8)
+  pausa_min_s: 5                    # yt-dlp: pausas de 5 a 10 s, concorrência 1, só do IP de casa
+  pausa_max_s: 10
