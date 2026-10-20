@@ -9,34 +9,45 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
 - **Prazo:** a liga antecipou a entrega para **21/10, até 23h59** (aviso no grupo, 15/10); a apresentação
   continua em 23/10. Os cortes para caber no prazo são a #24 (15/10) e a #25 (18/10): nada sai do produto. 22 e
   23/10 são de preparo da apresentação.
-- **Fase (19/10, fim da manhã):** fim da 1, meio da 2 e da 4. A M2, a #5 e a #6 estão decididas; M3, runner, M4,
-  texto, comparáveis, SHAP, modelo de uso, golden set e CI estão prontos e revisados (251 testes). Os runs das H1 a H6
-  estão **lacrados** até as hipóteses serem escritas (lista no fim de `.superpowers/sdd/2026-10-18-m2-metricas/progress.md`).
-- **Próximo passo (sessão nova):** o Vinicius escreve o `HIPOTESES.md`. Antes da H3, o Claude traz o problema da
-  lacuna (desenho favorece lacunas curtas; 3.5, erro comum 4) com a maturação; antes da H5, nenhum rótulo do
-  desenvolvimento tem até 90 dias; antes das H8 e H9, só ~206 pares na amostra de 2025. Depois: 3.5 e leitura da H2;
-  3.4 e marco 1 (run `opcao_a_texto`); 6.1 e o problema da A1; a #19; fechamento do dia (com a decisão da M8).
-- **Bloqueios:** a A1 trava o `prever_criativo`, o grafo (A6) e o MCP (A2). Ao abrir, conferir e religar a rubrica
-  (`set -a; source .env; set +a; uv run python -m previa.vlm rodar >> data/logs/vlm.log 2>&1`) e as thumbnails
-  (`uv run python -m previa.thumbs`). À noite, do IP de casa: `uv run python -m previa.midia amostra`; com as
-  thumbnails prontas, `uv run python -m previa.visual thumbs`.
+- **Fase (20/10, 12h15):** fim da 1, meio da 2 e da 4. No `HIPOTESES.md`, H1 (mecanismo), H2 e H4 escritas, e a
+  #27 decidida (régua dos blocos). Do Claude: base congelada v1 (`09f6035c11c9`), IC do `mae_log` no `comparar`,
+  thumbnails e embeddings (30.981), rubrica do VLM (1.400, kappa de 0,72 a 1,00) e H8 (`e97356c6` e `59961a2f`).
+  De manhã (20/10, sem o Vinicius): a H7 tinha rodado sem a cor e o brilho (a config não os listava; agora o runner
+  recusa bloco extra sem feature) e foi refeita (`f405ee37`, 71 features); a ablação da base toda (`previa.ablacao`:
+  escada, todos menos um e ruído, 10 runs) rodou e está lacrada; a guarda do OpenMP (o segfault de torch +
+  LightGBM acontece em qualquer ordem de import neste Mac); o rascunho do README; o data card v1 (com o
+  apagamento de 30/10 cobrindo as pastas novas); a lista dos 20 piores erros e os cortes para a M9 (lacrados).
+  Mídia da amostra em 467/1.400 (roda à noite, do IP de casa). 272 testes. Sem commit desde 19/10: o commit
+  automático foi bloqueado pela permissão, e o Vinicius aprova às 13h.
+- **Próximo passo (sessão de 20/10, 13h):** (0) aprovar o commit do trabalho de 19 e 20/10; (1) a #28 está
+  decidida (A; a B volta no fechamento de hoje, antes de a A2 começar); (2) H3 (lacuna × maturação: +69% de 0 a 3
+  dias, +4,1% de 3 a 7, +0,8% de 7 a 14; o backtest tem todos os rótulos maduros e por isso favorece lacunas
+  curtas), H5, H6 e H7 a H9, curtas; (3) abrir H2, H3 e H4 com a tabela da ablação, e o marco 1 (com os resumos da
+  3.4 e da 3.5); (4) 6.1 e a A1 (o caso à mão está pronto em `.superpowers/sdd/2026-10-20-a1/caso_a_mao.md`);
+  (5) o bloco 2 de decisões, em aprovar ou vetar; (6) 5.2, 5.3 e a M6.
+- **Bloqueios:** a A1 trava o `prever_criativo`, o grafo (A6) e o MCP (A2). À noite, do IP de casa: a mídia
+  (`uv run python -m previa.midia amostra >> data/logs/midia.log 2>&1`, retoma do cache e consolida os parquets no
+  fim) e, quando ela terminar, a H9 (`configs/experimentos/h9_video_audio.yaml`) e a ablação da amostra
+  (`uv run python -m previa.ablacao configs/ablacao_amostra.yaml`, 14 runs). Jobs longos sempre como tarefas da
+  sessão (`run_in_background`), para aparecerem no painel.
 
 ## Como funciona
 
-- **Vinicius escreve** (M# de ML, A# de AI Engineering): o raciocínio do coração da peça. As peças são M1–M4, M6,
-  M8, M9 (os 20 piores erros), A1, A2, A4, A7 e A8; não existem M5, M7 nem A3 (a A3 entrou na A2). A5, A6 e o
-  bootstrap da M9 passaram para o Claude no corte de 15/10 (#24); o prompt da A4 e o teste de injeção da A7, no de
-  18/10 (#25). Desde 19/10 (#26), sem esqueleto para preencher: o Claude traz um caso minúsculo com números, o
-  Vinicius resolve à mão e escreve os passos em português, o Claude escreve o código a partir deles (o caso vira
-  teste, ao lado dos testes-contrato da aula) e o Vinicius roda no mesmo caso e confere. Depois, o teach-back
-  (`/teach-back`), antes de alguém construir em cima da peça.
+- **Vinicius escreve** (M# de ML, A# de AI Engineering): o raciocínio do coração da peça. As peças são M1–M4, M6, M8, M9
+  (os 20 piores erros), A1, A2, A4, A7 e A8; não existem M5, M7 nem A3 (a A3 entrou na A2). A5, A6 e o bootstrap da M9
+  passaram para o Claude no corte de 15/10 (#24); o prompt da A4 e o teste de injeção da A7, no de 18/10 (#25); a M8, no
+  de 20/10 (#28). Desde 19/10 (#26), sem esqueleto para preencher: o Claude traz um caso minúsculo com números, o
+  Vinicius resolve à mão e escreve os passos em português, o Claude escreve o código a partir deles (o caso vira teste,
+  ao lado dos testes-contrato da aula) e o Vinicius roda no mesmo caso e confere. Depois, o teach-back (`/teach-back`),
+  antes de alguém construir em cima da peça.
 - **o Vinicius decide:** em duas mensagens (desde 19/10). Primeiro, o Claude traz só o problema, com um exemplo
   concreto, e o Vinicius raciocina sobre ele; depois, 2 ou 3 opções, a recomendação com a aula e o custo de errar.
   Uma decisão por vez, em texto. A resposta vai para `docs/DECISOES.md`.
 - **Claude:** encanamento, testes, integração e documentação de apoio. O Vinicius lê um resumo de 3 linhas.
-- **Leitura (desde 18/10, #25):** dirigida. Antes de cada peça do Vinicius, só as seções que ela usa: o código, "No
-  projeto Galaxies" e "Erros comuns" (~20 min por aula). Nas listas abaixo, "a fundo" agora quer dizer dirigida, e
-  "rápida" vira um resumo de 3 linhas do Claude. A leitura inteira vai para a trilha depois de 23/10.
+- **Leitura (desde 18/10, #25; desde 20/10, #28, só nas aulas das peças do Vinicius):** dirigida. Antes de cada peça do
+  Vinicius, só as seções que ela usa: o código, "No projeto Galaxies" e "Erros comuns" (~20 min por aula). Nas listas
+  abaixo, "a fundo" agora quer dizer dirigida, e "rápida" vira um resumo de 3 linhas do Claude. A leitura inteira vai
+  para a trilha depois de 23/10.
 - **Ritmo:** cerca de 5,2 h por dia do Vinicius (#24), sem folga. No fim de cada dia, `/fechar-sessao` compara o
   feito com este roteiro. Se o dia estourar em mais de meio dia, entra o próximo corte.
 
@@ -70,7 +81,7 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
 - **Vinicius escreve:**
   - [x] M1 (17/10, teach-back em `estudos/TEACHBACKS.md`)
   - [x] M2 (19/10; código do Claude a partir do caso à mão, #26)
-  - [ ] `HIPOTESES.md`
+  - [ ] `HIPOTESES.md` (19/10: H1, H2 e H4; faltam H3, H5 a H9)
 - **Claude:**
   - [x] `splits.py` portado da 2.3, com testes, e `folds_de_desenvolvimento` (17/10)
   - [x] `metricas.py` portado da 2.4, com testes (18/10), e a manchete da #6 (19/10)
@@ -79,7 +90,7 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
   - [x] a contagem de Shorts por mês e por canal, para a decisão das datas
   - [x] a trava do teste ajustada às datas decididas (continua em 01/04/2026)
   - [x] a regra das duplicatas (#1), corrigida na revisão de 17/10 e estendida entre canais
-  - [ ] a base congelada (versão e hash)
+  - [x] a base congelada (versão e hash) (19/10: v1, hash `09f6035c11c9`)
   - [x] o esqueleto de experimentos (YAML + dataclass, MLflow com commit, hash e corte, teste de perturbação) (19/10)
   - [x] `auditar_datas` (1.7) (19/10)
   - [ ] a tabela de baselines na base real, com a mediana madura e o fallback por degrau: a tabela e a manchete
@@ -123,7 +134,7 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
 - **Claude:**
   - [ ] `prever_criativo` como esqueleto andante (carrega o modelo uma vez, devolve `model_version`)
   - [x] as versões fixadas (`fastmcp==3.4.7`, `mcp==1.30.0`, langgraph, langchain) (19/10)
-  - [ ] a guarda do OpenMP
+  - [x] a guarda do OpenMP (20/10: `previa.openmp.um_runtime`; no Mac M4, torch + LightGBM dão segfault em qualquer ordem de import sem `OMP_NUM_THREADS=1`)
   - [ ] os stubs das tools
 - **Marco 2:** `prever_criativo` responde pelo MCP no Inspector e dentro do Claude Code (`claude mcp add`), com o
   número do GBM.
@@ -139,14 +150,14 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
   - [ ] limiares do flag (#14)
 - **Vinicius escreve:**
   - [ ] M6
-  - [ ] M9: assistir e classificar os 20 piores erros
+  - [ ] M9: assistir e classificar os 20 piores erros (a lista está pronta e lacrada: `data/erros/piores_2d1bb463.csv`, 20/10)
 - **Claude:**
-  - [ ] thumbnails da base toda (SigLIP 2, sondas, OpenCV, PCA no treino): download e `previa.visual` prontos em 19/10; os embeddings rodam quando o download terminar
+  - [x] thumbnails da base toda (SigLIP 2, sondas, OpenCV, PCA no treino) (20/10: 30.981 capas com embedding, 10 sondas e cor e brilho da faixa 9:16)
   - [ ] amostra com frames, cortes e transcrição (apagando a mídia depois de extrair): código pronto e testado em 19/10 (`previa.midia`); roda do IP de casa
-  - [ ] rubrica do VLM na amostra (Gemini; começou em 18/10, ~500 Shorts por dia, porque o free tier corta em ~500 pedidos antes das 8 h de vídeo: rodar `uv run python -m previa.vlm rodar` todo dia até 20/10, depois o `reteste`)
-  - [ ] bootstrap pareado por canal da M9 (corte #24; o Vinicius faz teach-back)
-  - [ ] fusão com prefixos
-  - [ ] o runner da ablação
+  - [x] rubrica do VLM na amostra (20/10: 1.400 Shorts, 0 erros; reteste em 50 com kappa de 0,72 a 1,00, os 6 campos acima de 0,6)
+  - [x] bootstrap pareado por canal da M9 (corte #24; o Vinicius faz teach-back): o da ablação, nas duas réguas (20/10)
+  - [x] fusão com prefixos (19/10, no runner)
+  - [x] o runner da ablação (20/10: `previa.ablacao`, escada + todos menos um + ruído; base toda rodada e lacrada; a da amostra quando a mídia terminar)
   - [ ] o `confidence_flag` com as regras decididas
   - [x] a medição da maturação (19/10: crescimento mediano de 0% depois de 21 dias; `previa.maturacao`)
 - **Pronta quando:** existe a tabela de ablação com IC e a cobertura do intervalo de 80% está medida, total e por
@@ -164,12 +175,12 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
   - [ ] criativos da demo (#18)
   - [ ] payload do explicador (#23)
 - **Vinicius escreve:**
-  - [ ] M8 (o próximo corte, reavaliado em 19/10)
   - [ ] A4: o validador
   - [ ] A7: a invariante
 - **Claude:**
   - [ ] A5 e A6 (corte #24; o Vinicius faz teach-back de cada uma): A5 pronta em 19/10 (`previa.comparaveis`)
   - [ ] o prompt da A4 e o teste de injeção da A7 (corte #25; o Vinicius faz teach-back)
+  - [ ] M8, o `top_drivers` (corte #28; o Vinicius faz teach-back)
   - [x] SHAP (`pred_contrib`, e o intervencional para o fundo da #16) (19/10)
   - [ ] payload e template da explicação
   - [ ] cliente do LLM e LLM falso
@@ -188,7 +199,7 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
   - [ ] A8: o README até 21/10; o ensaio cronometrado e o ensaio de perguntas em 22 e 23/10
   - [ ] autoavaliação do hub (até 21/10)
 - **Claude:**
-  - [ ] rascunho do README a partir do `DECISOES.md` (corte #25; o Vinicius reescreve)
+  - [x] rascunho do README a partir do `DECISOES.md` (corte #25; o Vinicius reescreve) (20/10: marcas `V:` e `PREENCHER:`)
   - [ ] tabelas do README
   - [ ] data card e model card finais
   - [ ] respostas da demo salvas em JSON (plano B)
@@ -196,21 +207,22 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
 
 ## Dia a dia (horas do Vinicius)
 
-Replanejado em 18/10 pelo corte #25. De 14 a 17/10 saíram a 2.2, a 2.3, a M1 e as decisões #1–#4 e #24; em 18/10,
-a 2.4 e a #25. A leitura é dirigida (~20 min por aula, só as seções da peça); as rápidas são os resumos do Claude,
-lidos junto com a peça.
+Replanejado em 18/10 pelo corte #25 e, para 20 e 21/10, em 20/10 pelo #28, peça por peça (as horas da tabela "Peças",
+sem o que passou para o Claude). De 14 a 17/10 saíram a 2.2, a 2.3, a M1 e as decisões #1–#4 e #24; em 18/10, a 2.4 e a
+#25. A leitura é dirigida (~20 min por aula, só as seções da peça); as rápidas são os resumos do Claude, lidos junto com
+a peça.
 
 | Dia | Leitura dirigida | Prática e decisões | ~h |
 | :--- | :--- | :--- | :--- |
 | Dom 18/10 | 2.4 (feita), 2.5 | decisão #25 (feita); #5 e `HIPOTESES.md`; M2; bloco 1 de decisões (#6–#13, #20–#22); conferir os 50 Shorts (#19); criar a `GOOGLE_API_KEY` no AI Studio e pôr no `.env` (5 min) | 4,3 |
 | Seg 19/10 | 3.5, 3.4, 6.1 | M3; M4; leitura do marco 1; A1 | 5,7 |
-| Ter 20/10 | 6.5, 5.2, 5.3, 5.6 | bloco 2 de decisões (#14–#18, #23); A2; M6; M8 | 6,2 |
-| Qua 21/10 | 2.6 e 4.8, 5.7 e EDD 3–5, 6.6 e EDD 2 e 6, 6.7 | M9 (20 piores erros); A4 (validador); A7 (invariante); teach-back de A5, A6, do bootstrap da M9, do prompt da A4 e da injeção da A7; README (reescrever o rascunho); autoavaliação; **entrega até 23h59** | 6,4 |
+| Ter 20/10 | 6.1, 5.2, 5.3 (3.4 e 3.5 viram resumo) | #28 (feita); H3 e H5 a H9, curtas; abrir a ablação e o marco 1; A1; bloco 2 de decisões (aprovar ou vetar); M6 | 5,7 |
+| Qua 21/10 | 2.6, 6.5, 5.7, 6.6 (4.8, 6.7 e as EDD viram resumo) | M9 (20 piores erros); A2; A4 (validador); A7 (invariante); teach-back de A5, A6, M8, do bootstrap da M9, do prompt da A4 e da injeção da A7; README (reescrever o rascunho); autoavaliação; **entrega até 23h59** | 7,5 |
 | Qui 22/10 | — | ensaio cronometrado da demo; ensaio de perguntas | — |
 | Sex 23/10 | — | **apresentação** | — |
 
-A soma de 18 a 21/10 dá ~22,5 h, contra ~21 h de 5,2 h por dia: ~1,5 h de estouro, dentro do erro destas
-estimativas. O fusível é a M8 (~1 h): se o fechamento de 19/10 mostrar atraso, ela passa para o Claude.
+Com a #28 (A), 20 e 21/10 somam ~13,2 h para ~10,4 h: ~2,8 h de estouro. A B (a A2 para o Claude, ~1,8 h com
+a 6.5) volta no fechamento de 20/10, com o dia medido, antes de a A2 começar.
 
 ## Peças que o Vinicius escreve
 
@@ -266,14 +278,14 @@ O Claude traz cada uma na hora certa, com contexto e opções. A recomendação 
 | 24 | Corte pela entrega em 21/10: absorver ~10 h (o que estava em 22–23/10, menos o ensaio, e o atraso de 14/10) | ROTEIRO ("Se atrasar") | 1 | aplicar já os 6 itens de "Se atrasar" (~7,5 h; nada sai do produto); a M8 continua dele, e o resto (~2,5 h) sai de ~25 min a mais por dia | **decidida 15/10 (A)** |
 | 25 | Corte 2: absorver ~11 h de atraso (18/10) | ROTEIRO ("Se atrasar"), 5.6 | 1 | leitura dirigida; prompt da A4 e injeção da A7 para o Claude; decisões em dois blocos (menos a #5); rascunho do README do Claude. A M8 fica dele, como fusível | **decidida 18/10 (A)** |
 | 26 | Formato das peças "Vinicius escreve" (19/10): o esqueleto com `TODO(human)` não ensinava (a M2 travou sem contexto) | — | 1 | o raciocínio é dele (caso à mão + passos em português), o código é do Claude; treinar a sintaxe de pandas e numpy vai para depois de 23/10 | **decidida 19/10** |
+| 27 | Régua dos blocos nas H2 a H6 (19/10): o histórico pode somar quase nada na ordem e muito no número | 2.4, 2.6 | 1 | duas réguas: fica se melhorar a manchete ou o `mae_log` (IC pareado sem o zero), sem piorar a outra; +3 pontos só na H1 | **decidida 19/10 (A)** |
+| 28 | Corte 3 (19/10, noite): ~3,7 h de 19/10 ficaram para trás; 20 e 21/10 somam ~16 h de trabalho do Vinicius para ~10,4 h | ROTEIRO ("Se atrasar") | 1 | A: leitura dirigida só nas aulas das peças dele, M8 para o Claude, bloco 2 em aprovar ou vetar, H3 e H5 a H9 curtas; a B (a A2 para o Claude) volta no fechamento de 20/10, antes de a A2 começar | **decidida 20/10 (A; a B no fechamento)** |
 
 **Pendências do Claude:**
 
-- `auditar_datas` (Fase 1);
-- congelar a base de treino (Fase 1);
+- resumos de 3 linhas da 3.4, 3.5, 4.8, 5.6, 6.7 e das EDD (corte #28), cada um entregue com a peça que o usa;
 - recoleta das estatísticas antes do treino final (Fase 2);
-- medir a maturação (19 e 20/10, com cerca de 2 semanas de snapshots, a tempo do README);
-- apagar os dados brutos em 30/10;
+- apagar os dados brutos em 30/10, pelo passo a passo do data card v1 (inclui as pastas do módulo 4 e do golden set); o MLflow é decisão do Vinicius;
 - inscritos da API versionados em `data/canais.csv` até 30/10.
 
 **README (texto do Vinicius, na A8):** o porquê do alvo e "posts anteriores **e maduros**"; o critério de sucesso.
@@ -301,9 +313,16 @@ Corte nesta ordem:
 8. o prompt da A4 e o teste de injeção da A7: o Claude escreve; o Vinicius faz teach-back;
 9. as decisões restantes em dois blocos de aprovar ou vetar, menos a #5 (critério de sucesso), que vem inteira;
 10. o README: o Claude rascunha a partir do `DECISOES.md`; o Vinicius reescreve;
-11. M8: o Claude escreve; o Vinicius faz teach-back (o próximo, se o fechamento de 19/10 mostrar atraso).
+11. M8: o Claude escreve; o Vinicius faz teach-back;
+12. leitura dirigida só nas aulas das peças que continuam do Vinicius (6.1, 6.5, 5.2, 5.3, 2.6, 5.7 e 6.6); 3.4,
+    3.5, 4.8, 5.6, 6.7 e as EDD viram resumo de 3 linhas do Claude, lido com a peça; o bloco 2 de decisões (#14 a
+    #18 e #23) em aprovar ou vetar, uma linha cada; H3 e H5 a H9 curtas (hipótese e mecanismo; a métrica é a régua
+    da #27);
+13. A2: o Claude escreve o servidor e o Vinicius faz teach-back, ou o Vinicius escreve só as descrições das tools e
+    as mensagens de erro (~20 min). Decide-se no fechamento de 20/10, antes de a A2 começar.
 
-Os itens 1 a 6 valem desde 15/10 (#24); os itens 7 a 10, desde 18/10 (#25).
+Os itens 1 a 6 valem desde 15/10 (#24); os itens 7 a 10, desde 18/10 (#25); os itens 11 e 12, desde 20/10
+(#28).
 
 **Sempre raciocinadas pelo Vinicius (caso à mão e passos, #26):** M1 a M4, M6, A1, A2, o validador da A4, a invariante da A7 e o texto da A8.
 

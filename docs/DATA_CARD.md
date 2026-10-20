@@ -1,8 +1,9 @@
-# Data card: base de Shorts do Prévia (v0.1, 08/10/2026)
+# Data card: base de Shorts do Prévia (v1, 20/10/2026)
 
 > Exercício da [aula 1.8](https://inteliacademyclub.github.io/autoestudos/aulas/ml-preditivo-e-agentes/formulacao-e-dados/documentacao-etica-e-termos/).
-> Números de 08/10, antes da primeira coleta dos 18 canais incluídos nesse dia. Próximas versões: congelamento da
-> base de treino (12/10) e última coleta de rótulos (19/10).
+> A v1 descreve a base congelada dos experimentos (`data/base_v1.parquet`, exportação de 19/10/2026, 06h46, hash de
+> desenvolvimento `09f6035c11c9`). Os números do período de teste (01/04 a 14/09/2026) são contagens de linhas,
+> sem ler curtidas: o teste abre uma vez, no fim. A v0.1 (08/10) está no histórico do git.
 
 ## Origem
 
@@ -12,31 +13,33 @@
   (detalhes e estatísticas), `channelSections.list` (canais em destaque) e `search.list` (só para descobrir canais).
 - **Fontes de apoio:** nenhuma em uso. SMTPD e MicroLens-100K, se entrarem, servem só para ensaio, nunca para teste
   (aula 1.3).
+- **Mídia (módulo 4):** a thumbnail pública de cada Short (`hqdefault`, 480 × 360) para a base toda, e os vídeos de
+  uma amostra de 1.400 Shorts, baixados em 360p com o yt-dlp, só para extrair features, e apagados em seguida.
 
 ## Período
 
-- **Publicação dos Shorts rotulados:** de 14/05/2014 a 07/09/2026. 77% foram publicados depois de 15/10/2024, e
-  2,4% antes de julho de 2021, quando os Shorts foram lançados no mundo todo.
-- **Coletas:** de 05/10 a 08/10/2026, 6 execuções (5 completas; a de 06/10 às 5h caiu por timeout de rede e foi
-  refeita à tarde). Coleta diária às 05h15, agendada no launchd.
-- **Cortes:** a base de treino congela em 12/10 (Shorts publicados até 12/09). A última coleta de rótulos é em 19/10
-  (publicados até 19/09).
+- **Publicação dos Shorts rotulados:** de 14/05/2014 a 19/09/2026. Antes de 01/07/2021 há 336 Shorts (1,1%),
+  vídeos verticais curtos de antes do formato no Brasil, que ficam só no histórico do canal (#2).
+- **Coletas:** de 05/10 a 19/10/2026 para a v1, diárias às 05h15 (launchd), até 30/10. Na primeira coleta, de
+  05/10, entrou o histórico inteiro de cada canal.
+- **Blocos do split (#3):** treino de 01/07/2021 a 01/01/2026 (20.579 Shorts), gap em jan/2026 (1.025),
+  calibração de 01/02 a 31/03/2026 (1.882) e teste de 01/04 a 14/09/2026 (7.265, dos 70 canais).
 
 ## Volume
 
-11.203 Shorts rotulados de 52 canais, todos validados no esquema mínimo. A base inteira tem 78.353 vídeos, 23.246
-deles Shorts; vira rótulo o Short com 30 dias ou mais, até 400 por canal (contagem com o teto; a exportação sem
-teto, de 08/10, tem 22.172; veja "Coleta").
+31.303 Shorts rotulados de 70 canais (35 por setor), todos validados no esquema mínimo. São 30.983 criativos e 320
+cópias (duplicatas, #1). A tabela de vídeos do coletor tem 95.998 vídeos, 32.813 deles Shorts; vira rótulo o Short
+com 30 dias ou mais, sem teto por canal (o teto é parâmetro do experimento, #8).
 
-Shorts rotulados por setor e faixa de inscritos:
+Shorts rotulados por setor e faixa de inscritos (a faixa é a da curadoria, com os inscritos de outubro):
 
 | Setor | até 10 mil | 10–100 mil | 100 mil–1 mi | mais de 1 mi | Total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
-| Automotivo | 123 | 625 | 3.804 | 1.683 | 6.235 |
-| Beleza | 310 | 1.081 | 1.626 | 1.951 | 4.968 |
-| **Total** | **433** | **1.706** | **5.430** | **3.634** | **11.203** |
+| Automotivo | 126 | 2.076 | 6.988 | 5.100 | 14.290 |
+| Beleza | 311 | 5.853 | 7.644 | 3.205 | 17.013 |
+| **Total** | **437** | **7.929** | **14.632** | **8.305** | **31.303** |
 
-Canais incluídos (70, já com os 18 da busca de 08/10, que entram na coleta de 09/10):
+Canais incluídos:
 
 | Setor e tipo | até 10 mil | 10–100 mil | 100 mil–1 mi | mais de 1 mi | Total |
 | :--- | ---: | ---: | ---: | ---: | ---: |
@@ -45,28 +48,41 @@ Canais incluídos (70, já com os 18 da busca de 08/10, que entram na coleta de 
 | Beleza, criador | 0 | 7 | 8 | 5 | 20 |
 | Beleza, marca | 2 | 5 | 5 | 3 | 15 |
 
+Fora da base, o **golden set** (#4): 30 Shorts maduros de 01/04 a 14/09/2026, de 6 canais sorteados entre as
+reservas revisadas (2 marcas e 1 criador por setor), com o histórico dos 6 canais (1.793 Shorts), em `data/golden/`.
+
 ## Licença e termos
 
 - **Termos:** YouTube API Services Terms of Service e Developer Policies, na versão de 14/09/2026 lida na aula 1.8.
 - **Uso:** educacional e interno, sem produto e sem clientes reais consumindo as previsões.
 - **Sem redistribuição:** o repositório (privado) tem o código, as planilhas de curadoria e este data card. Base,
-  parquets, vídeos e frames ficam fora do git (`.gitignore`).
+  parquets, thumbnails, vídeos, frames e áudio ficam fora do git (`.gitignore`).
 - **Retenção:** a coleta diária renova as estatísticas de todo vídeo cujo dado mais recente passou de 25 dias e apaga
   os que sumiram da API. Em seguida, uma auditoria confere se algum vídeo passou de 30 dias sem renovação; se passou,
-  a execução falha e o Mac avisa.
+  a execução falha e o Mac avisa. A base congelada v1 é só leitura e é apagada com o resto.
+- **Mídia:** o vídeo da amostra é apagado logo depois da extração, também quando uma etapa falha; ficam só as
+  features (cortes, cor, fala, energia do áudio). As thumbnails ficam em `data/thumbs/` até 30/10.
+- **Gemini (free tier):** recebeu só URLs de Shorts já publicados (a rubrica da amostra e o reteste de 50). Um
+  criativo não publicado nunca vai ao free tier (princípio 5 do `CLAUDE.md`).
 - **Apagamento:** os dados brutos serão apagados em **30/10/2026**. Desse dia em diante, o `scripts/coletar.sh` não
   coleta e avisa todo dia, até o passo a passo abaixo ser feito.
 - **Tensões conhecidas com as políticas (aula 1.8):** a regra dos 30 dias (III.E.4.d) contra os snapshots antigos,
   que são o rótulo; métricas derivadas (III.E.4.h) contra o alvo relativo; agregação de canais de donos diferentes
-  (III.E.2); download e raspagem de mídia (III.E.1 e III.E.6) contra o módulo 4, que ainda não começou.
+  (III.E.2); o download de mídia (III.E.1 e III.E.6), limitado à amostra, em ritmo lento, com apagamento logo depois
+  da extração.
 
-Passo a passo do apagamento, em 30/10:
+Passo a passo do apagamento, em 30/10 (v1: inclui as pastas do módulo 4 e do golden set):
 
 ```bash
 launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.previa.coletor.plist
 rm ~/Library/LaunchAgents/com.previa.coletor.plist
-rm -f data/shorts.duckdb data/*.parquet data/cota*.json && rm -rf data/logs media/
+rm -f data/shorts.duckdb data/*.parquet data/cota*.json data/amostra_multimodal.csv data/conferencia_shorts*.csv
+rm -rf data/logs data/thumbs data/emb_thumb_v1 data/cache data/vlm data/golden data/videos data/ablacao media/ artefatos/
 ```
+
+<!-- V: decidir até 30/10 o que fazer com o MLflow (`mlflow.db` e `mlruns/`): ele guarda as métricas agregadas,
+que o README cita pelo run id, e as previsões por `post_id` (`previsoes.json`), que são dado derivado da API. Uma
+opção é apagar só os `previsoes.json` e manter as métricas. -->
 
 ## Coleta
 
@@ -77,40 +93,55 @@ rm -f data/shorts.duckdb data/*.parquet data/cota*.json && rm -rf data/logs medi
   diários dos Shorts com até 60 dias e renovação dos vencidos.
 - **Regra de Short:** até 60 s se publicado antes de 15/10/2024, até 180 s depois (quando o limite mudou para 3
   minutos), e não horizontal: largura menor ou igual à altura no player, com formato desconhecido contando como
-  Short.
-- **Teto por canal:** desde 08/10, a exportação leva todos os Shorts rotulados (22.172 na reexportação desse dia).
-  O teto (400 no plano, ainda em aberto) passa a valer só para as linhas de treino, como parâmetro do experimento:
-  o histórico do canal precisa de todos os posts (paridade treino/uso). Com o teto de 400, 12 canais ficavam nele.
-- **Duplicatas (decisão #1 de 14/10, implementada em 15/10):** a coluna `duplicate_group` leva o ID da primeira
-  cópia publicada do mesmo criativo: título normalizado e duração iguais **e** thumbnail com dHash de 64 bits a até
-  10 bits da cópia mais antiga, inclusive entre canais desde 17/10 (`src/previa/duplicatas.py`, aula 2.2). Na exportação de 15/10: 285
-  grupos e 307 cópias (185 da Mundo do Automóvel para PCD e 91 da Principia), contra 675 grupos e 1.137 cópias só
-  com título e duração; nenhuma entre canais. Nada é apagado: só a primeira cópia vira linha de treino e de teste
-  (`linhas_do_modelo`), e o histórico do canal usa todas. Os hashes ficam em `data/thumb_hash.parquet` (1.812
-  thumbnails; a imagem nunca é gravada), apagado em 30/10. Uma thumbnail que falha vira aviso, e o post fica pela
-  regra de título e duração até a próxima exportação.
+  Short. A conferência de 50 Shorts a olho (#19) está em aberto. <!-- PREENCHER: a concordância da #19 -->
+- **Teto por canal:** a exportação leva todos os Shorts rotulados. O teto de 400 vale só para as linhas de treino,
+  como parâmetro do experimento (H6): o histórico do canal precisa de todos os posts (paridade treino/uso).
+- **Duplicatas (#1, 14/10, entre canais desde 17/10):** a coluna `duplicate_group` leva o ID da primeira cópia
+  publicada do mesmo criativo: título normalizado e duração iguais **e** thumbnail com dHash de 64 bits a até 10
+  bits da cópia mais antiga (`src/previa/duplicatas.py`, aula 2.2). Na v1: 320 cópias. Nada é apagado: só a
+  primeira cópia vira linha de treino e de teste, e o histórico do canal usa todas. Uma thumbnail que falha vira
+  aviso, e o post fica pela regra de título e duração.
+- **Maturação (medida em 19/10, com os snapshots de 05 a 19/10):** o crescimento mediano das curtidas em ~12 dias é
+  de +69% para quem foi visto com 0 a 3 dias, +4,1% com 3 a 7, +0,8% com 7 a 14, +0,1% com 14 a 21 e 0% a partir de
+  21 dias (`uv run python -m previa.maturacao`). A regra dos 30 dias tem folga.
 - **Versão:** `src/previa/coletor.py` no git. Mudanças relevantes: retry de rede (06/10), preferência por IPv4 e
   busca por termo (08/10), validação e auditoria a cada coleta (08/10).
-- **Cota:** de 110 a 140 unidades por dia na coleta diária, de um limite de 10 mil. Picos: 3.805 na primeira coleta
-  (05/10) e 8.615 na avaliação de 614 candidatos (08/10).
+- **Cota:** de 180 a 205 unidades por dia na coleta diária (outubro), de um limite de 10 mil. Picos: 3.805 na
+  primeira coleta (05/10), 8.615 na avaliação de 614 candidatos (08/10) e 384 no golden set (19/10).
 
 ## Setores e estratificação
 
-Beleza e automotivo, 35 canais cada. Nos Shorts rotulados, o automotivo tem 74% de criadores e a beleza tem 74% de
-marcas; os 20 criadores de beleza incluídos em 08/10 devem equilibrar isso a partir da coleta de 09/10. Idioma e
-país: canais brasileiros, em português. O país da API é opcional e vem vazio em muitos canais, por isso a conferência
-final de país e idioma é humana (critério 2 do plano).
+Beleza e automotivo, 35 canais cada. Nos Shorts rotulados, o automotivo tem 83% de criadores; a beleza, 50% de
+criadores e 50% de marcas, depois dos 20 criadores de beleza incluídos em 08/10. Idioma e país: canais brasileiros,
+em português. O país da API é opcional e vem vazio em muitos canais, por isso a conferência final de país e idioma é
+humana (critério 2 do plano).
 
 ## Alvo e rótulo
 
 - **Rótulo** (`metric_target`): o `likeCount` do primeiro snapshot com 30 dias ou mais de idade.
-- **Alvo de treino** (README, aula 1.1): o log da razão entre as curtidas do Short e a mediana das curtidas dos posts
-  anteriores do mesmo canal.
-- **Idade do rótulo:** mediana de 324 dias, 10% com até 60 dias e 10% com mais de 1.247 dias. **53% dos rótulos
-  foram medidos com mais de 300 dias**: a primeira coleta pegou de uma vez o histórico inteiro de cada canal.
-- **Curtidas ocultas:** viram `None`, nunca 0, e atingem 0,42% dos Shorts rotulados. Canais com mais da metade das
-  curtidas ocultas ficaram fora na curadoria, e o esquema falha se a base passar de 10%.
-- **Distribuição:** mediana de 191 curtidas e percentil 90 de 5.148. É a cauda longa da aula 1.6.
+- **Alvo de treino** (README, aula 1.6): o log da razão entre as curtidas do Short e a mediana madura das curtidas
+  dos posts anteriores do mesmo canal (publicados ao menos 30 dias antes), definido com 10+ posts maduros (#20).
+- **Idade do rótulo:** na base de desenvolvimento (até 31/03/2026), mediana de 636 dias, 10% com até 261 e 10% com
+  mais de 1.361; **85% foram medidos com mais de 300 dias**, porque a primeira coleta pegou o histórico inteiro de
+  cada canal. No teste (publicados de abril a setembro de 2026, coletados em outubro), os rótulos têm de 1 a 6 meses.
+- **Curtidas ocultas:** viram `None`, nunca 0, e atingem 3,7% dos Shorts da base de desenvolvimento. Canais com mais
+  da metade das curtidas ocultas ficaram fora na curadoria, e o esquema falha se a base passar de 10%.
+- **Distribuição (desenvolvimento):** mediana de 271 curtidas e percentil 90 de 5.922. É a cauda longa da aula 1.6.
+
+## Features derivadas (módulo 4)
+
+| Tabela | O que tem | Cobertura |
+| :--- | :--- | :--- |
+| `emb_titulo_v1.parquet` | embedding do título (MiniLM multilíngue, 384 dimensões; o PCA é ajustado no treino de cada fold) | os 31.303 |
+| `emb_thumb_v1/` | embedding da capa (SigLIP 2, faixa central 9:16) | 30.981 |
+| `sondas_thumb_v1.parquet` | 10 sondas relativas da capa (4.4) | 30.981 |
+| `aparencia_thumb_v1.parquet` | brilho, contraste, saturação e colorfulness da capa (4.3) | 30.981 |
+| `vlm/rubrica_v1.jsonl` | rubrica do Gemini: gancho, energia e ritmo, rosto, produto em close, antes/depois, texto na tela (kappa de 0,72 a 1,00 no reteste de 50) | 1.400 da amostra |
+| `cache/` | cortes, movimento e aparência dos frames, fala e energia do áudio | a amostra, em andamento |
+
+A amostra (#12) tem 20 Shorts por canal, sorteados com seed 0 entre as primeiras cópias, proporcional ao tamanho de
+cada bloco de tempo, sem olhar curtidas: 930 no treino, 111 na calibração e 359 no teste (19,9 h de vídeo). A capa é
+a da data da coleta, que o canal pode ter trocado depois da publicação (4.2, erro comum 6).
 
 ## O que esta base NÃO representa
 
@@ -162,33 +193,41 @@ Escritos pelo Vinicius em 08/10 (exercício da aula 1.8).
    feature no treino, e na hora da previsão a gente fixa o valor em 30. Outra saída é treinar só com rótulos de idade
    parecida, mas isso joga fora muitos dados. A escolha sai de um experimento no módulo 3.
 
+<!-- V: os números dos itens 1 e 3 são de 08/10. Na v1: no item 1, a beleza tem 50% de marcas (eram 74%) e o
+automotivo, 83% de criadores; no item 3, a base de desenvolvimento tem mediana de 636 dias e 85% com mais de 300.
+Atualizar com as suas palavras, e o item 3 com o resultado da H5 -->
+
+4. **Capa da data da coleta.** (complemento do Claude, a revisar) A thumbnail é a de outubro de 2026, e o canal
+   pode tê-la trocado depois da publicação. Na previsão, a capa de A e B é a que a marca escolher.
+
 ## Esquema
 
 `src/previa/esquema.py`: `Post` (Pydantic, um registro) e `BaseShorts` (pandera, a tabela de treino). Campos:
 `post_id`, `channel_id`, `published_at`, `caption` (título + descrição), `media_ref` (link do Short, nunca arquivo),
 `metric_target`, `target_age_days` (≥ 30), `subscribers_at_collection` (fora das features de treino, aula 1.7),
-`collected_at` e `sector`. Checagens: ID único, coleta depois da publicação e no máximo 10% sem curtidas. O modo
-estrito trava coluna faltando ou sobrando. A validação roda a cada coleta diária e grava `data/base_minima.parquet`.
-Primeira validação na base real, em 08/10: 11.203 linhas, nenhum erro.
+`collected_at`, `sector` e `duplicate_group`. Checagens: ID único, coleta depois da publicação e no máximo 10% sem
+curtidas. O modo estrito trava coluna faltando ou sobrando. A validação roda a cada coleta diária e grava
+`data/base_minima.parquet`; a base congelada é uma cópia dela.
 
-## Conformidade (checklist da aula 1.8, em 08/10)
+## Conformidade (checklist da aula 1.8, revisto em 20/10)
 
 | Item | Situação | O que falta e até quando |
 | :--- | :--- | :--- |
 | `collected_at` e `age_days` em toda linha | ✅ | — |
 | Refresh ou exclusão em até 30 dias, agendado | ✅ renovação diária (25 dias) + auditoria diária que falha alto | — |
 | Base, vídeos, frames e áudios fora de repositório ou pasta pública | ⚠️ base fora do git, mas `data/canais.csv`, versionado, guarda inscritos e contagens da API | Decidir até 30/10: tirar os números da API do arquivo versionado (e do histórico do git) ou registrar a exceção |
-| Nenhum vídeo baixado guardado | ✅ por enquanto: nenhuma mídia baixada | Decidir como obter a mídia (aula 4.2, III.E.1 e III.E.6) antes do multimodal, até 16/10 |
-| Chave da API só em variável de ambiente | ✅ `.env` fora do git; `sem_chave` limpa a chave dos logs | — |
-| Nada confidencial ou pessoal no Gemini free tier | ✅ nada enviado; o VLM (camada 2) saiu do escopo | Manter se o VLM voltar |
+| Nenhum vídeo baixado guardado | ✅ o vídeo da amostra é apagado depois da extração, também com falha de etapa; as thumbnails ficam até 30/10 | Apagar em 30/10 |
+| Nada confidencial ou pessoal no Gemini free tier | ✅ só URLs de Shorts publicados | Manter: criativo não publicado nunca vai ao free tier |
 | Comentários não coletados | ✅ só o `commentCount`; nenhum texto, nenhum autor | — |
-| Sem reconhecimento facial | ✅ nada implementado | No módulo 4, só presença de rosto |
+| Sem reconhecimento facial | ✅ só a presença de rosto (um campo da rubrica), sem identificar ninguém | — |
 | Data card com "o que NÃO representa" e vieses | ✅ | — |
 | Esquema validado com pandera a cada exportação | ✅ desde 08/10 | — |
-| Previsão apresentada como estimativa do modelo | ❌ a tool ainda não existe | No contrato da tool e no README, até 20/10 |
-| Plano de exclusão dos dados brutos, com data | ✅ 30/10/2026; a coleta desliga sozinha | Seguir o passo a passo acima |
+| Previsão apresentada como estimativa do modelo | ❌ a tool ainda não existe | No contrato da tool (A1) e no README, até 21/10 |
+| Plano de exclusão dos dados brutos, com data | ✅ 30/10/2026; a coleta desliga sozinha | Seguir o passo a passo acima; decidir o MLflow |
 
 ## Contato e versão
 
 - **Responsável:** Vinicius Castiglia. **Repositório:** `case-galaxies` (privado).
 - **v0.1 (08/10/2026):** primeira versão, exercício da aula 1.8.
+- **v1 (20/10/2026):** a base congelada dos experimentos (70 canais, 31.303 Shorts), a mídia do módulo 4, o golden
+  set, a maturação medida e o passo a passo do apagamento com as pastas novas. Rascunho do Claude, a revisar.

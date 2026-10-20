@@ -1,0 +1,22 @@
+# Ablação na base toda (aulas 2.6 e 4.8). Lido por previa.ablacao.
+#
+# O completo é a H7 (Opção A + texto + capa). Os blocos ficam na ordem da escada (a do briefing:
+# canal, tempo, texto, visual) e precisam cobrir todas as entradas do completo, cada uma num bloco
+# só. A amostra multimodal (rubrica do VLM, vídeo e áudio) tem a sua ablação à parte, quando a
+# mídia terminar.
+completo: configs/experimentos/h7_thumb.yaml
+ruido: 2              # colunas de puro ruído no controle negativo (2.6)
+blocos:
+  historico:          # as 9 da 3.5 (H2); a âncora do alvo relativo continua em todas as variantes
+    features: [hist_*, tendencia, dias_desde_ultimo, posts_30d]
+  calendario:
+    features: [hora_local, dia_semana_local, feriado]
+  metadados:
+    features: [idade_canal_dias, duracao_s, setor]
+  texto:              # H4: as manuais e o PCA de 16 dos embeddings do título
+    features: [txt_*]
+    pca: [titulo]
+  capa:               # H7: SigLIP 2 com PCA de 16, as 10 sondas e a cor e o brilho do OpenCV
+    features: [sonda_*, thumb_*]
+    pca: [thumb]
+    extras: [sondas_thumb, aparencia_thumb]

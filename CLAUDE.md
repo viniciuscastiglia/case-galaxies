@@ -28,7 +28,7 @@ O briefing oficial é o TAPI (`escopo_projeto.md`), que é o nome do documento, 
   confiança; o contrato da tool; o que vai ao README e à demo. Ele escreve as peças "Vinicius escreve" do ROTEIRO
   (M1–M4, M6, M8, M9, A1, A2, A4, A7 e A8; A5, A6 e o bootstrap da M9 passaram para o Claude no corte de
   15/10; o prompt da A4, o teste de injeção da A7 e o rascunho do README, no de 18/10, quando a leitura virou
-  dirigida). Um corte tira estudo ou escrita do Vinicius, nunca escopo do produto.
+  dirigida; a M8, no de 20/10, #28). Um corte tira estudo ou escrita do Vinicius, nunca escopo do produto.
 - **O Claude faz o resto e traz as decisões.** Encanamento, pandas de apoio, testes, integração, infraestrutura e
   documentação de apoio. Decide sozinho o que é encanamento e registra em `docs/DECISOES.md`. Nunca toma uma decisão
   da lista acima no lugar do Vinicius.
@@ -135,15 +135,17 @@ uv run python -m previa.curadoria buscar   # busca por termo (data/termos_busca.
 ./scripts/coletar.sh                       # coleta diária (carrega o .env; log em data/logs/coleta.log)
 uv run mlflow ui --port 5001               # a porta 5000 é do AirPlay
 uv run python -m previa.experimento configs/experimentos/opcao_a_texto.yaml   # um experimento (MLflow)
-uv run python -m previa.experimento comparar RUN_A RUN_B   # ganho de B sobre A, pareado por canal
+uv run python -m previa.experimento comparar RUN_A RUN_B   # B sobre A nas duas réguas (#27), pareado por canal
+uv run python -m previa.ablacao configs/ablacao.yaml   # escada, todos menos um e ruído (2.6, 4.8)
+uv run python -m previa.erros RUN_ID     # resíduos por corte e os 20 piores para a M9 (2.6)
 uv run python -m previa.baselines janela   # a manchete da #6 para os baselines
 uv run python -m previa.vlm rodar          # rubrica do VLM (precisa do .env; ~500 pedidos por dia)
 uv run python -m previa.thumbs             # thumbnails da base (retoma do cache)
 uv run python -m previa.midia amostra      # frames, cortes e áudio da amostra: SÓ do IP de casa
 ```
 
-Nos experimentos, a base entra por `previa.dados.carregar_base()`, que não devolve o período de teste
-(`configs/avaliacao.yaml`), e os folds por `previa.splits.folds_de_desenvolvimento(df, cfg)`, só dentro do treino.
+Nos experimentos, a base entra por `previa.dados.carregar_base()`, que lê a base congelada (`base` em
+`configs/avaliacao.yaml`, hoje a v1) e não devolve o período de teste, e os folds por `previa.splits.folds_de_desenvolvimento(df, cfg)`, só dentro do treino.
 `carregar_base(final=True)` abre o teste, avisa e registra em `data/logs/teste_aberto.log`. A base sintética da liga está em `from previa.sintetico import gerar_base`.
 
 Nunca mostre chaves em saída de terminal ou log. Erros da API do Google trazem a URL com `key=`; use
@@ -162,8 +164,9 @@ Nunca mostre chaves em saída de terminal ou log. Erros da API do Google trazem 
 - **yt-dlp:** só do IP de casa, com Deno e `yt-dlp[default]`, em ritmo lento. Use `-S "res:360"`: com
   `height<=360`, o Short vertical sai em 144×256.
 - **MediaPipe:** aborta no Apple Silicon. Rosto só no Colab ou no Kaggle.
-- **OpenMP no macOS:** LightGBM com torch no mesmo processo dá segfault (extraia num processo e treine em outro); com
-  FAISS, use `OMP_NUM_THREADS=1` antes dos imports; o LightGBM precisa do `libomp` (`brew install libomp`).
+- **OpenMP no macOS:** LightGBM com torch no mesmo processo dá segfault, em qualquer ordem de import (medido em
+  20/10). Extraia num processo e treine em outro; o processo que serve a tool chama `previa.openmp.um_runtime()`
+  (`OMP_NUM_THREADS=1`) antes dos imports. O LightGBM precisa do `libomp` (`brew install libomp`).
 - **MCP:** fixe `fastmcp==3.4.7` + `mcp==1.30.0` (o `langchain-mcp-adapters` 0.3.2 exige `mcp<2`) e ignore o
   "Update available". Nada de `print()` num servidor stdio.
 - **MAPIE:** o `train_conformalize_test_split` é aleatório; separe treino, calibração e teste por data, à mão.

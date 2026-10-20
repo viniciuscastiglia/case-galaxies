@@ -1,0 +1,28 @@
+# Ablação na amostra multimodal (aulas 2.6 e 4.8). Lido por previa.ablacao.
+#
+# Os mesmos blocos da base toda, mais a rubrica do VLM (H8) e os sinais do vídeo e do áudio (H9),
+# avaliados só nos 1.400 Shorts da amostra (o treino usa a base toda, com NaN fora dela). Em 2025 há
+# só ~206 pares a até 14 dias na amostra: o IC vai ser largo, e "não detectamos ganho" é resultado
+# válido (4.8). Roda depois da mídia (precisa de data/cache/*_v1.parquet).
+completo: configs/experimentos/completo_amostra.yaml
+ruido: 2
+blocos:
+  historico:
+    features: [hist_*, tendencia, dias_desde_ultimo, posts_30d]
+  calendario:
+    features: [hora_local, dia_semana_local, feriado]
+  metadados:
+    features: [idade_canal_dias, duracao_s, setor]
+  texto:
+    features: [txt_*]
+    pca: [titulo]
+  capa:
+    features: [sonda_*, thumb_*]
+    pca: [thumb]
+    extras: [sondas_thumb, aparencia_thumb]
+  vlm:
+    features: [vlm_*]
+    extras: [vlm]
+  video_audio:
+    features: [sinal_*, aud_*]
+    extras: [sinais, audio]
