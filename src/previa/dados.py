@@ -4,6 +4,10 @@ Aulas 1.2, 2.3 e 2.5: o teste é separado no dia 1 e usado uma vez, no fim. Fora
 final, `carregar_base` não devolve nada publicado a partir de `teste_inicio`
 (configs/avaliacao.yaml). Abrir o teste exige `final=True`, avisa e deixa um registro em
 data/logs/teste_aberto.log: é a prova de quantas vezes o teste foi olhado.
+
+A base é a cópia congelada que `base` aponta no config (aula 2.5, erro comum 2): a coleta diária
+reexporta a `base_minima` com as curtidas novas, e a mesma config daria outro número no dia
+seguinte. Sem a chave, o erro é explícito: nunca cai na base viva em silêncio.
 """
 
 import warnings
@@ -20,12 +24,14 @@ CONFIGS = Path("configs")
 
 def carregar_base(
     final: bool = False,
-    caminho_base=DADOS / "base_minima.parquet",
+    caminho_base=None,
     caminho_config=CONFIGS / "avaliacao.yaml",
     registro=DADOS / "logs" / "teste_aberto.log",
 ) -> pd.DataFrame:
     """Base mínima para desenvolver (final=False) ou para a avaliação final (final=True)."""
     config = yaml.safe_load(Path(caminho_config).read_text(encoding="utf-8"))
+    if caminho_base is None:
+        caminho_base = DADOS / config["base"]  # um caminho absoluto no config vale como está
     teste_inicio = pd.Timestamp(str(config["teste_inicio"]), tz="UTC")
     base = pd.read_parquet(caminho_base)
     if not final:

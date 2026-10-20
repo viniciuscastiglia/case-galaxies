@@ -1,5 +1,5 @@
-# H8, rubrica do VLM (#13; 4.7 e 4.8): + os campos vlm_*. Antes de rodar, troque vlm_* pelos
-# campos com kappa > 0,6 no teste-reteste (#13). Controle: h8_controle.yaml.
+# H8, rubrica do VLM (#13; 4.7 e 4.8): + os campos vlm_*. Os 6 passaram do kappa de 0,6 no
+# teste-reteste de 20/10 (0,72 a 1,00), então entram todos. Controle: h8_controle.yaml.
 nome: h8-vlm
 hipotese: H8
 descricao: "H8: + os campos da rubrica do VLM, avaliada só na amostra"

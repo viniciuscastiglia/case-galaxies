@@ -3,6 +3,20 @@
 Histórico das sessões. As entradas novas ficam no topo, com 3 a 5 linhas por sessão (`/fechar-sessao`). O plano
 vivo está em `docs/ROTEIRO.md` e as decisões em `docs/DECISOES.md`.
 
+## 19/10 (tarde e noite) · hipóteses H1, H2 e H4, régua dos blocos e base congelada
+
+- O Vinicius escreveu o mecanismo da H1 (no feed o vídeo começa sozinho; assunto, duração e horário decidem quem fica),
+  a H2 (o histórico ajuda pouco na ordem, porque é quase igual para A e B a até 14 dias, e ajuda no número: no
+  Acelerados, a mediana de tudo dá 1.070 e os últimos 20 maduros, ~560) e a H4 (o texto ajuda na ordem; os embeddings
+  só entram se ganharem das manuais). Decidiu a #27: o bloco fica se melhorar a manchete ou o `mae_log`, sem piorar a outra.
+- Funcionou: os 6 Shorts reais do Acelerados (02 a 10/06/2025) em tabela; contextualizar o porquê do arquivo e do par
+  controle × tratamento antes de perguntar; multiplicadores inventados para separar ordem e número. A confusão foi
+  "histórico = mais dados para treinar" (é coluna, não linha).
+- Do Claude: IC pareado do `mae_log` no `comparar`, base congelada v1 (`09f6035c11c9`), thumbnails e embeddings
+  (30.981) e H7 lacrada (`f98c3e05`, falta o OpenCV). Mídia em 441/1.400; rubrica em ~973/1.400 (cota às 14h42).
+  255 testes.
+- Ficou para trás ~3,7 h do dia (cansaço à noite). Próxima sessão: a decisão do corte (#28), depois a H3 em diante.
+
 ## 18 e 19/10 (manhã) · M2, critério de sucesso e o pipeline do modelo
 
 - Decididos: o bloco 1 (10 decisões, 18/10), a #6 (manchete pesando cada canal pelo nº de Shorts; a Salon Line tinha

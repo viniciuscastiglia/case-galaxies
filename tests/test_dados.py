@@ -37,3 +37,16 @@ def test_avaliacao_final_abre_o_teste_com_aviso_e_registro(arquivos):
     with pytest.warns(UserWarning):
         carregar_base(final=True, **arquivos)
     assert len(arquivos["registro"].read_text().splitlines()) == 2  # cada abertura conta
+
+
+def test_le_a_base_congelada_do_config(arquivos, tmp_path):
+    """Aula 2.5, erro comum 2: os experimentos leem a cópia congelada que o config aponta."""
+    congelada = tmp_path / "base_v1.parquet"
+    pd.read_parquet(arquivos["caminho_base"]).iloc[:1].to_parquet(congelada, index=False)
+    arquivos["caminho_config"].write_text(f'teste_inicio: "2026-04-01"\nbase: "{congelada}"\n')
+    base = carregar_base(caminho_config=arquivos["caminho_config"], registro=arquivos["registro"])
+    assert base["post_id"].tolist() == ["antes000000"]
+    sem_chave = tmp_path / "sem_base.yaml"
+    sem_chave.write_text('teste_inicio: "2026-04-01"\n')
+    with pytest.raises(KeyError, match="base"):  # falha nunca silenciosa: sem cair na base viva
+        carregar_base(caminho_config=sem_chave, registro=arquivos["registro"])

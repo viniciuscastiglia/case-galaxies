@@ -39,6 +39,7 @@ from previa.coletor import DADOS
 from previa.dados import carregar_base
 from previa.features import montar_features
 from previa.metricas import (
+    ic_dif_mae_pareado,
     ic_ganho_pareado,
     mae_log,
     pairwise_janela,
@@ -72,8 +73,10 @@ class Config:
     teto_por_canal: int | None = None  # #8 (H6): no máximo N linhas de treino por canal
     idade_rotulo_max: int | None = None  # #21 (H5 b): só rótulos com até N dias de idade
     fixar: dict = field(default_factory=dict)  # #21 (H5 a): feature fixada na previsão
-    extras: list[str] = field(default_factory=list)  # blocos por join (4.8): sondas_thumb, vlm...
+    # blocos por join (4.8): sondas_thumb, aparencia_thumb, vlm...
+    extras: list[str] = field(default_factory=list)
     so_amostra: bool = False  # avaliar só nos Shorts da amostra multimodal (H8, 4.8)
+    ruido: int = 0  # controle negativo (2.6): `ruido_1`..`ruido_N`, sem relação com o alvo
 
 
 def ler_config(caminho) -> Config:
@@ -120,6 +123,8 @@ def ler_extra(nome: str) -> pd.DataFrame:
 
     if nome == "sondas_thumb":
         t = pd.read_parquet(DADOS / "sondas_thumb_v1.parquet").set_index("video_id")
+    elif nome == "aparencia_thumb":  # cor e brilho da capa (4.3), a parte OpenCV do bloco (#12)
+        t = pd.read_parquet(DADOS / "aparencia_thumb_v1.parquet").set_index("video_id")
     elif nome == "vlm":  # a rubrica (#13); só os campos com kappa > 0,6 entram na config
         linhas = [json.loads(x) for x in (DADOS / "vlm" / "rubrica_v1.jsonl").open()]
         t = pd.DataFrame(linhas).drop_duplicates("post_id", keep="last").set_index("post_id")
@@ -297,7 +302,11 @@ def _tabela_por_dobra(a: pd.DataFrame, col: str, dobras: pd.Series | None) -> pd
 
 
 def ganho_entre(d, te, p_a, p_b, n_boot=2000, seed=0, dobras=None) -> dict:
-    """Ganho de B sobre A na manchete da #6, pareado por canal, nas linhas com baseline (#5)."""
+    """Ganho de B sobre A nas duas réguas (#27), pareado por canal, nas linhas com baseline (#5).
+
+    A manchete da #6 (`ganho` > 0: B ordena melhor) e o erro em curtidas (`dif_mae_log` < 0: B erra
+    menos o número), cada um com o IC 95% do bootstrap de canais.
+    """
     ok = te[d.loc[te, "p_base"].notna().to_numpy()]
     a = d.loc[ok, ["channel_id", "published_at", "y"]].assign(
         pa=p_a.reindex(ok), pb=p_b.reindex(ok)
@@ -306,12 +315,19 @@ def ganho_entre(d, te, p_a, p_b, n_boot=2000, seed=0, dobras=None) -> dict:
     n = a.groupby("channel_id").size()
     ma, mb = par_a_par_peso_posts(tab_a, n), par_a_par_peso_posts(tab_b, n)
     lo, hi = ic_ganho_pareado(tab_b, tab_a, n, n_boot, seed)
+    mae_a, mae_b = mae_log(a["y"], a["pa"]), mae_log(a["y"], a["pb"])
+    mlo, mhi = ic_dif_mae_pareado(a["y"], a["pa"], a["pb"], a["channel_id"], n_boot, seed)
     return {
         "manchete_a": ma,
         "manchete_b": mb,
         "ganho": mb - ma,
         "ic_ganho_lo": float(lo),
         "ic_ganho_hi": float(hi),
+        "mae_log_a": mae_a,
+        "mae_log_b": mae_b,
+        "dif_mae_log": mae_b - mae_a,
+        "ic_dif_mae_lo": float(mlo),
+        "ic_dif_mae_hi": float(mhi),
         "linhas": len(a),
     }
 
@@ -368,7 +384,14 @@ def rodar(
         min_posts_alvo=cfg.min_posts_alvo,
         extras=extras,
     )
+    if cfg.ruido:  # o tamanho do acaso nesta avaliação (2.6, erro comum 2)
+        ruido = np.random.default_rng(cfg.seed).normal(size=(len(d), cfg.ruido))
+        for k in range(cfg.ruido):
+            d[f"ruido_{k + 1}"] = ruido[:, k]
     base_feats = expandir_features(cfg.features, d.columns)
+    for nome, bloco in (extras or {}).items():  # senão o tratamento vira o controle (4.8, erro 4)
+        if not set(bloco.columns) & set(base_feats):
+            raise ValueError(f"bloco extra {nome}: nenhuma coluna dele está nas features da config")
     embeddings = embeddings or {}
     saida = {}
     for nome, pares in folds(d, cfg_av).items():
@@ -400,7 +423,39 @@ def rodar(
     return saida
 
 
-def registrar(cfg: Config, caminho, resultado, base) -> str:
+def tabela_de_previsoes(resultado) -> pd.DataFrame:
+    """As previsões fora da amostra de um run (`post_id`, `p`, `dobra`, `avaliacao`)."""
+    return pd.concat(
+        [
+            pd.DataFrame({"p": r["previsoes"], "dobra": r["dobras"]})
+            .reset_index()
+            .assign(avaliacao=a)
+            for a, r in resultado.items()
+        ]
+    )
+
+
+def ganhos(d, prev_a, prev_b, n_boot=2000, seed=0) -> pd.DataFrame:
+    """Ganho de B sobre A em cada avaliação dos dois, pareado por canal, nas tabelas de previsões.
+
+    Os pares da manchete ficam dentro do mesmo fold de A (os dois runs usam os mesmos folds).
+    """
+    linha_de = pd.Series(d.index, index=d["post_id"])
+    saida = {}
+    for avaliacao in sorted(set(prev_a["avaliacao"]) & set(prev_b["avaliacao"])):
+        p = {}
+        for lado, prev in (("a", prev_a), ("b", prev_b)):
+            t = prev[prev["avaliacao"] == avaliacao]
+            idx = linha_de.loc[t["post_id"]].to_numpy()
+            p[lado] = pd.Series(t["p"].to_numpy(), index=idx)
+            if lado == "a":
+                dobras = pd.Series(t["dobra"].to_numpy(), index=idx)
+        te = p["a"].index.intersection(p["b"].index)
+        saida[avaliacao] = ganho_entre(d, te, p["a"], p["b"], n_boot, seed, dobras)
+    return pd.DataFrame(saida)
+
+
+def registrar(cfg: Config, caminho, resultado, base, tags=None) -> str:
     """Um run no MLflow: tags de rastreio, params, a config inteira e as métricas."""
     mlflow.set_experiment(EXPERIMENTO)
     with mlflow.start_run(run_name=cfg.nome, description=cfg.descricao) as run:
@@ -411,6 +466,7 @@ def registrar(cfg: Config, caminho, resultado, base) -> str:
                 "hipotese": cfg.hipotese,
                 "config": str(caminho),
                 "avaliacao": "desenvolvimento (2025)",
+                **(tags or {}),
             }
         )
         fora = ("lgbm", "features", "descricao")
@@ -422,15 +478,8 @@ def registrar(cfg: Config, caminho, resultado, base) -> str:
         mlflow.log_dict(asdict(cfg), "config.json")
         for a, r in resultado.items():
             mlflow.log_metrics({f"{a}_{k}": float(v) for k, v in r.items() if k not in NAO_METRICA})
-        previsoes = pd.concat(
-            [
-                pd.DataFrame({"p": r["previsoes"], "dobra": r["dobras"]})
-                .reset_index()
-                .assign(avaliacao=a)
-                for a, r in resultado.items()
-            ]
-        )
-        mlflow.log_table(previsoes, "previsoes.json")  # para comparar modelos depois (#5, H2 a H8)
+        # para comparar modelos depois (#5, H2 a H8)
+        mlflow.log_table(tabela_de_previsoes(resultado), "previsoes.json")
         mlflow.log_params({f"pca_{b}": n for b, n in cfg.pca.items()})
         return run.info.run_id
 
@@ -446,19 +495,7 @@ def comparar(run_a: str, run_b: str, n_boot=2000, seed=0, min_posts=3) -> pd.Dat
         )
     prev = {r: mlflow.load_table("previsoes.json", run_ids=[r]) for r in (run_a, run_b)}
     d = preparar(base, ler_duracoes(), ler_avaliacao(), min_posts=min_posts)
-    linha_de = pd.Series(d.index, index=d["post_id"])
-    saida = {}
-    for avaliacao in sorted(set(prev[run_a]["avaliacao"]) & set(prev[run_b]["avaliacao"])):
-        p = {}
-        for r in (run_a, run_b):
-            t = prev[r][prev[r]["avaliacao"] == avaliacao]
-            idx = linha_de.loc[t["post_id"]].to_numpy()
-            p[r] = pd.Series(t["p"].to_numpy(), index=idx)
-            if r == run_a:
-                dobras = pd.Series(t["dobra"].to_numpy(), index=idx)
-        te = p[run_a].index.intersection(p[run_b].index)
-        saida[avaliacao] = ganho_entre(d, te, p[run_a], p[run_b], n_boot, seed, dobras)
-    return pd.DataFrame(saida)
+    return ganhos(d, prev[run_a], prev[run_b], n_boot, seed)
 
 
 def main(argv=None) -> int:

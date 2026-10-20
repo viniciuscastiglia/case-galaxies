@@ -201,6 +201,7 @@ def test_ganho_entre_dois_modelos_iguais_e_zero(cfg_av):
     p = d.loc[te, "hist_media"]
     r = ganho_entre(d, te, p, p, n_boot=100, seed=0)
     assert r["ganho"] == 0.0 and r["ic_ganho_lo"] == 0.0 and r["ic_ganho_hi"] == 0.0
+    assert r["dif_mae_log"] == 0.0 and r["ic_dif_mae_lo"] == 0.0 and r["ic_dif_mae_hi"] == 0.0
 
 
 def test_alvo_relativo_ao_canal(cfg_av):
@@ -295,3 +296,12 @@ def test_setor_desconhecido_levanta():
 
     with pytest.raises(ValueError, match="Beleza"):
         codigo_setor(pd.Series(["beleza", "Beleza"]))
+
+
+def test_bloco_extra_sem_nenhuma_feature_levanta(cfg_av, cfg):
+    # 20/10: a H7 juntou a cor e o brilho da capa (`thumb_*`), mas a lista de features só tinha
+    # `sonda_*`, e o tratamento rodou sem eles (4.8, erro comum 4). Falha nunca silenciosa.
+    base, dur = _base()
+    cor = pd.DataFrame({"thumb_brilho": 0.5}, index=base["post_id"])
+    with pytest.raises(ValueError, match="aparencia_thumb"):
+        rodar(cfg, base, dur, cfg_av, n_boot=50, seed=0, extras={"aparencia_thumb": cor})

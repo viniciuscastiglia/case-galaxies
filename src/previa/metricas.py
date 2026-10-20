@@ -176,6 +176,30 @@ def ic_ganho_pareado(tab_modelo, tab_base, n, n_boot=2000, seed=0):
     return np.nanpercentile(dif, [2.5, 97.5])
 
 
+def ic_dif_mae_pareado(y, p_a, p_b, canal, n_boot=2000, seed=0):
+    """IC 95% de MAE(B) - MAE(A) em log, pareado por canal (régua dos blocos, #27).
+
+    Negativo: B erra menos o número. Os dois modelos são medidos nas mesmas linhas; cada
+    reamostra sorteia canais inteiros (erro comum 4 da 2.4) e refaz o MAE dos dois com as somas
+    dos erros dos canais sorteados, então cada post pesa igual, como no `mae_log`.
+    """
+    d = pd.DataFrame(
+        {
+            "canal": np.asarray(canal),
+            "ea": np.abs(np.asarray(y, float) - np.asarray(p_a, float)),
+            "eb": np.abs(np.asarray(y, float) - np.asarray(p_b, float)),
+        }
+    )
+    if d[["ea", "eb"]].isna().any().any():  # falha nunca silenciosa: NaN viraria erro zero
+        raise ValueError("ic_dif_mae_pareado: y ou previsão com NaN (filtre as linhas antes)")
+    tab = d.groupby("canal").agg(ea=("ea", "sum"), eb=("eb", "sum"), n=("ea", "size"))
+    rng = np.random.default_rng(seed)
+    k = rng.integers(0, len(tab), size=(n_boot, len(tab)))
+    ea, eb, n = (tab[c].to_numpy(float) for c in ("ea", "eb", "n"))
+    dif = (eb[k].sum(axis=1) - ea[k].sum(axis=1)) / n[k].sum(axis=1)
+    return np.percentile(dif, [2.5, 97.5])
+
+
 # --- M2: par-a-par na janela de 14 dias (exercício da 2.4; caso à mão de 19/10 nos testes) ---
 
 

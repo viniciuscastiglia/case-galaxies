@@ -13,6 +13,7 @@ from previa.metricas import (
     cobertura,
     f1_faixas,
     ic_bootstrap_canal,
+    ic_dif_mae_pareado,
     ic_ganho_pareado,
     ic_par_a_par,
     ic_par_a_par_peso_posts,
@@ -235,3 +236,33 @@ def test_ic_com_reamostra_sem_pares_nao_vira_nan():
     n = pd.Series(1, index=tab.index)
     assert np.isfinite(ic_par_a_par(tab)).all()
     assert np.isfinite(ic_par_a_par_peso_posts(tab, n)).all()
+
+
+# --- régua dos blocos (#27): o erro em curtidas, pareado por canal ---
+
+
+def test_dif_mae_pareada_caso_pequeno():
+    # canal X: A erra 1 e 0, B acerta os dois; canal Y: A erra 1, B erra 0,5.
+    # MAE de A = 2/3, de B = 0,5/3: B - A = -0,5. Qualquer reamostra de canais dá -0,5 também
+    # (X sozinho: -2/4; Y sozinho: -0,5/1), então o IC é o ponto.
+    y = [1.0, 2.0, 0.0]
+    pa, pb = [2.0, 2.0, 1.0], [1.0, 2.0, 0.5]
+    lo, hi = ic_dif_mae_pareado(y, pa, pb, ["X", "X", "Y"], n_boot=200, seed=0)
+    assert lo == pytest.approx(-0.5) and hi == pytest.approx(-0.5)
+
+
+def test_dif_mae_pareada_modelos_iguais_e_zero():
+    y = rng.normal(size=60)
+    p = y + rng.normal(size=60)
+    canal = np.repeat(["a", "b", "c"], 20)
+    lo, hi = ic_dif_mae_pareado(y, p, p, canal, n_boot=200, seed=0)
+    assert lo == 0.0 and hi == 0.0
+
+
+def test_dif_mae_pareada_reamostra_canais():
+    # B melhora muito o canal a e piora o b: com 2 canais, o IC cobre os dois lados do zero
+    y = np.zeros(20)
+    pa = np.r_[np.full(10, 1.0), np.full(10, 0.1)]
+    pb = np.r_[np.full(10, 0.1), np.full(10, 0.8)]
+    lo, hi = ic_dif_mae_pareado(y, pa, pb, np.repeat(["a", "b"], 10), n_boot=500, seed=0)
+    assert lo == pytest.approx(-0.9) and hi == pytest.approx(0.7) and lo < 0 < hi

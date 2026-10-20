@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 from PIL import Image
 
-from previa.visual import carregar_embeddings, embedar_thumbs, sondas_relativas
+from previa.visual import aparencia_thumbs, carregar_embeddings, embedar_thumbs, sondas_relativas
 
 
 class EncoderFalso:
@@ -54,3 +54,20 @@ def test_sondas_relativas_tiram_a_media_da_imagem():
 def test_carregar_embeddings_vazio(tmp_path):
     assert carregar_embeddings(tmp_path / "nada").empty
     assert isinstance(carregar_embeddings(tmp_path / "nada"), pd.DataFrame)
+
+
+def test_aparencia_da_capa_so_olha_a_faixa_9_16(tmp_path):
+    # 480 × 360 como as capas dos Shorts: faixa central cinza e laterais vermelhas (a cópia
+    # desfocada do quadro). Sem o recorte, metade da imagem seria vermelho saturado.
+    img = np.zeros((360, 480, 3), np.uint8)
+    img[:] = (255, 0, 0)
+    faixa = round(360 * 9 / 16)
+    inicio = (480 - faixa) // 2
+    img[:, inicio : inicio + faixa] = 128
+    Image.fromarray(img).save(tmp_path / "abc.jpg", quality=100)
+    t = aparencia_thumbs(["abc", "sem_capa"], tmp_path)
+    assert list(t.index) == ["abc"]  # sem a imagem, a linha fica de fora (NaN no join)
+    cores = ["thumb_brilho", "thumb_contraste", "thumb_saturacao", "thumb_colorfulness"]
+    assert list(t.columns) == cores
+    assert t.loc["abc", "thumb_saturacao"] < 0.05
+    assert abs(t.loc["abc", "thumb_brilho"] - 128 / 255) < 0.02

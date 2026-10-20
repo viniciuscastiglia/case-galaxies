@@ -8,7 +8,9 @@ sondas relativas (cosseno com cada frase menos a média das frases na mesma imag
 entram no modelo como colunas nomeadas. O PCA não mora aqui: ele é ajustado só no treino de cada
 fold, no runner (4.4, erro comum 3).
 
-`uv run python -m previa.visual thumbs` embeda as thumbnails já baixadas e refaz as sondas.
+`uv run python -m previa.visual thumbs` embeda as thumbnails já baixadas e refaz as sondas;
+`uv run python -m previa.visual aparencia` mede brilho, contraste, saturação e colorfulness da
+faixa 9:16 de cada capa, com a mesma `aparencia` dos frames da amostra (4.3).
 """
 
 import os
@@ -21,6 +23,7 @@ from PIL import Image
 
 from previa.amostra import ler_config
 from previa.coletor import DADOS
+from previa.midia import aparencia
 from previa.thumbs import PASTA as PASTA_THUMBS
 from previa.thumbs import recortar_9_16
 
@@ -101,6 +104,18 @@ def embedar_thumbs(ids, pasta_thumbs: Path, destino: Path, encoder, lote=256, lo
     return resumo
 
 
+def aparencia_thumbs(ids, pasta_thumbs: Path) -> pd.DataFrame:
+    """Cor e brilho de cada capa (4.3), na faixa 9:16 que o encoder vê; sem capa, sem linha."""
+    linhas = {}
+    for v in ids:
+        caminho = Path(pasta_thumbs) / f"{v}.jpg"
+        if caminho.exists():
+            linhas[v] = aparencia(np.asarray(preparar_thumb(caminho)))
+    t = pd.DataFrame.from_dict(linhas, orient="index").add_prefix("thumb_")
+    t.index.name = "video_id"
+    return t
+
+
 def sondas_relativas(emb_img: np.ndarray, emb_txt: np.ndarray) -> np.ndarray:
     """Similaridade com cada sonda menos a média das sondas na mesma imagem (4.4)."""
     sim = emb_img @ emb_txt.T  # cosseno: tudo tem norma 1
@@ -109,10 +124,16 @@ def sondas_relativas(emb_img: np.ndarray, emb_txt: np.ndarray) -> np.ndarray:
 
 def main(argv=None) -> int:
     acao = (argv or sys.argv[1:] or ["thumbs"])[0]
-    if acao != "thumbs":
-        print("uso: python -m previa.visual thumbs", file=sys.stderr)
+    if acao not in ("thumbs", "aparencia"):
+        print("uso: python -m previa.visual thumbs|aparencia", file=sys.stderr)
         return 2
     cfg = ler_config()["siglip"]
+    if acao == "aparencia":
+        ids = sorted(p.stem for p in PASTA_THUMBS.glob("*.jpg"))
+        t = aparencia_thumbs(ids, PASTA_THUMBS)
+        t.reset_index().to_parquet(DADOS / f"aparencia_thumb_v{cfg['versao']}.parquet", index=False)
+        print(f"{len(t)} capas com brilho, contraste, saturação e colorfulness", flush=True)
+        return 0
     destino = DADOS / f"emb_thumb_v{cfg['versao']}"
     ids = sorted(p.stem for p in PASTA_THUMBS.glob("*.jpg"))
     encoder = Siglip(cfg["ckpt"])
