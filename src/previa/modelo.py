@@ -259,25 +259,26 @@ def referencia(posts_canal: pd.DataFrame, quando) -> tuple[float, int]:
     return float(h["hist_mediana"]), int(h["hist_n"])
 
 
-MIN_POSTS_ANCORA = 3  # #20 (2.1): com menos, o baseline nem existe, e o modelo nunca foi avaliado
+MIN_POSTS_ANCORA = (
+    3  # #20 (2.1): com menos, o baseline nem existe; entra a cadeia de #34 (ancora.py)
+)
+DEGRAUS = ("mediana_do_canal", "inscritos", "mediana_do_setor")
 
 
-def prever_log(bundle: Bundle, x: pd.DataFrame, ref=None, n_ref=None) -> float:
+def prever_log(bundle: Bundle, x: pd.DataFrame, ref=None, degrau="mediana_do_canal") -> float:
     """log1p das curtidas previstas para a linha `x` (o único lugar de onde sai o número).
 
-    No alvo relativo, `ref` e `n_ref` vêm de `referencia`: sem âncora, ou com menos de 3 posts
-    maduros, não há número (a avaliação só cobre esse regime; o flag de confiança é a 5.4).
+    No alvo relativo, `ref` é a âncora de `previa.ancora.ancora` e `degrau` o degrau da cadeia de
+    cold start (#34; 2.1): "mediana_do_canal" (regime avaliado), "inscritos" ou "mediana_do_setor".
+    Os dois últimos dão número, mas o chamador deve sinalizar `canal_novo` (5.4).
     """
     r = float(bundle.modelo.predict(x)[0])
     if bundle.config.get("alvo", "relativo") != "relativo":
         return r
+    if degrau not in DEGRAUS:
+        raise ValueError(f"degrau da âncora desconhecido: {degrau!r}; use um de {DEGRAUS}")
     if ref is None or np.isnan(ref):
-        raise ValueError("alvo relativo: o canal não tem post maduro para ancorar a previsão")
-    if n_ref is None or n_ref < MIN_POSTS_ANCORA:
-        raise ValueError(
-            f"o canal tem {n_ref} posts maduros; o modelo só foi avaliado com "
-            f"{MIN_POSTS_ANCORA} posts ou mais (#20)"
-        )
+        raise ValueError(f"alvo relativo: sem âncora para a previsão (degrau {degrau})")
     return r + float(ref)
 
 

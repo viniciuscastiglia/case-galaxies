@@ -135,12 +135,16 @@ def test_salva_carrega_e_preve_igual(base, cfg, cfg_av, tmp_path):
     x = features_de_um_short(carregado, posts, novo)
     ref, n_ref = referencia(posts, novo["published_at"])
     assert n_ref >= 10
-    assert prever_log(carregado, x, ref, n_ref) == pytest.approx(prever_log(bundle, x, ref, n_ref))
-    assert prever_log(bundle, x, ref, n_ref) == pytest.approx(bundle.modelo.predict(x)[0] + ref)
-    with pytest.raises(ValueError, match="ancorar"):
-        prever_log(bundle, x, float("nan"), 0)
-    with pytest.raises(ValueError, match="3 posts"):  # regime nunca avaliado (#20; revisão)
-        prever_log(bundle, x, ref, 2)
+    assert prever_log(carregado, x, ref) == pytest.approx(prever_log(bundle, x, ref))
+    assert prever_log(bundle, x, ref) == pytest.approx(bundle.modelo.predict(x)[0] + ref)
+    with pytest.raises(ValueError, match="sem âncora"):
+        prever_log(bundle, x, float("nan"))
+    with pytest.raises(ValueError, match="degrau"):
+        prever_log(bundle, x, ref, "chute")
+    for degrau in ("inscritos", "mediana_do_setor"):  # cold start (#34): dá número, sem recusar
+        assert prever_log(bundle, x, 6.0, degrau) == pytest.approx(
+            bundle.modelo.predict(x)[0] + 6.0
+        )
     assert carregado.versao == bundle.versao and bundle.versao.startswith("gbm-teste-")
 
 
