@@ -45,6 +45,7 @@ from previa.baselines import ler_config as ler_config_baselines
 from previa.caminhos import CONFIGS
 from previa.coletor import DADOS
 from previa.dados import carregar_base
+from previa.esquema import validar_tabela_de_treino
 from previa.features import montar_features, quantis_do_canal
 from previa.metricas import (
     f1_faixas_canal,
@@ -497,6 +498,7 @@ def rodar(
         for k in range(cfg.ruido):
             d[f"ruido_{k + 1}"] = ruido[:, k]
     base_feats = expandir_features(cfg.features, d.columns)
+    validar_tabela_de_treino(d, base_feats)  # o contrato, antes de qualquer fit (F15; 1.8, 3.5)
     for nome, bloco in (extras or {}).items():  # senão o tratamento vira o controle (4.8, erro 4)
         if not set(bloco.columns) & set(base_feats):
             raise ValueError(f"bloco extra {nome}: nenhuma coluna dele está nas features da config")

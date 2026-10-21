@@ -1,12 +1,20 @@
 from datetime import datetime, timezone
 
+import numpy as np
 import pandas as pd
 import pandera.pandas as pa
 import pytest
 
 from previa.coletor import abrir_base, parse_video, salvar, salvar_canais
 from previa.duplicatas import dhash
-from previa.esquema import BaseShorts, Post, exportar_base_minima, montar_base_minima
+from previa.esquema import (
+    BaseShorts,
+    Post,
+    TabelaTreino,
+    exportar_base_minima,
+    montar_base_minima,
+    validar_tabela_de_treino,
+)
 
 from fakes import CANAL_ID, canal, thumbnail, thumbnail_por_id, video
 
@@ -183,3 +191,83 @@ def test_exportar_base_minima_marca_o_reupload_pela_thumbnail(tmp_path):
         "v2xxxxxxxxx": "v2xxxxxxxxx",
         "v3xxxxxxxxx": "v1xxxxxxxxx",
     }
+
+
+# --- a tabela de treino (F15; princípio 6 do CLAUDE.md; aulas 1.8 e 3.5) ---
+
+
+def _tabela_de_treino():
+    """Três posts de um canal no formato do `preparar`: o primeiro sem histórico (NaN legítimo)."""
+    pub = pd.to_datetime(["2026-01-05T12:00Z", "2026-02-20T12:00Z", "2026-03-10T09:00Z"])
+    return pd.DataFrame(
+        {
+            "post_id": ["aaaaaaaaaaa", "bbbbbbbbbbb", "ccccccccccc"],
+            "channel_id": ["UCabc123LuminaBeauty0000"] * 3,
+            "published_at": pub,
+            "y": [6.1, 6.4, np.log1p(900)],
+            "setor": [1.0, 1.0, 1.0],
+            "hist_n": [0, 1, 2],
+            "hist_mediana": [np.nan, 6.1, 6.25],
+            "hist_ultimo_ts": pd.to_datetime([pd.NaT, "2026-01-05T12:00Z", "2026-02-20T12:00Z"]),
+            "duracao_s": [22.0, np.nan, 31.0],  # duração ausente também é legítima
+            "linha": [True, True, True],
+        }
+    )
+
+
+def test_tabela_de_treino_aceita_os_nan_legitimos():
+    d = _tabela_de_treino()
+    validar_tabela_de_treino(d, ["hist_n", "hist_mediana", "duracao_s", "setor"])
+    TabelaTreino.validate(d, lazy=True)  # o contrato sozinho também aceita; não estrito: sobra ok
+
+
+@pytest.mark.parametrize(
+    "quebra",
+    [
+        {"hist_ultimo_ts": pd.Timestamp("2026-02-20T12:00Z")},  # igual ao published_at
+        {"setor": 2.0},
+        {"y": -0.5},
+        {"y": np.nan},
+        {"hist_n": -1},
+        {"duracao_s": -3.0},
+        {"post_id": "aaaaaaaaaaa"},  # repetido na linha 0
+    ],
+    ids=["ultimo_igual", "setor_2", "y_negativo", "y_nulo", "hist_n_negativo", "duracao", "dup"],
+)
+def test_tabela_de_treino_recusa_cada_invariante(quebra):
+    d = _tabela_de_treino()
+    for coluna, valor in quebra.items():
+        d.loc[1, coluna] = valor
+    with pytest.raises(pa.errors.SchemaErrors):
+        validar_tabela_de_treino(d, ["hist_n", "duracao_s"])
+
+
+def test_tabela_de_treino_pede_published_at_em_utc_sem_fixar_a_unidade():
+    d = _tabela_de_treino()
+    validar_tabela_de_treino(d.assign(published_at=d["published_at"].dt.as_unit("us")), ["hist_n"])
+    validar_tabela_de_treino(d.assign(published_at=d["published_at"].dt.as_unit("ns")), ["hist_n"])
+    sao_paulo = d["published_at"].dt.tz_convert("America/Sao_Paulo")
+    ingenuo = d["published_at"].dt.tz_localize(None)
+    for ruim in (sao_paulo, ingenuo):  # sem fuso ou em outro fuso: nunca coagido em silêncio
+        with pytest.raises(pa.errors.SchemaErrors):
+            validar_tabela_de_treino(d.assign(published_at=ruim), ["hist_n"])
+
+
+def test_tabela_de_treino_so_confere_as_linhas_de_treino():
+    d = _tabela_de_treino()
+    d.loc[2, "linha"] = False
+    d.loc[2, "setor"] = 2.0  # fora do treino: histórico que serve só de passado
+    validar_tabela_de_treino(d, ["hist_n"])
+
+
+def test_tabela_de_treino_recusa_feature_ausente_nao_numerica_ou_infinita():
+    d = _tabela_de_treino()
+    with pytest.raises(ValueError, match="nao_existe"):
+        validar_tabela_de_treino(d, ["hist_n", "nao_existe"])
+    with pytest.raises(ValueError, match="caption"):
+        validar_tabela_de_treino(d.assign(caption="oi"), ["hist_n", "caption"])
+    inf = d.assign(hist_mediana=[np.nan, np.inf, 6.25])
+    with pytest.raises(ValueError, match="hist_mediana"):
+        validar_tabela_de_treino(inf, ["hist_n", "hist_mediana"])
+    fora_do_treino = inf.assign(linha=[True, False, True])  # o inf está numa linha que não treina
+    validar_tabela_de_treino(fora_do_treino, ["hist_n", "hist_mediana"])

@@ -6,8 +6,10 @@ só com os posts anteriores do canal, são as mesmas que o treino calculou para 
 
 import numpy as np
 import pandas as pd
+import pandera.pandas as pa
 import pytest
 
+from previa.esquema import validar_tabela_de_treino
 from previa.experimento import ler_config, preparar
 from previa.modelo import (
     carregar,
@@ -195,4 +197,29 @@ def test_bundle_recusa_extras(base, cfg, cfg_av):
     b, dur, emb = _partes(base)
     cfg.extras = ["vlm"]
     with pytest.raises(ValueError, match="extras"):
+        treinar_bundle(cfg, b, dur, cfg_av, emb)
+
+
+def test_bundle_valida_a_tabela_de_treino(base, cfg, cfg_av, monkeypatch):
+    # F15 (princípio 6; aulas 1.8 e 3.5): o modelo de uso confere a mesma tabela que o runner,
+    # com as features da config e antes de o PCA criar as colunas dos blocos
+    import previa.modelo as modelo
+
+    chamadas = []
+
+    def espiao(d, features):
+        chamadas.append(list(features))
+        return validar_tabela_de_treino(d, features)
+
+    monkeypatch.setattr(modelo, "validar_tabela_de_treino", espiao)
+    b, dur, emb = _partes(base)
+    treinar_bundle(cfg, b, dur, cfg_av, emb)
+    assert chamadas == [cfg.features]
+    assert not any(c.startswith("titulo_pc") for c in chamadas[0])
+
+
+def test_bundle_recusa_a_tabela_que_quebra_o_contrato(base, cfg, cfg_av):
+    b, dur, emb = _partes(base)
+    dur.loc[b["post_id"].iloc[100]] = -1.0  # 2022-09: uma duração negativa numa linha de treino
+    with pytest.raises(pa.errors.SchemaErrors, match="duracao_s"):
         treinar_bundle(cfg, b, dur, cfg_av, emb)

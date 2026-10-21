@@ -10,10 +10,12 @@ import warnings
 import mlflow
 import numpy as np
 import pandas as pd
+import pandera.pandas as pa
 import pytest
 import yaml
 
 from previa.caminhos import CONFIGS
+from previa.esquema import validar_tabela_de_treino
 from previa.experimento import (
     EXPERIMENTO,
     LIMITE_IMPORTANCIA,
@@ -623,3 +625,77 @@ def test_comparar_recusa_cortes_diferentes_antes_do_hash_e_avisa_run_antigo(
     with pytest.warns(UserWarning, match="sem data_corte"):
         g = comparar("A", "B", n_boot=50)
     assert g.loc["ganho", "walk_forward"] == 0.0  # os mesmos dois modelos
+
+
+# --- contrato da tabela de treino (F15; princípio 6 do CLAUDE.md; aulas 1.8 e 3.5) ---
+
+
+def _base_com_nan_legitimos():
+    """A base sintética em que o último canal só começa em 2023 (hist_* vazio nos primeiros posts
+    dele, já dentro das linhas de treino) e um post sem duração: os NaN que o contrato aceita."""
+    base, dur = _base()
+    tarde = (base["channel_id"] == "UC5") & (
+        base["published_at"] < pd.Timestamp("2023-01-01", tz="UTC")
+    )
+    base = base[~tarde].reset_index(drop=True)
+    dur = dur.loc[base["post_id"]]
+    dur.loc[base["post_id"].iloc[100]] = np.nan
+    return base, dur
+
+
+def test_rodar_valida_a_tabela_de_treino(cfg_av, cfg, monkeypatch):
+    # a base sintética inteira passa pelo `rodar`, com os NaN legítimos dos primeiros posts
+    import previa.experimento as exp
+
+    chamadas = []
+
+    def espiao(d, features):
+        chamadas.append((d, list(features)))
+        return validar_tabela_de_treino(d, features)  # o contrato de verdade, não um dublê
+
+    monkeypatch.setattr(exp, "validar_tabela_de_treino", espiao)
+    base, dur = _base_com_nan_legitimos()
+    rodar(cfg, base, dur, cfg_av, n_boot=100, seed=0)
+    assert len(chamadas) == 1 and chamadas[0][1] == cfg.features
+    treino = chamadas[0][0].query("linha")
+    for coluna in ("hist_ultimo_ts", "hist_mediana", "hist_desvio", "duracao_s"):
+        assert treino[coluna].isna().any(), coluna  # o nulo estava lá e o contrato o aceitou
+
+
+def test_rodar_recusa_a_tabela_que_quebra_o_contrato(cfg_av, cfg):
+    base, dur = _base()
+    dur.loc[base["post_id"].iloc[100]] = -5.0  # 2022-06: uma duração negativa numa linha de treino
+    with pytest.raises(pa.errors.SchemaErrors, match="duracao_s"):
+        rodar(cfg, base, dur, cfg_av, n_boot=50, seed=0)
+
+
+def test_tabela_de_treino_recusa(cfg_av, cfg):
+    base, dur = _base()
+    d = preparar(base, dur, cfg_av, cfg.lacuna_dias, min_posts_alvo=cfg.min_posts_alvo)
+    validar_tabela_de_treino(d, cfg.features)  # o ponto de partida passa
+    linhas = d.index[d["linha"]]
+    com_historico = linhas[d.loc[linhas, "hist_ultimo_ts"].notna().to_numpy()]
+
+    # o histórico não pode incluir o próprio post: hist_ultimo_ts == published_at
+    vazou = d.copy()
+    vazou.loc[com_historico[10], "hist_ultimo_ts"] = vazou.loc[com_historico[10], "published_at"]
+    with pytest.raises(pa.errors.SchemaErrors):
+        validar_tabela_de_treino(vazou, cfg.features)
+
+    setor = d.copy()
+    setor.loc[linhas[0], "setor"] = 2.0
+    with pytest.raises(pa.errors.SchemaErrors):
+        validar_tabela_de_treino(setor, cfg.features)
+
+    repetido = d.copy()  # o mesmo post_id em duas linhas de treino
+    repetido.loc[linhas[1], "post_id"] = repetido.loc[linhas[0], "post_id"]
+    with pytest.raises(pa.errors.SchemaErrors):
+        validar_tabela_de_treino(repetido, cfg.features)
+
+    infinito = d.copy()
+    infinito.loc[linhas[5], "hist_media"] = np.inf
+    with pytest.raises(ValueError, match="hist_media"):
+        validar_tabela_de_treino(infinito, [*cfg.features, "hist_media"])
+
+    with pytest.raises(ValueError, match="nao_existe"):
+        validar_tabela_de_treino(d, [*cfg.features, "nao_existe"])

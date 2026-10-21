@@ -1,8 +1,9 @@
 """Esquema mínimo do briefing, em código (aula 1.8): Pydantic valida cada registro e pandera
 valida a tabela de treino. Rode a validação a cada exportação."""
 
-from typing import Literal
+from typing import Any, Literal
 
+import numpy as np
 import pandas as pd
 import pandera.pandas as pa
 from pandera.typing import Series
@@ -70,6 +71,68 @@ class BaseShorts(pa.DataFrameModel):
     class Config:
         strict = True  # coluna extra ou faltando = erro
         coerce = True  # converte tipos quando possível (ex.: "2410" -> 2410)
+
+
+def _em_utc(s: pd.Series) -> bool:
+    """A coluna é datetime com fuso UTC, de qualquer unidade (a base real é `us`, a sintética
+    pode ser `ns`): compara o dtype com o UTC na unidade da própria coluna, sem coagir."""
+    return isinstance(s.dtype, pd.DatetimeTZDtype) and s.dtype == pd.DatetimeTZDtype(
+        s.dtype.unit, "UTC"
+    )
+
+
+class TabelaTreino(pa.DataFrameModel):
+    """A tabela do `preparar` para o treino: só os invariantes (princípio 6; aulas 1.8 e 3.5).
+
+    Não é estrita: a tabela tem dezenas de colunas (features, baseline, faixas). Cada nulo daqui é
+    legítimo e fica de fora das regras: `hist_*` e `hist_ultimo_ts` nos primeiros posts do canal,
+    `duracao_s` quando a duração falta. O que não pode: `y` nulo ou negativo, `setor` fora de 0/1,
+    `post_id` repetido, histórico que não é anterior à publicação (o teste da M3, princípio 2).
+    Valide só as linhas de treino (`validar_tabela_de_treino`): o resto da tabela é passado.
+    """
+
+    post_id: Series[str] = pa.Field(unique=True)
+    channel_id: Series[str]
+    published_at: Series[Any]  # fuso UTC conferido abaixo; a unidade (us ou ns) fica livre
+    y: Series[float] = pa.Field(ge=0)  # log1p das curtidas, nunca nulo
+    setor: Series[float] = pa.Field(isin=[0.0, 1.0])
+    hist_n: Series[int] = pa.Field(ge=0)
+    duracao_s: Series[float] = pa.Field(ge=0, nullable=True)
+    hist_ultimo_ts: Series[Any] = pa.Field(nullable=True)  # NaT nos primeiros posts do canal
+
+    @pa.check("published_at", "hist_ultimo_ts", name="datetime_em_utc")
+    def datetime_em_utc(cls, s: pd.Series) -> bool:
+        return _em_utc(s)
+
+    @pa.dataframe_check
+    def historico_anterior_a_publicacao(cls, df: pd.DataFrame) -> Series[bool]:
+        # checagem no DataFrame: onde há histórico, o último post usado é estritamente anterior
+        ultimo = df["hist_ultimo_ts"]
+        return ultimo.isna() | (ultimo < df["published_at"])
+
+
+def validar_tabela_de_treino(d: pd.DataFrame, features: list[str]) -> None:
+    """O contrato da tabela de treino nas linhas de treino (`d["linha"]`), antes de qualquer fit.
+
+    Valida a `TabelaTreino` (`lazy=True`: todas as falhas de uma vez, `SchemaErrors`) e confere que
+    cada feature existe, é numérica e não tem ±inf, só nas linhas de treino. NaN pode: o LightGBM
+    trata como ausente (aula 3.5). Falha nunca silenciosa (princípio 7): `ValueError` com os nomes.
+    """
+    if "linha" not in d.columns:
+        raise ValueError("a tabela de treino não tem a coluna `linha` (rode o preparar)")
+    treino = d[d["linha"]]
+    TabelaTreino.validate(treino, lazy=True)
+    ausentes = [f for f in features if f not in d.columns]
+    if ausentes:
+        raise ValueError(f"features fora da tabela de treino: {ausentes}")
+    texto = [f for f in features if not pd.api.types.is_numeric_dtype(treino[f])]
+    if texto:
+        raise ValueError(f"features não numéricas na tabela de treino: {texto}")
+    infinitas = [
+        f for f in features if np.isinf(treino[f].to_numpy(dtype=float, na_value=np.nan)).any()
+    ]
+    if infinitas:
+        raise ValueError(f"features com ±inf na tabela de treino (só NaN é permitido): {infinitas}")
 
 
 def montar_base_minima(

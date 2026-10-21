@@ -24,6 +24,7 @@ import numpy as np
 import pandas as pd
 
 from previa.caminhos import ARTEFATOS
+from previa.esquema import validar_tabela_de_treino
 from previa.experimento import (
     Config,
     aplicar_pca,
@@ -55,6 +56,7 @@ def treinar_bundle(cfg: Config, base, duracoes, cfg_av, embeddings=None) -> Bund
     if cfg.extras:  # o caminho dos blocos extras na previsão ainda não existe
         raise ValueError(f"extras ainda não suportados no bundle: {cfg.extras}")
     d = preparar(base, duracoes, cfg_av, cfg.lacuna_dias, min_posts_alvo=cfg.min_posts_alvo)
+    validar_tabela_de_treino(d, cfg.features)  # o mesmo contrato do runner (F15; 1.8, 3.5)
     fim = cfg_av["cal_inicio"] - pd.Timedelta(days=cfg_av["gap_dias"])
     tr = d.index[d["linha"] & (d["published_at"] < fim)]
     dobra, feats, pcas = d.loc[tr].copy(), list(cfg.features), {}
