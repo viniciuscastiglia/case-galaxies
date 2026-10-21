@@ -77,9 +77,11 @@ def pairwise_accuracy(y, p, canal=None):
     return float(acertos / pares) if pares else np.nan
 
 
-# convenção da aula até a decisão #7 (faixas: quantis do canal × cortes fixos)
+# Convenção da 2.4 (cortes fixos no alvo relativo). O projeto usa `faixa_do_canal` (#7, 1.6):
+# `faixa` e `f1_faixas` ficam porque são o código da aula.
 CORTES = [-np.inf, -0.5, 0.5, 1.5, np.inf]  # log da razão vs. mediana do canal
 FAIXAS = ["abaixo", "na média", "acima", "viral"]
+SEM_HISTORICO = "sem histórico"  # canal com menos de 10 posts maduros: a faixa não existe
 
 
 def faixa(r):
@@ -89,6 +91,39 @@ def faixa(r):
 
 def f1_faixas(r, r_pred):
     return float(f1_score(faixa(r), faixa(r_pred), labels=FAIXAS, average="macro", zero_division=0))
+
+
+def faixa_do_canal(v, p25, p75, p95):
+    """Faixa de v (y ou previsão, em log1p) pelos quantis do histórico do canal (#7, aula 1.6).
+
+    `v < p25` "abaixo"; `v <= p75` "na média"; `v <= p95` "acima"; acima disso "viral". Os
+    quantis vêm de `features.quantis_do_canal`, um por linha: cada canal fala a sua língua. Com
+    qualquer quantil NaN (menos de 10 posts maduros) a faixa é "sem histórico", nunca "abaixo".
+    Um `v` NaN com histórico levanta ValueError: comparado a qualquer corte ele viraria "viral".
+    """
+    v, p25, p75, p95 = (np.asarray(x, float) for x in (v, p25, p75, p95))
+    sem = np.isnan(p25) | np.isnan(p75) | np.isnan(p95)
+    if np.isnan(v[~sem]).any():  # falha nunca silenciosa (princípio 7)
+        raise ValueError("faixa_do_canal: valor NaN em linha com histórico (filtre antes)")
+    faixas = np.select([v < p25, v <= p75, v <= p95], FAIXAS[:3], default=FAIXAS[3])
+    return np.where(sem, SEM_HISTORICO, faixas)
+
+
+def f1_faixas_canal(y, p, p25, p75, p95):
+    """F1 macro nas 4 faixas do canal (#7), só nas linhas com histórico; NaN se não houver nenhuma.
+
+    A faixa real vem de y e a prevista de p (os dois em log1p, a previsão absoluta `r + ref`),
+    ambos contra os quantis do canal. A linha "sem histórico" não tem faixa verdadeira: fica de
+    fora, em vez de contar como "abaixo" e inflar ou derrubar o F1 dos canais com histórico.
+    """
+    y, p = np.asarray(y, float), np.asarray(p, float)
+    q = [np.asarray(x, float) for x in (p25, p75, p95)]
+    com = ~(np.isnan(q[0]) | np.isnan(q[1]) | np.isnan(q[2]))
+    if not com.any():
+        return np.nan
+    real = faixa_do_canal(y[com], *(x[com] for x in q))
+    previsto = faixa_do_canal(p[com], *(x[com] for x in q))
+    return float(f1_score(real, previsto, labels=FAIXAS, average="macro", zero_division=0))
 
 
 def cobertura(y, lo, hi):

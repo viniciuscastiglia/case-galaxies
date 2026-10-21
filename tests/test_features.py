@@ -9,7 +9,13 @@ import pandas as pd
 import pytest
 
 from previa.baselines import mediana_madura
-from previa.features import cadencia, calendario, historico_do_canal, montar_features
+from previa.features import (
+    cadencia,
+    calendario,
+    historico_do_canal,
+    montar_features,
+    quantis_do_canal,
+)
 
 DIA_0 = pd.Timestamp("2025-01-01", tz="UTC")
 
@@ -155,3 +161,85 @@ def test_calendario_hora_local_feriado_e_idade():
     assert c["dia_semana_local"].iloc[0] == 5  # 01/03/2025, sábado, em Brasília
     assert c["feriado"].tolist() == [0, 1, 1]  # terça de Carnaval e Tiradentes
     assert c["idade_canal_dias"].tolist() == [0, 2, 50]
+
+
+# --- quantis do canal (decisão #7, aula 1.6): a régua das faixas, não uma feature do modelo ---
+
+QUANTIS = ["faixa_p25", "faixa_p75", "faixa_p95"]
+
+
+def test_quantis_do_canal_caso_a_mao():
+    # 10 posts maduros (dias 0 a 9, y = 1..10); um post sem curtidas no dia 20 não conta
+    dias = [*range(10), 20, 38, 39]
+    ys = [*range(1, 11), np.nan, 0.0, 0.0]
+    q = quantis_do_canal(_canal(dias, ys), lacuna_dias=30, min_posts=10)
+    assert list(q.columns) == QUANTIS
+    assert q.iloc[:11].isna().all().all()  # os 10 primeiros e o post do dia 20: sem 10 maduros
+    # dia 38: o post do dia 9 tem 29 dias e não entra; sobram 9 maduros, menos que min_posts
+    assert q.iloc[11].isna().all()
+    # dia 39: o post do dia 9 tem 30 dias e entra; y = 1..10, interpolação linear do pandas
+    assert q.iloc[12].tolist() == pytest.approx([3.25, 7.75, 9.55])
+
+
+def test_quantis_posts_recentes_entram_so_depois_dos_30_dias():
+    # os mesmos 10 maduros e, nos dias 38 e 39, dois posts com y = 0; o do dia 100 já os vê:
+    # 12 posts (0, 0, 1..10) e o p25 cai de 3,25 para 1,75 (a prova de que entraram)
+    dias = [*range(10), 38, 39, 100]
+    ys = [*range(1, 11), 0.0, 0.0, 5.0]
+    q = quantis_do_canal(_canal(dias, ys))
+    esperado = np.quantile([*range(1, 11), 0.0, 0.0], [0.25, 0.75, 0.95])
+    assert q.iloc[12].tolist() == pytest.approx(esperado.tolist())
+    assert q.iloc[12]["faixa_p25"] == pytest.approx(1.75)
+
+
+def test_quantis_min_posts_e_configuravel():
+    d = _canal([0, 1, 2, 40], [1.0, 2.0, 3.0, 9.0])
+    assert quantis_do_canal(d, min_posts=4).iloc[3].isna().all()
+    assert quantis_do_canal(d, min_posts=3).iloc[3].tolist() == pytest.approx([1.5, 2.5, 2.9])
+
+
+def test_quantis_um_canal_nao_ve_o_outro():
+    d = pd.concat(
+        [_canal(list(range(10)), list(range(1, 11)), "UCa"), _canal([39], [0.0], "UCb")],
+        ignore_index=True,
+    )
+    assert quantis_do_canal(d).iloc[10].isna().all()  # UCb não tem maduros, mesmo com os de UCa
+
+
+def test_quantis_batem_com_np_quantile_dos_maduros():
+    d = _aleatoria()
+    q = quantis_do_canal(d, lacuna_dias=30, min_posts=10)
+    com = q.dropna()
+    assert len(com) > 100
+    for i in com.index[::25]:
+        post = d.loc[i]
+        maduros = d[
+            (d["channel_id"] == post["channel_id"])
+            & d["y"].notna()
+            & (d["published_at"] <= post["published_at"] - pd.Timedelta(days=30))
+        ]["y"]
+        assert len(maduros) >= 10
+        esperado = np.quantile(maduros, [0.25, 0.75, 0.95])
+        assert com.loc[i, QUANTIS].tolist() == pytest.approx(esperado.tolist())
+
+
+def test_quantis_perturbar_o_futuro_nao_muda():
+    d = _aleatoria()
+    assert _perturbacao(lambda x: quantis_do_canal(x, lacuna_dias=30), d)
+    # e o teste não é vazio: há quantis calculados antes do corte
+    antes = quantis_do_canal(d, lacuna_dias=30)
+    assert antes.loc[d["published_at"] <= CORTE].notna().all(axis=1).sum() > 50
+
+
+def test_quantis_ordem_das_linhas_nao_importa():
+    d = _aleatoria()
+    a = quantis_do_canal(d)
+    b = quantis_do_canal(d.sample(frac=1, random_state=1)).loc[d.index]
+    pd.testing.assert_frame_equal(a, b)
+
+
+def test_quantis_nao_sao_feature_do_modelo():
+    from previa.features import FEATURES
+
+    assert not set(QUANTIS) & set(FEATURES)
+    assert not set(QUANTIS) & set(montar_features(_aleatoria()).columns)

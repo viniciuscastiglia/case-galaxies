@@ -12,6 +12,8 @@ from scipy.stats import kendalltau, spearmanr
 from previa.metricas import (
     cobertura,
     f1_faixas,
+    f1_faixas_canal,
+    faixa_do_canal,
     ic_bootstrap_canal,
     ic_dif_mae_pareado,
     ic_ganho_pareado,
@@ -69,6 +71,70 @@ def test_f1_faixas_e_cobertura():
     r = np.array([-1.0, 0.0, 1.0, 2.0])
     assert f1_faixas(r, r) == 1.0
     assert cobertura([1, 2, 3, 4], [0, 0, 0, 5], [5, 5, 5, 6]) == 0.75
+
+
+# --- faixas pelos quantis do canal (decisão #7, aula 1.6): p25, p75 e p95 do histórico maduro ---
+
+Q = (3.25, 7.75, 9.55)  # o caso à mão: y = 1..10, interpolação linear
+
+
+def test_faixa_do_canal_bordas():
+    v = [3.0, 3.25, 7.75, 8.0, 9.55, 9.6]
+    faixas = faixa_do_canal(v, *Q)
+    assert faixas.tolist() == ["abaixo", "na média", "na média", "acima", "acima", "viral"]
+    assert isinstance(faixas, np.ndarray)
+
+
+def test_faixa_do_canal_cada_linha_com_os_quantis_do_seu_canal():
+    # o mesmo y = 5 é "abaixo" num canal que costuma passar de 6 e "viral" num que fica em 2
+    faixas = faixa_do_canal([5.0, 5.0], [6.0, 1.0], [8.0, 2.0], [9.0, 3.0])
+    assert faixas.tolist() == ["abaixo", "viral"]
+
+
+def test_faixa_do_canal_sem_historico_e_nunca_abaixo():
+    nan = np.nan
+    v = [1.0, 5.0, 9.9, 5.0]
+    p25, p75, p95 = [nan, 3.25, 3.25, 3.25], [nan, 7.75, nan, 7.75], [nan, 9.55, 9.55, nan]
+    faixas = faixa_do_canal(v, p25, p75, p95)  # qualquer quantil NaN basta
+    assert faixas.tolist() == ["sem histórico", "na média", "sem histórico", "sem histórico"]
+
+
+def test_faixa_do_canal_recusa_valor_nan_com_historico():
+    # NaN comparado a qualquer corte vira "viral" em silêncio: tem que falhar alto
+    with pytest.raises(ValueError, match="NaN"):
+        faixa_do_canal([np.nan], *Q)
+    assert faixa_do_canal([np.nan], np.nan, np.nan, np.nan).tolist() == ["sem histórico"]
+
+
+def test_f1_faixas_canal_previsao_perfeita_e_erro_de_uma_faixa():
+    y = np.array([3.0, 5.0, 8.0, 9.6])  # uma de cada faixa, com os quantis Q
+    q = [np.full(4, c) for c in Q]
+    assert f1_faixas_canal(y, y, *q) == 1.0
+    # erra só o viral (previsto "acima"): abaixo e na média perfeitas; acima 2/3 (precisão 1/2,
+    # revocação 1); viral 0 -> (1 + 1 + 2/3 + 0) / 4
+    p = np.array([3.0, 5.0, 8.0, 9.0])
+    assert f1_faixas_canal(y, p, *q) == pytest.approx((1 + 1 + 2 / 3 + 0) / 4)
+
+
+def test_faixa_sem_historico_fica_fora_do_f1():
+    y = np.array([3.0, 5.0, 8.0, 9.6])
+    p = np.array([3.0, 5.0, 8.0, 9.0])
+    q = [np.full(4, c) for c in Q]
+    base = f1_faixas_canal(y, p, *q)
+    # duas linhas sem histórico (quantis NaN), com y e p que dariam "abaixo" se contassem
+    y2, p2 = np.append(y, [0.0, 0.0]), np.append(p, [0.0, 1.0])
+    q2 = [np.append(c, [np.nan, np.nan]) for c in q]
+    assert f1_faixas_canal(y2, p2, *q2) == base
+    # e o F1 só com as linhas sem histórico não existe
+    assert np.isnan(f1_faixas_canal([0.0, 1.0], [0.0, 1.0], *[[np.nan, np.nan]] * 3))
+
+
+def test_f1_faixas_canal_recusa_nan_nas_linhas_com_historico():
+    q = [np.full(2, c) for c in Q]
+    with pytest.raises(ValueError, match="NaN"):
+        f1_faixas_canal([1.0, np.nan], [1.0, 1.0], *q)
+    with pytest.raises(ValueError, match="NaN"):
+        f1_faixas_canal([1.0, 2.0], [1.0, np.nan], *q)
 
 
 # --- auxiliares da leitura por canal (Claude) ---

@@ -32,6 +32,8 @@ HISTORICO = [
 CADENCIA = ["dias_desde_ultimo", "posts_30d"]
 CALENDARIO = ["hora_local", "dia_semana_local", "feriado", "idade_canal_dias"]
 FEATURES = HISTORICO + CADENCIA + CALENDARIO  # as 13 colunas da 3.5 que vão para o modelo
+# a régua das faixas (#7, 1.6): quantis de y do histórico maduro; NÃO entra em FEATURES
+QUANTIS_DAS_FAIXAS = {"faixa_p25": 0.25, "faixa_p75": 0.75, "faixa_p95": 0.95}
 
 
 def ler_config(caminho=CONFIGS / "features.yaml") -> dict:
@@ -76,6 +78,37 @@ def historico_do_canal(df, lacuna_dias=30) -> pd.DataFrame:
         f["hist_ultimo_ts"] = ultimo.where(k > 0).dt.tz_localize("UTC")
         f.index = g.index
         partes.append(f)
+    return pd.concat(partes).loc[df.index]
+
+
+def quantis_do_canal(df, lacuna_dias=30, min_posts=10) -> pd.DataFrame:
+    """Quantis p25, p75 e p95 de y do histórico maduro do canal: a régua das faixas (#7, 1.6).
+
+    A regra de corte é a do `historico_do_canal`: só posts com y publicados ao menos
+    `lacuna_dias` antes de cada post (30 dias inclusive, `np.searchsorted`), então o histórico é
+    anterior e maduro (princípio 2, 2.2). O quantil é o do pandas (`expanding().quantile`, com
+    interpolação linear): para y = 1..10, p25 = 3,25, p75 = 7,75 e p95 = 9,55. Com menos de
+    `min_posts` maduros a faixa não existe e as três colunas ficam NaN (#20: 10, como o alvo
+    relativo), nunca um quantil de dois posts.
+
+    Não é feature do modelo: o alvo continua sendo o y relativo. Serve só para dizer a faixa, na
+    língua do canal, e a tool usa a mesma função na previsão (princípio 4).
+    """
+    lado = "right" if lacuna_dias > 0 else "left"  # a mesma convenção do historico_do_canal
+    partes = []
+    for _, g in df.groupby("channel_id", sort=False):
+        t = _sem_fuso(g["published_at"])
+        h = g[g["y"].notna()].sort_values("published_at", kind="stable")
+        th, y = _sem_fuso(h["published_at"]), h["y"].reset_index(drop=True)
+        k = np.searchsorted(th, t - np.timedelta64(lacuna_dias, "D"), side=lado)  # nº de maduros
+        suficiente = k >= max(min_posts, 1)  # com k = 0 não há "post k-1": nunca cai no primeiro
+        q = pd.DataFrame(np.nan, index=range(len(t)), columns=list(QUANTIS_DAS_FAIXAS))
+        if len(y) and suficiente.any():
+            for nome, nivel in QUANTIS_DAS_FAIXAS.items():
+                ate_o_post = y.expanding().quantile(nivel).to_numpy()  # só os k primeiros contam
+                q[nome] = np.where(suficiente, ate_o_post[np.maximum(k - 1, 0)], np.nan)
+        q.index = g.index
+        partes.append(q)
     return pd.concat(partes).loc[df.index]
 
 

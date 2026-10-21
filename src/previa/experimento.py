@@ -37,7 +37,7 @@ from previa.baselines import alvo
 from previa.baselines import ler_config as ler_config_baselines
 from previa.coletor import DADOS
 from previa.dados import carregar_base
-from previa.features import montar_features
+from previa.features import montar_features, quantis_do_canal
 from previa.metricas import (
     ic_dif_mae_pareado,
     ic_ganho_pareado,
@@ -165,7 +165,8 @@ def preparar(base, duracoes, cfg_av, lacuna_dias=30, min_posts=3, min_posts_alvo
 
     `ref` é a mediana madura do canal (30 dias, em log1p) e `n_ref` quantos posts ela usa; o
     baseline é `ref` com 3+ posts (#20, 2.1) e o alvo relativo `y_rel = y - ref` existe com 10+
-    (#20, 1.6). A previsão de um modelo relativo é `r + ref`.
+    (#20, 1.6). A previsão de um modelo relativo é `r + ref`. `faixa_p25/p75/p95` são os quantis
+    de y do mesmo histórico (30 dias, 10+ posts, #7, 1.6): a régua das faixas, nunca feature.
     """
     d = base.copy()
     d["y"] = alvo(d)
@@ -188,7 +189,7 @@ def preparar(base, duracoes, cfg_av, lacuna_dias=30, min_posts=3, min_posts_alvo
     d["ref"], d["n_ref"] = maduro["hist_mediana"], maduro["hist_n"]  # mediana madura do canal (log)
     d["p_base"] = d["ref"].where(d["n_ref"] >= min_posts)
     d["y_rel"] = (d["y"] - d["ref"]).where(d["n_ref"] >= min_posts_alvo)
-    return d
+    return d.join(quantis_do_canal(d, 30, min_posts_alvo))  # a régua das faixas (#7, 1.6)
 
 
 def folds(d, cfg_av) -> dict:

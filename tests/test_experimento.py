@@ -20,6 +20,7 @@ from previa.experimento import (
     rodar,
     treinar_gbm,
 )
+from previa.features import FEATURES
 from previa.splits import ler_avaliacao
 
 AVALIACAO = """\
@@ -116,6 +117,32 @@ def test_preparar_marca_as_linhas_e_mantem_o_historico(cfg_av):
     # o post de 2021-05 entra no histórico de quem vem 30+ dias depois, no mesmo canal
     assert d.loc[20, "hist_n"] >= 1
     assert d["duracao_s"].notna().all()
+
+
+def test_preparar_junta_os_quantis_do_canal_das_faixas(cfg_av):
+    # decisão #7 (aula 1.6): p25/p75/p95 do histórico maduro, sempre com 30 dias e min_posts_alvo
+    base, dur = _base()
+    d = preparar(base, dur, cfg_av, lacuna_dias=30)
+    q = ["faixa_p25", "faixa_p75", "faixa_p95"]
+    assert (d["n_ref"] >= 10).sum() > 1000  # a base sintética tem posts de sobra
+    assert (
+        d[q].notna().all(axis=1).tolist() == (d["n_ref"] >= 10).tolist()
+    )  # a mesma régua do y_rel
+    ok = d[q].dropna()
+    assert (ok["faixa_p25"] <= d.loc[ok.index, "ref"]).all()  # p25 <= mediana <= p75
+    assert (d.loc[ok.index, "ref"] <= ok["faixa_p75"]).all()
+    assert (ok["faixa_p75"] <= ok["faixa_p95"]).all()
+    assert not {*q} & {*FEATURES}  # a régua das faixas não é feature do modelo
+
+
+def test_preparar_quantis_usam_sempre_30_dias_e_nao_mudam_o_resto(cfg_av):
+    base, dur = _base()
+    a = preparar(base, dur, cfg_av, lacuna_dias=30)
+    b = preparar(base, dur, cfg_av, lacuna_dias=7)
+    q = ["faixa_p25", "faixa_p75", "faixa_p95"]
+    pd.testing.assert_frame_equal(a[q], b[q])  # como a `ref`: a régua é de 30 dias
+    pd.testing.assert_series_equal(a["ref"], b["ref"])
+    assert not a["hist_n"].equals(b["hist_n"])  # e a feature do modelo segue a lacuna pedida
 
 
 def test_gbm_early_stopping_refit_e_seed(cfg_av, cfg):
