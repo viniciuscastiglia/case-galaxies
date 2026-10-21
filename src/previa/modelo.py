@@ -13,6 +13,10 @@ chega com a M6; até lá, o bundle tem o modelo pontual.
 """
 
 import hashlib
+import json
+import os
+import sys
+import tempfile
 from dataclasses import asdict, dataclass, field
 from datetime import date
 from functools import lru_cache
@@ -20,16 +24,23 @@ from pathlib import Path
 
 import joblib
 import lightgbm as lgb  # antes de qualquer torch no processo (hub, troubleshooting)
+import mlflow
 import numpy as np
 import pandas as pd
 
-from previa.caminhos import ARTEFATOS
+from previa.caminhos import ARTEFATOS, CONFIGS
 from previa.esquema import validar_tabela_de_treino
 from previa.experimento import (
+    EXPERIMENTO,
     Config,
     aplicar_pca,
     codigo_setor,
+    commit_atual,
+    data_de_corte,
     hash_base,
+    ler_config,
+    ler_duracoes,
+    ler_embeddings_do_bloco,
     preparar,
     treinar_gbm,
 )
@@ -49,6 +60,9 @@ class Bundle:
     ultimo_treino: str
     arvores: int
     config: dict = field(default_factory=dict)
+    run_id: str | None = None  # o run do MLflow que registrou este pacote (#37, F23)
+    base: str = ""  # o nome do arquivo da base congelada
+    hash_base: str = ""  # a impressão digital da base de treino
 
 
 def treinar_bundle(cfg: Config, base, duracoes, cfg_av, embeddings=None) -> Bundle:
@@ -71,14 +85,93 @@ def treinar_bundle(cfg: Config, base, duracoes, cfg_av, embeddings=None) -> Bund
     assinatura = f"{feats}|{hash_base(base)}|{n}".encode()
     versao = f"gbm-{cfg.nome}-{date.today():%Y%m%d}-{hashlib.sha1(assinatura).hexdigest()[:7]}"
     ultimo = str(d.loc[tr, "published_at"].max())
-    return Bundle(modelo, feats, pcas, versao, cfg.lacuna_dias, ultimo, n, asdict(cfg))
+    return Bundle(
+        modelo, feats, pcas, versao, cfg.lacuna_dias, ultimo, n, asdict(cfg),
+        base=str(cfg_av.get("base", "")), hash_base=hash_base(base),
+    )  # fmt: skip
+
+
+def model_version(bundle: Bundle) -> dict:
+    """De qual modelo veio o número: a tool devolve isto em toda resposta (#37, F23; aula 6.5)."""
+    if not bundle.run_id:
+        raise ValueError("o pacote não tem run id: registre-o com registrar_bundle antes de servir")
+    rotulo = f"{bundle.versao} · run {bundle.run_id[:8]} · treino até {bundle.ultimo_treino[:10]}"
+    return {
+        "versao": bundle.versao,
+        "run_id": bundle.run_id,
+        "ultimo_treino": bundle.ultimo_treino,
+        "base": bundle.base,
+        "hash_base": bundle.hash_base,
+        "rotulo": rotulo,
+    }
 
 
 def salvar(bundle: Bundle, destino=ARTEFATOS) -> Path:
+    """Grava `modelo.joblib` e, ao lado, `model_version.json` (só com run id; #37)."""
     destino = Path(destino)
     destino.mkdir(parents=True, exist_ok=True)
     joblib.dump(bundle, destino / "modelo.joblib")
+    if bundle.run_id:
+        (destino / "model_version.json").write_text(
+            json.dumps(model_version(bundle), ensure_ascii=False, indent=2), encoding="utf-8"
+        )
     return destino / "modelo.joblib"
+
+
+def registrar_bundle(bundle: Bundle, cfg_av: dict, caminho_config, destino=ARTEFATOS) -> str:
+    """Abre o run do modelo de uso no MLflow, salva o pacote e registra os dois arquivos nele.
+
+    O arquivo que a tool lê da pasta é o mesmo que fica como artefato do run (#37, opção A).
+    """
+    mlflow.set_experiment(EXPERIMENTO)
+    destino = Path(destino)
+    with mlflow.start_run(run_name=f"modelo_de_uso-{bundle.versao}") as run:
+        mlflow.set_tags(
+            {
+                "papel": "modelo_de_uso",
+                "git_commit": commit_atual(),
+                "hash_base": bundle.hash_base,
+                "data_corte": data_de_corte(cfg_av),
+                "config": str(caminho_config),
+            }
+        )
+        bundle.run_id = run.info.run_id
+        try:
+            # grava numa pasta temporária, registra no run e só então troca os arquivos da pasta
+            # de uso: se o MLflow falhar, o pacote bom anterior continua lá (falha não silenciosa)
+            destino.mkdir(parents=True, exist_ok=True)
+            with tempfile.TemporaryDirectory(dir=destino) as tmp:
+                pacote = salvar(bundle, tmp)
+                mlflow.log_artifact(str(pacote))
+                mlflow.log_artifact(str(pacote.parent / "model_version.json"))
+                for nome in ("modelo.joblib", "model_version.json"):
+                    os.replace(Path(tmp) / nome, destino / nome)
+        except Exception:
+            bundle.run_id = None
+            raise
+        carregar.cache_clear()  # um `carregar` anterior no processo guardaria o pacote antigo
+        return run.info.run_id
+
+
+def main(argv=None) -> int:
+    """`treinar CONFIG [AVALIACAO]`: treina o modelo final, registra o run e imprime o rótulo."""
+    from previa.dados import carregar_base
+    from previa.splits import ler_avaliacao
+
+    argv = list(sys.argv[1:] if argv is None else argv)
+    if len(argv) not in (2, 3) or argv[0] != "treinar":
+        print("uso: python -m previa.modelo treinar CONFIG [AVALIACAO]", file=sys.stderr)
+        return 2
+    caminho = Path(argv[1])
+    cfg = ler_config(caminho)
+    caminho_av = argv[2] if len(argv) == 3 else CONFIGS / "avaliacao.yaml"
+    cfg_av = ler_avaliacao(caminho_av)
+    base = carregar_base(caminho_config=caminho_av)  # base, datas, nome e hash da mesma config
+    embeddings = {b: ler_embeddings_do_bloco(b) for b in cfg.pca}
+    bundle = treinar_bundle(cfg, base, ler_duracoes(), cfg_av, embeddings)
+    registrar_bundle(bundle, cfg_av, caminho, destino=ARTEFATOS)
+    print(model_version(bundle)["rotulo"])
+    return 0
 
 
 @lru_cache(maxsize=1)
@@ -150,3 +243,7 @@ def prever_log(bundle: Bundle, x: pd.DataFrame, ref=None, n_ref=None) -> float:
             f"{MIN_POSTS_ANCORA} posts ou mais (#20)"
         )
     return r + float(ref)
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

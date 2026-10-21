@@ -4,18 +4,26 @@ O teste central é a paridade: as features que `features_de_um_short` monta para
 só com os posts anteriores do canal, são as mesmas que o treino calculou para ele.
 """
 
+import hashlib
+import json
+
+import mlflow
 import numpy as np
 import pandas as pd
 import pandera.pandas as pa
 import pytest
+from test_experimento import mlflow_temporario  # noqa: F401
 
 from previa.esquema import validar_tabela_de_treino
 from previa.experimento import ler_config, preparar
 from previa.modelo import (
     carregar,
     features_de_um_short,
+    main,
+    model_version,
     prever_log,
     referencia,
+    registrar_bundle,
     salvar,
     treinar_bundle,
 )
@@ -223,3 +231,100 @@ def test_bundle_recusa_a_tabela_que_quebra_o_contrato(base, cfg, cfg_av):
     dur.loc[b["post_id"].iloc[100]] = -1.0  # 2022-09: uma duração negativa numa linha de treino
     with pytest.raises(pa.errors.SchemaErrors, match="duracao_s"):
         treinar_bundle(cfg, b, dur, cfg_av, emb)
+
+
+def _sha(caminho) -> str:
+    return hashlib.sha256(open(caminho, "rb").read()).hexdigest()
+
+
+@pytest.mark.usefixtures("mlflow_temporario")
+def test_registrar_bundle_poe_o_run_no_model_version(base, cfg, cfg_av, tmp_path):
+    b, dur, emb = _partes(base)
+    bundle = treinar_bundle(cfg, b, dur, cfg_av, emb)
+    assert bundle.run_id is None
+    run_id = registrar_bundle(bundle, cfg_av, tmp_path / "exp.yaml", destino=tmp_path / "art")
+    mv = model_version(bundle)
+    assert mv["run_id"] == run_id and run_id[:8] in mv["rotulo"]
+    assert mv["versao"] in mv["rotulo"] and mv["ultimo_treino"][:10] in mv["rotulo"]
+    assert mv["hash_base"] and mv["hash_base"] != ""
+    assert carregar(tmp_path / "art").run_id == run_id
+    tags = mlflow.get_run(run_id).data.tags
+    assert tags["papel"] == "modelo_de_uso" and tags["hash_base"] == mv["hash_base"]
+    assert {"git_commit", "data_corte", "config"} <= set(tags)
+
+
+@pytest.mark.usefixtures("mlflow_temporario")
+def test_artefato_do_run_e_o_arquivo_salvo(base, cfg, cfg_av, tmp_path):
+    b, dur, emb = _partes(base)
+    bundle = treinar_bundle(cfg, b, dur, cfg_av, emb)
+    destino = tmp_path / "art"
+    run_id = registrar_bundle(bundle, cfg_av, tmp_path / "exp.yaml", destino=destino)
+    baixado = mlflow.artifacts.download_artifacts(
+        run_id=run_id, artifact_path="modelo.joblib", dst_path=str(tmp_path / "baixado")
+    )
+    assert _sha(baixado) == _sha(destino / "modelo.joblib")
+
+
+def test_model_version_json_ao_lado_do_pacote(base, cfg, cfg_av, tmp_path):
+    b, dur, emb = _partes(base)
+    bundle = treinar_bundle(cfg, b, dur, cfg_av, emb)
+    bundle.run_id = "abcdef1234567890"
+    salvar(bundle, tmp_path / "art")
+    gravado = json.loads((tmp_path / "art" / "model_version.json").read_text())
+    assert gravado == model_version(bundle)
+    assert gravado["rotulo"].startswith(bundle.versao + " · run abcdef12 · treino até ")
+
+
+@pytest.mark.usefixtures("mlflow_temporario")
+def test_registrar_bundle_que_falha_deixa_a_pasta_intocada(
+    base, cfg, cfg_av, tmp_path, monkeypatch
+):
+    b, dur, emb = _partes(base)
+    bundle = treinar_bundle(cfg, b, dur, cfg_av, emb)
+    destino = tmp_path / "art"
+    registrar_bundle(bundle, cfg_av, tmp_path / "exp.yaml", destino=destino)
+    antes = {n: (destino / n).read_bytes() for n in ("modelo.joblib", "model_version.json")}
+    outro = treinar_bundle(cfg, b, dur, cfg_av, emb)
+    outro.versao = "gbm-outro"
+
+    def quebra(*a, **k):
+        raise RuntimeError("mlflow fora do ar")
+
+    monkeypatch.setattr(mlflow, "log_artifact", quebra)
+    with pytest.raises(RuntimeError, match="mlflow fora do ar"):
+        registrar_bundle(outro, cfg_av, tmp_path / "exp.yaml", destino=destino)
+    assert outro.run_id is None
+    assert {n: (destino / n).read_bytes() for n in antes} == antes
+    assert sorted(p.name for p in destino.iterdir()) == sorted(antes)  # sem lixo temporário
+
+
+def test_model_version_de_pacote_antigo_pede_o_registro(base, cfg, cfg_av):
+    b, dur, emb = _partes(base)
+    bundle = treinar_bundle(cfg, b, dur, cfg_av, emb)
+    del bundle.__dict__["run_id"]  # um joblib antigo não tem o atributo (cai no padrão da classe)
+    with pytest.raises(ValueError, match="registrar_bundle"):
+        model_version(bundle)
+
+
+@pytest.mark.usefixtures("mlflow_temporario")
+def test_main_treina_com_a_base_da_config_de_avaliacao(base, cfg, tmp_path, monkeypatch, capsys):
+    import previa.modelo as modelo
+    from previa.experimento import hash_base
+
+    arq = tmp_path / "base_propria.parquet"
+    base.to_parquet(arq)
+    aval = tmp_path / "aval.yaml"
+    aval.write_text(AVALIACAO + f'base: "{arq}"\n')
+    cfg_yaml = tmp_path / "exp.yaml"
+    cfg_yaml.write_text(CONFIG)
+    b, dur, emb = _partes(base)
+    monkeypatch.setattr(modelo, "ler_duracoes", lambda: dur)
+    monkeypatch.setattr(modelo, "ler_embeddings_do_bloco", lambda bloco: emb[bloco])
+    monkeypatch.setattr(modelo, "ARTEFATOS", tmp_path / "art")
+    destino = tmp_path / "art"
+    assert main(["treinar", str(cfg_yaml), str(aval)]) == 0
+    mv = json.loads((destino / "model_version.json").read_text())
+    assert mv["base"] == str(arq)
+    cortada = base[base["published_at"] < pd.Timestamp("2026-04-01", tz="UTC")]
+    assert mv["hash_base"] == hash_base(cortada.reset_index(drop=True))
+    assert mv["rotulo"] in capsys.readouterr().out
