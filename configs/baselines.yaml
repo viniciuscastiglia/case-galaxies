@@ -5,5 +5,7 @@
 maturidade_dias: 30   # princípio 2: histórico só com posts publicados ao menos 30 dias antes
 min_posts: 3          # posts maduros com y para o canal ter baseline (2.1; decisão #20)
 janela_dias: 14       # M2: pares do mesmo canal a até 14 dias (exercício da 2.4)
+ks: [3, 5, 10, 20]        # média dos últimos k maduros: o k sai do walk-forward de 2025 (2.1, F25)
+janela_baseline_dias: 90  # mediana dos posts maduros dos 90 dias antes do limite (6.1; F25)
 n_boot: 2000          # IC por bootstrap de canais (2.4)
 seed: 0
