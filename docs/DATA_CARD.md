@@ -4,6 +4,12 @@
 > A v1 descreve a base congelada dos experimentos (`data/base_v1.parquet`, exportação de 19/10/2026, 06h46, hash de
 > desenvolvimento `09f6035c11c9`). Os números do período de teste (01/04 a 14/09/2026) são contagens de linhas,
 > sem ler curtidas: o teste abre uma vez, no fim. A v0.1 (08/10) está no histórico do git.
+>
+> **v2 (decisão #33):** `data/base_v2.parquet`, exportação de 21/10/2026, 06h25, hash `96fd13a28156`, congelada por
+> `python -m previa.dados congelar`. É a base do modelo de uso, retreinado com a mesma receita depois do teste final:
+> ela gasta de propósito os meses do teste da v1 no treino e na calibração (`configs/avaliacao_v2.yaml`, datas a
+> confirmar pelo Vinicius), e o `carregar_base` a recusa antes da primeira abertura do teste. Os números dela não se
+> comparam com os do teste da v1. É apagada em 30/10 com a v1.
 
 ## Origem
 
