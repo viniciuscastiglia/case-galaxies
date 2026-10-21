@@ -10,6 +10,8 @@ reexporta a `base_minima` com as curtidas novas, e a mesma config daria outro n�
 seguinte. Sem a chave, o erro é explícito: nunca cai na base viva em silêncio.
 """
 
+import argparse
+import shutil
 import warnings
 from datetime import datetime, timezone
 from pathlib import Path
@@ -32,6 +34,17 @@ def carregar_base(
     if caminho_base is None:
         caminho_base = DADOS / config["base"]  # um caminho absoluto no config vale como está
     teste_inicio = pd.Timestamp(str(config["teste_inicio"]), tz="UTC")
+    if config.get("exige_teste_aberto", False):
+        # a v2 gasta os meses de teste da v1 (#33): só depois da avaliação final
+        aberturas = (
+            Path(registro).read_text(encoding="utf-8").strip() if Path(registro).exists() else ""
+        )
+        if not aberturas:
+            raise ValueError(
+                "esta config (base v2) usa os meses de teste da v1 para treino e calibração, e o "
+                "teste final ainda não foi aberto (registro vazio): rode antes "
+                "`python -m previa.final`"
+            )
     base = pd.read_parquet(caminho_base)
     if not final:
         return base[base["published_at"] < teste_inicio].reset_index(drop=True)
@@ -46,3 +59,37 @@ def carregar_base(
         stacklevel=2,
     )
     return base
+
+
+def congelar(origem: Path, destino: Path) -> str:
+    """Congela a base mínima da coleta diária numa cópia com nome (aula 2.5, erro comum 2).
+
+    Recusa sobrescrever um arquivo que já existe (a v1 é a base dos runs das H1 a H6, decisão #33),
+    valida o esquema mínimo (princípio 6) antes de copiar e devolve o `hash_base` da cópia.
+    """
+    from previa.esquema import BaseShorts
+    from previa.experimento import hash_base  # import tardio: o experimento importa este módulo
+
+    origem, destino = Path(origem), Path(destino)
+    if destino.exists():
+        raise FileExistsError(
+            f"{destino.name} já existe e não é sobrescrito: escolha outro nome (ex.: base_v3)"
+        )
+    base = pd.read_parquet(origem)
+    BaseShorts.validate(base, lazy=True)  # erro aqui: corrija na coleta, não na cópia
+    shutil.copyfile(origem, destino)
+    return hash_base(pd.read_parquet(destino))
+
+
+def main(argv=None) -> None:
+    ap = argparse.ArgumentParser(description="Base congelada (decisão #33)")
+    sub = ap.add_subparsers(dest="cmd", required=True)
+    c = sub.add_parser("congelar", help="copia data/base_minima.parquet para o nome dado")
+    c.add_argument("nome", help="ex.: base_v2.parquet (dentro de data/)")
+    args = ap.parse_args(argv)
+    h = congelar(DADOS / "base_minima.parquet", DADOS / args.nome)
+    print(f"{args.nome} congelada; hash_base {h}")
+
+
+if __name__ == "__main__":
+    main()

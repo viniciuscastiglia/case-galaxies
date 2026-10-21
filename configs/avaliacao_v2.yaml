@@ -1,0 +1,26 @@
+# Avaliação da base v2 (decisão #33). Mesma forma da avaliacao.yaml; lido por previa.splits.ler_avaliacao.
+#
+# ATENÇÃO: as datas abaixo são uma PROPOSTA, a confirmar pelo Vinicius (as datas e o esquema de
+# validação são decisão dele). Nada aqui toca a v1: avaliacao.yaml segue apontando base_v1.parquet.
+#
+# Ordem: treino -> gap -> calibração (sem teste). ATENÇÃO: a v2 gasta DE PROPÓSITO os meses de teste
+# da v1 (abril a setembro/2026) como treino e calibração do CQR, para o modelo de uso. Por isso só
+# pode ser carregada DEPOIS da avaliação final da v1 (F16, `python -m previa.final`): carregar_base
+# recusa enquanto data/logs/teste_aberto.log estiver vazio. Os números da v2 NÃO são comparáveis
+# aos do teste da v1. Aqui teste_inicio = teste_fim e o bloco de teste é vazio. Datas em 00h UTC;
+# os fins são exclusivos.
+exige_teste_aberto: true
+teste_inicio: "2026-09-15"    # aqui, o fim da calibração do CQR; sem teste
+base: "base_v2.parquet"       # congelada por `python -m previa.dados congelar base_v2.parquet`
+treino_inicio: "2021-07-01"
+gap_dias: 30
+cal_inicio: "2026-07-01"      # o treino vai até cal_inicio - gap_dias = 01/06/2026 (exclusivo)
+teste_fim: "2026-09-15"       # igual a teste_inicio: teste vazio
+
+walk_forward:
+  n_folds: 4
+  inicio: "2025-01-01"
+
+canal_novo:
+  n_grupos: 4
+  seed: 0
