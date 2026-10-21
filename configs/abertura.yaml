@@ -1,0 +1,77 @@
+# Abertura dos resultados lacrados (decisão #36). Lido por previa.abertura; só o controlador roda,
+# com o Vinicius presente. Os nomes de controle e tratamento são os caminhos das configs (a tag
+# `config` do run no MLflow), conforme o controle e o tratamento de cada hipótese no HIPOTESES.md.
+# A H1 não entra: é o teste final, aberto à parte (carregar_base(final=True)).
+#
+# `regras`: uma por avaliação.
+#   padrao      a régua da #27: fica se melhorar a manchete OU o mae_log (IC 95% pareado por canal sem
+#               o zero), sem piorar a outra (o IC da outra não fica inteiro do lado ruim)
+#   mae_log     decide o mae_log (IC sem o zero), sem piorar a manchete (H8, H9, H11)
+#   nao_piorar  nenhuma das duas réguas com o IC inteiro do lado ruim (H6, no walk-forward)
+#   ilustracao  só mostra o número; nunca é candidata (H3, lacuna de 0 dias)
+# `exige`: a comparação só fica se a outra também ficar (H4: o (b) tem de ganhar do (a)).
+ablacao: ablacao/ablacao.csv      # relativo a DADOS; saída de previa.ablacao
+# `blocos`: cada bloco da ablação -> a comparação cujo veredito da #27 diz se ele fica no modelo
+# (null: base da Opção A, sem hipótese). Bloco fora da ablação (detectores, o último): a escada e
+# a remoção são a própria comparação da hipótese.
+blocos:
+  historico: H2
+  calendario: null
+  metadados: null
+  texto: H4b
+  capa: H7
+  detectores: H10
+comparacoes:
+  H2:
+    controle: configs/experimentos/h2_sem_historico.yaml
+    tratamento: configs/experimentos/opcao_a_texto.yaml
+    regras: {walk_forward: padrao}
+  H3:
+    controle: configs/experimentos/opcao_a_texto.yaml
+    tratamento: configs/experimentos/h3_lacuna_7.yaml
+    regras: {walk_forward: padrao}
+  H3-lacuna-0:
+    controle: configs/experimentos/opcao_a_texto.yaml
+    tratamento: configs/experimentos/h3_lacuna_0.yaml
+    regras: {walk_forward: ilustracao}
+  H4a:
+    controle: configs/experimentos/opcao_a.yaml
+    tratamento: configs/experimentos/opcao_a_manuais.yaml
+    regras: {walk_forward: padrao}
+  H4b:
+    controle: configs/experimentos/opcao_a.yaml
+    tratamento: configs/experimentos/opcao_a_texto.yaml
+    regras: {walk_forward: padrao}
+    exige: H4b-sobre-a
+  H4b-sobre-a:
+    controle: configs/experimentos/opcao_a_manuais.yaml
+    tratamento: configs/experimentos/opcao_a_texto.yaml
+    regras: {walk_forward: padrao}
+  H5:
+    controle: configs/experimentos/opcao_a_texto.yaml
+    tratamento: configs/experimentos/h5_idade_controle.yaml
+    regras: {walk_forward: padrao}
+  H6:
+    controle: configs/experimentos/opcao_a_texto.yaml
+    tratamento: configs/experimentos/h6_teto_400.yaml
+    regras: {canal_novo: padrao, walk_forward: nao_piorar}
+  H7:
+    controle: configs/experimentos/opcao_a_texto.yaml
+    tratamento: configs/experimentos/h7_thumb.yaml
+    regras: {walk_forward: padrao}
+  H8:
+    controle: configs/experimentos/h8_controle.yaml
+    tratamento: configs/experimentos/h8_vlm.yaml
+    regras: {walk_forward: mae_log}
+  H9:
+    controle: configs/experimentos/h8_controle.yaml
+    tratamento: configs/experimentos/h9_video_audio.yaml
+    regras: {walk_forward: mae_log}
+  H10:
+    controle: configs/experimentos/h7_thumb.yaml
+    tratamento: configs/experimentos/h10_detectores.yaml
+    regras: {walk_forward: padrao}
+  H11:
+    controle: configs/experimentos/h7_thumb.yaml
+    tratamento: configs/experimentos/h11_huber.yaml
+    regras: {walk_forward: mae_log, canal_novo: mae_log}
