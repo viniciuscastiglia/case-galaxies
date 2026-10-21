@@ -15,6 +15,10 @@ sem inscritos (princípio 2). As linhas de treino e de avaliação são as prime
 curtidas desde `treino_inicio`; o histórico usa todos os posts. O baseline é a mediana madura
 das mesmas features (`hist_mediana` com `hist_n` >= 3), como na leitura da M2.
 
+Cada run guarda a data de corte da avaliação (tag `data_corte`, F22) e o `comparar` recusa runs com
+cortes diferentes (2.5, erro comum 3). Cada avaliação traz também a importância por ganho das
+features (F35): uma feature com mais da metade do ganho é alarme de vazamento (2.2).
+
 Uso: uv run python -m previa.experimento configs/experimentos/opcao_a.yaml
      uv run python -m previa.experimento comparar RUN_A RUN_B   (ganho de B sobre A, pareado)
      uv run python -m previa.experimento painel RUN_ID   (o painel de métricas de um run salvo)
@@ -22,6 +26,7 @@ Uso: uv run python -m previa.experimento configs/experimentos/opcao_a.yaml
 
 import argparse
 import hashlib
+import json
 import subprocess
 import sys
 import warnings
@@ -37,6 +42,7 @@ from sklearn.decomposition import PCA
 
 from previa.baselines import alvo
 from previa.baselines import ler_config as ler_config_baselines
+from previa.caminhos import CONFIGS
 from previa.coletor import DADOS
 from previa.dados import carregar_base
 from previa.features import montar_features, quantis_do_canal
@@ -59,7 +65,8 @@ from previa.texto import manuais
 EXPERIMENTO = "previa-curtidas"
 SETORES = ["automotivo", "beleza"]
 FIXOS = {"verbosity": -1, "deterministic": True, "force_row_wise": True}  # 2.5: determinismo
-NAO_METRICA = ("arvores", "previsoes", "dobras")
+NAO_METRICA = ("arvores", "previsoes", "dobras", "importancia")  # o que não é float (registrar)
+LIMITE_IMPORTANCIA = 0.5  # 2.2: uma feature com mais da metade do ganho é "importância dominante"
 
 
 @dataclass
@@ -428,6 +435,34 @@ def avaliar(d, te, p_modelo, n_boot=2000, seed=0, dobras=None) -> dict:
     }
 
 
+def importancia_por_ganho(modelos) -> pd.Series:
+    """O ganho (`gain`) de cada feature, somado nos modelos das dobras e normalizado para somar 1.
+
+    Em ordem decrescente, indexado pelo nome que o modelo guardou (aula 2.2: uma feature que
+    concentra o ganho é a primeira suspeita de vazamento). Sem nenhum split no ganho total, a
+    fatia não existe: ValueError (princípio 7), e não uma série de NaN.
+    """
+    ganho = pd.Series(dtype=float)
+    for m in modelos:
+        por_modelo = pd.Series(m.feature_importance("gain"), index=m.feature_name())
+        ganho = ganho.add(por_modelo, fill_value=0.0)
+    if not ganho.sum() > 0:
+        raise ValueError("importância por ganho: nenhum split nos modelos (ganho total zero)")
+    return (ganho / ganho.sum()).sort_values(ascending=False, kind="stable")
+
+
+def avisar_importancia_dominante(resultado: dict, limite=LIMITE_IMPORTANCIA) -> None:
+    """Avisa quando uma feature concentra mais de `limite` do ganho em alguma avaliação (2.2)."""
+    for avaliacao, r in resultado.items():
+        if r["importancia_maior_fatia"] > limite:
+            warnings.warn(
+                f"importância dominante em {avaliacao}: {r['importancia'].index[0]} tem "
+                f"{r['importancia_maior_fatia']:.2f} do ganho (limite {limite}); "
+                "confira vazamento (aula 2.2)",
+                stacklevel=2,
+            )
+
+
 def rodar(
     cfg: Config,
     base,
@@ -445,6 +480,8 @@ def rodar(
     `embeddings` (bloco -> DataFrame com índice post_id) alimenta os blocos de `cfg.pca`, com o
     PCA ajustado de novo no treino de cada fold. `extras` (bloco -> DataFrame com índice post_id)
     entra por join; `so_avaliar` (post_ids) restringe as linhas avaliadas, como na amostra (H8).
+    Cada avaliação traz `importancia` (Series, ganho normalizado das features) e
+    `importancia_maior_fatia` (float, a maior fatia; o alarme é `avisar_importancia_dominante`).
     """
     d = preparar(
         base,
@@ -467,6 +504,7 @@ def rodar(
     saida = {}
     for nome, pares in folds(d, cfg_av).items():
         p, arvores, todos = pd.Series(np.nan, index=d.index), [], d.index[:0]
+        modelos = []
         id_dobra = pd.Series(-1, index=d.index)
         for k, (tr, te) in enumerate(pares):
             if so_avaliar is not None:
@@ -480,13 +518,17 @@ def rodar(
                 feats += list(cols.columns)
             modelo, n = treinar_gbm(dobra, tr, cfg, feats)
             arvores.append(n)
+            modelos.append(modelo)
             x_te = fixar_na_previsao(dobra.loc[te, feats], cfg)
             p.loc[te] = prever_absoluto(modelo, x_te, dobra.loc[te, "ref"], cfg)
             id_dobra.loc[te] = k
             todos = todos.union(te)
+        importancia = importancia_por_ganho(modelos)  # F35, 2.2
         saida[nome] = {
             **avaliar(d, todos, p, n_boot, seed, dobras=id_dobra),
             "n_features": len(feats),
+            "importancia": importancia,
+            "importancia_maior_fatia": float(importancia.iloc[0]),
             "arvores": arvores,
             "previsoes": p.loc[todos].set_axis(d.loc[todos, "post_id"]),
             "dobras": id_dobra.loc[todos].set_axis(d.loc[todos, "post_id"]),
@@ -561,8 +603,46 @@ def painel_do_run(run_id: str, n_boot=2000, seed=0, min_posts=3) -> pd.DataFrame
     return painel_das_previsoes(d, prev, n_boot, seed)
 
 
-def registrar(cfg: Config, caminho, resultado, base, tags=None) -> str:
-    """Um run no MLflow: tags de rastreio, params, a config inteira e as métricas."""
+def avaliacao_crua() -> dict:
+    """O `configs/avaliacao.yaml` como está agora, em dict JSON (as datas ficam como texto)."""
+    cru = yaml.safe_load((CONFIGS / "avaliacao.yaml").read_text(encoding="utf-8"))
+    return json.loads(json.dumps(cru, default=str))
+
+
+def data_de_corte(cfg_av: dict) -> str:
+    """A data de corte da avaliação de desenvolvimento: o início do walk-forward (AAAA-MM-DD)."""
+    return str(cfg_av["walk_forward"]["inicio"].date())
+
+
+def conferir_cortes(tags: dict[str, dict], corte_atual: str) -> None:
+    """Recusa comparar runs com datas de corte diferentes entre si ou da atual (2.5, erro 3; F22).
+
+    `tags` é run_id -> tags do run. Run lacrado antes da F22 não tem `data_corte`: avisa e segue,
+    conferido só pelo hash da base. Cortes diferentes levantam ValueError.
+    """
+    cortes = {}
+    for run, t in tags.items():
+        if "data_corte" in t:
+            cortes[run] = t["data_corte"]
+        else:
+            warnings.warn(
+                f"run {run} sem data_corte, anterior à F22: conferido só pelo hash da base",
+                stacklevel=2,
+            )
+    if len(set(cortes.values()) | {corte_atual}) > 1:
+        raise ValueError(
+            f"os runs têm datas de corte diferentes (data_corte): {cortes}; atual {corte_atual}. "
+            "Rode de novo com o mesmo corte (aula 2.5, erro comum 3)"
+        )
+
+
+def registrar(cfg: Config, caminho, resultado, base, tags=None, cfg_av=None) -> str:
+    """Um run no MLflow: tags de rastreio, params, a config inteira e as métricas.
+
+    Grava a data de corte (`data_corte`) e o `gap_dias` do `cfg_av` (sem ele, o do projeto), o
+    `avaliacao.yaml` cru (`avaliacao.json`) e a importância por ganho (`importancia_gain.json`).
+    """
+    cfg_av = ler_avaliacao() if cfg_av is None else cfg_av
     mlflow.set_experiment(EXPERIMENTO)
     with mlflow.start_run(run_name=cfg.nome, description=cfg.descricao) as run:
         mlflow.set_tags(
@@ -572,6 +652,8 @@ def registrar(cfg: Config, caminho, resultado, base, tags=None) -> str:
                 "hipotese": cfg.hipotese,
                 "config": str(caminho),
                 "avaliacao": "desenvolvimento (2025)",
+                "data_corte": data_de_corte(cfg_av),
+                "gap_dias": cfg_av["gap_dias"],
                 **(tags or {}),
             }
         )
@@ -582,6 +664,10 @@ def registrar(cfg: Config, caminho, resultado, base, tags=None) -> str:
         params |= {f"{a}_arvores": ",".join(map(str, r["arvores"])) for a, r in resultado.items()}
         mlflow.log_params(params)
         mlflow.log_dict(asdict(cfg), "config.json")
+        mlflow.log_dict(avaliacao_crua(), "avaliacao.json")
+        mlflow.log_dict(
+            {a: r["importancia"].to_dict() for a, r in resultado.items()}, "importancia_gain.json"
+        )
         for a, r in resultado.items():
             mlflow.log_metrics({f"{a}_{k}": float(v) for k, v in r.items() if k not in NAO_METRICA})
         # para comparar modelos depois (#5, H2 a H8)
@@ -594,13 +680,16 @@ def comparar(run_a: str, run_b: str, n_boot=2000, seed=0, min_posts=3) -> pd.Dat
     """Ganho do run B sobre o run A, pareado por canal, nas previsões salvas de cada um."""
     mlflow.set_experiment(EXPERIMENTO)  # o load_table procura no experimento ativo
     base = carregar_base()
-    hashes = {r: mlflow.get_run(r).data.tags.get("hash_base") for r in (run_a, run_b)}
+    cfg_av = ler_avaliacao()
+    tags = {r: dict(mlflow.get_run(r).data.tags) for r in (run_a, run_b)}
+    conferir_cortes(tags, data_de_corte(cfg_av))  # antes do hash (F22; 2.5, erro comum 3)
+    hashes = {r: t.get("hash_base") for r, t in tags.items()}
     if len(set(hashes.values()) | {hash_base(base)}) != 1:
         raise ValueError(
             f"os runs não usaram a base atual ({hash_base(base)}): {hashes}; rode os dois de novo"
         )
     prev = {r: mlflow.load_table("previsoes.json", run_ids=[r]) for r in (run_a, run_b)}
-    d = preparar(base, ler_duracoes(), ler_avaliacao(), min_posts=min_posts)
+    d = preparar(base, ler_duracoes(), cfg_av, min_posts=min_posts)
     return ganhos(d, prev[run_a], prev[run_b], n_boot, seed)
 
 
@@ -621,7 +710,7 @@ def main(argv=None) -> int:
     parser = argparse.ArgumentParser(prog="python -m previa.experimento")
     parser.add_argument("config")
     args = parser.parse_args(argv)
-    cfg, cfg_b = ler_config(args.config), ler_config_baselines()
+    cfg, cfg_b, cfg_av = ler_config(args.config), ler_config_baselines(), ler_avaliacao()
     base = carregar_base()  # sem o período de teste
     embeddings = {b: ler_embeddings_do_bloco(b) for b in cfg.pca}
     extras = {e: ler_extra(e) for e in cfg.extras}
@@ -632,7 +721,7 @@ def main(argv=None) -> int:
         cfg,
         base,
         ler_duracoes(),
-        ler_avaliacao(),
+        cfg_av,
         cfg_b["n_boot"],
         cfg_b["seed"],
         embeddings,
@@ -644,7 +733,8 @@ def main(argv=None) -> int:
         {a: {k: v for k, v in r.items() if k not in NAO_METRICA} for a, r in resultado.items()}
     )
     print(tabela.round(4).to_string())
-    run_id = registrar(cfg, args.config, resultado, base)
+    avisar_importancia_dominante(resultado)  # F35: uma feature com mais da metade do ganho
+    run_id = registrar(cfg, args.config, resultado, base, cfg_av=cfg_av)
     print(f"\nrun {run_id} · commit {commit_atual()} · base {hash_base(base)}")
     print(f"comando: uv run python -m previa.experimento {args.config}")
     return 0

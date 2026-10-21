@@ -4,13 +4,24 @@ Base sintética pequena no formato da base mínima: 6 canais, 2021 a 2025, curti
 canal e da duração. O LightGBM roda com poucas árvores para o teste ser rápido.
 """
 
+import json
+import warnings
+
+import mlflow
 import numpy as np
 import pandas as pd
 import pytest
+import yaml
 
+from previa.caminhos import CONFIGS
 from previa.experimento import (
+    EXPERIMENTO,
+    LIMITE_IMPORTANCIA,
     aplicar_pca,
     avaliar,
+    avisar_importancia_dominante,
+    comparar,
+    conferir_cortes,
     folds,
     ganho_entre,
     hash_base,
@@ -19,6 +30,7 @@ from previa.experimento import (
     painel,
     painel_das_previsoes,
     preparar,
+    registrar,
     rodar,
     tabela_de_previsoes,
     treinar_gbm,
@@ -481,3 +493,133 @@ def test_painel_do_run_le_as_previsoes_salvas_sem_treinar(cfg_av, cfg, monkeypat
     FakeRun.data.tags = {"hash_base": "outra"}  # run de outra base: falha alto, como o `comparar`
     with pytest.raises(ValueError, match="base atual"):
         exp.painel_do_run("RUN", n_boot=100, seed=0, min_posts=3)
+
+
+# --- data de corte no run e importância por ganho (F22, F35; aulas 2.2 e 2.5) ---
+
+
+@pytest.fixture
+def mlflow_temporario(tmp_path):
+    """O MLflow num sqlite de tmp_path, com os artefatos também lá (o padrão seria `./mlruns`):
+    nenhum teste toca o `mlflow.db` do projeto. Restaura o endereço e o experimento ativo."""
+    antes = mlflow.get_tracking_uri()
+    mlflow.set_tracking_uri(f"sqlite:///{tmp_path / 'mlflow.db'}")
+    mlflow.create_experiment(EXPERIMENTO, artifact_location=str(tmp_path / "artefatos"))
+    yield tmp_path
+    mlflow.set_tracking_uri(antes)
+    mlflow.tracking.fluent._active_experiment_id = None
+
+
+def test_conferir_cortes_avisa_run_sem_tag_e_recusa_cortes_diferentes():
+    # runs lacrados antes da F22 não têm `data_corte`: avisa e segue (2.5, erro comum 3)
+    with pytest.warns(UserWarning, match="a sem data_corte"):
+        conferir_cortes({"a": {}, "b": {"data_corte": "2025-01-01"}}, "2025-01-01")
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")  # todos com o mesmo corte: nem um aviso
+        conferir_cortes({"a": {"data_corte": "2025-01-01"}}, "2025-01-01")
+    # um run com outro corte que o do outro run, ou que o atual: a comparação não vale
+    with pytest.raises(ValueError, match="data_corte"):
+        conferir_cortes(
+            {"a": {"data_corte": "2025-01-01"}, "b": {"data_corte": "2024-07-01"}}, "2025-01-01"
+        )
+    with pytest.raises(ValueError, match="2024-07-01"):
+        conferir_cortes({"a": {"data_corte": "2024-07-01"}}, "2025-01-01")
+
+
+def test_importancia_soma_1_e_pega_a_feature_vazada(cfg_av, cfg):
+    base, dur = _base()
+    r = rodar(cfg, base, dur, cfg_av, n_boot=100, seed=0)
+    for avaliacao in ("walk_forward", "canal_novo"):
+        imp = r[avaliacao]["importancia"]
+        assert imp.sum() == pytest.approx(1.0)
+        assert set(imp.index) == set(cfg.features)  # o nome vem do modelo, não da posição
+        assert imp.is_monotonic_decreasing
+        assert r[avaliacao]["importancia_maior_fatia"] == pytest.approx(imp.iloc[0])
+    # uma feature vazada (o alvo mais um ruído pequeno) tem que dominar o ganho e disparar o alarme
+    d = preparar(base, dur, cfg_av, cfg.lacuna_dias, min_posts_alvo=cfg.min_posts_alvo)
+    ruido = np.random.default_rng(1).normal(0, 0.05, len(d))
+    vazada = pd.DataFrame({"vazada": d["y_rel"].to_numpy() + ruido}, index=d["post_id"])
+    cfg.features = [*cfg.features, "vazada"]
+    r = rodar(cfg, base, dur, cfg_av, n_boot=100, seed=0, extras={"vazada": vazada})
+    for avaliacao in ("walk_forward", "canal_novo"):
+        assert r[avaliacao]["importancia"].index[0] == "vazada"
+        assert r[avaliacao]["importancia_maior_fatia"] > LIMITE_IMPORTANCIA
+    with pytest.warns(UserWarning, match="vazada"):
+        avisar_importancia_dominante(r)
+
+
+def test_alarme_de_importancia_so_acima_do_limite():
+    def res(fatia):
+        imp = pd.Series({"vazada": fatia, "outra": 1 - fatia})
+        return {"walk_forward": {"importancia": imp, "importancia_maior_fatia": fatia}}
+
+    assert LIMITE_IMPORTANCIA == 0.5  # 2.2: "importância dominante"
+    with pytest.warns(UserWarning, match=r"walk_forward.*vazada.*0\.80"):
+        avisar_importancia_dominante(res(0.8))
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")
+        avisar_importancia_dominante(res(0.4))
+
+
+def test_registrar_grava_corte_e_avaliacao(cfg_av, cfg, mlflow_temporario):
+    base, dur = _base()
+    r = rodar(cfg, base, dur, cfg_av, n_boot=100, seed=0)
+    client = mlflow.MlflowClient()
+
+    run_id = registrar(cfg, "exp.yaml", r, base, cfg_av=cfg_av)
+    run = client.get_run(run_id)
+    assert run.data.tags["data_corte"] == "2025-01-01"  # o início do walk-forward do cfg_av
+    assert run.data.tags["gap_dias"] == "30"
+    arquivos = {f.path for f in client.list_artifacts(run_id)}
+    assert {"avaliacao.json", "importancia_gain.json", "config.json"} <= arquivos
+    cru = mlflow.artifacts.load_dict(f"runs:/{run_id}/avaliacao.json")
+    assert cru == json.loads(
+        json.dumps(yaml.safe_load((CONFIGS / "avaliacao.yaml").read_text(encoding="utf-8")))
+    )  # o arquivo cru, como estava na hora do run
+    gain = mlflow.artifacts.load_dict(f"runs:/{run_id}/importancia_gain.json")
+    assert set(gain) == {"walk_forward", "canal_novo"}
+    for fatias in gain.values():
+        assert set(fatias) == set(cfg.features)
+        assert sum(fatias.values()) == pytest.approx(1.0)
+    # a fatia dominante é métrica; a série da importância não (o `log_metrics` pede float)
+    assert "walk_forward_importancia_maior_fatia" in run.data.metrics
+    assert not any(k.endswith("_importancia") for k in run.data.metrics)
+
+    # sem `cfg_av` (como a ablação chama), o corte sai do avaliacao.yaml do projeto
+    sem = client.get_run(registrar(cfg, "exp.yaml", r, base))
+    esperado = str(ler_avaliacao()["walk_forward"]["inicio"].date())
+    assert sem.data.tags["data_corte"] == esperado
+
+
+def test_comparar_recusa_cortes_diferentes_antes_do_hash_e_avisa_run_antigo(
+    cfg_av, cfg, monkeypatch
+):
+    import previa.experimento as exp
+
+    base, dur = _base()
+    r = rodar(cfg, base, dur, cfg_av, n_boot=100, seed=0)
+    tags = {}
+
+    class FakeRun:
+        def __init__(self, run_id):
+            self.data = type("Dados", (), {"tags": tags[run_id]})
+
+    monkeypatch.setattr(exp.mlflow, "set_experiment", lambda nome: None)
+    monkeypatch.setattr(exp.mlflow, "get_run", FakeRun)
+    monkeypatch.setattr(exp.mlflow, "load_table", lambda nome, run_ids: tabela_de_previsoes(r))
+    monkeypatch.setattr(exp, "carregar_base", lambda: base)
+    monkeypatch.setattr(exp, "ler_duracoes", lambda: dur)
+    monkeypatch.setattr(exp, "ler_avaliacao", lambda: cfg_av)
+
+    # cortes diferentes E hash errado: o corte é conferido primeiro, e é ele que a mensagem cita
+    tags |= {
+        "A": {"hash_base": "outra", "data_corte": "2024-07-01"},
+        "B": {"hash_base": "outra", "data_corte": "2025-01-01"},
+    }
+    with pytest.raises(ValueError, match="data_corte"):
+        comparar("A", "B", n_boot=50)
+    # run lacrado sem a tag: avisa e compara (o hash da base já o confere)
+    tags |= {"A": {"hash_base": hash_base(base)}, "B": {"hash_base": hash_base(base)}}
+    with pytest.warns(UserWarning, match="sem data_corte"):
+        g = comparar("A", "B", n_boot=50)
+    assert g.loc["ganho", "walk_forward"] == 0.0  # os mesmos dois modelos
