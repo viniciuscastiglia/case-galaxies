@@ -13,6 +13,7 @@ dependencies = [
     "isodate==0.7.2",
     "langchain==1.4.2",
     "langchain-core==1.6.5",
+    "langchain-google-genai==4.4.0",
     "langchain-mcp-adapters==0.3.2",
     "langgraph==1.2.12",
     "librosa==1.0.0",
@@ -64,6 +65,13 @@ known-local-folder = ["fakes"]
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["tests"]
+# shap 0.52 (aula 6.6): o import dele chama set_bad/set_over/set_under do matplotlib, que avisa como
+# PendingDeprecationWarning (não DeprecationWarning, que é outra classe).
+filterwarnings = [
+    "ignore:The set_bad function will be deprecated:PendingDeprecationWarning",
+    "ignore:The set_over function will be deprecated:PendingDeprecationWarning",
+    "ignore:The set_under function will be deprecated:PendingDeprecationWarning",
+]
 
 [tool.uv]
 # Mac Apple Silicon (a máquina do projeto) e Linux (o CI). No Mac Intel, o shap 0.52 exige um numba
