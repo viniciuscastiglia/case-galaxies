@@ -10,6 +10,8 @@ import sys
 import uuid
 from pathlib import Path
 
+import pytest
+
 RAIZ_REPO = Path(__file__).resolve().parents[1]
 VARIAVEIS = ("PREVIA_DADOS", "GALAXIES_ARTEFATOS")
 
@@ -56,6 +58,24 @@ def test_sem_variaveis_os_padroes_sao_da_raiz_do_repo(tmp_path):
     r = _rodar(codigo, tmp_path)
     assert r.returncode == 0, r.stderr
     assert r.stdout.split() == [str(RAIZ_REPO / "data"), str(RAIZ_REPO / "artefatos")]
+
+
+@pytest.mark.parametrize("variavel", VARIAVEIS)
+def test_variavel_vazia_vale_como_ausente(tmp_path, variavel):
+    # `export GALAXIES_ARTEFATOS=` (ou uma linha vazia no .env) não pode virar o cwd
+    codigo = "from previa import caminhos; print(caminhos.DADOS); print(caminhos.ARTEFATOS)"
+    r = _rodar(codigo, tmp_path, **{variavel: ""})
+    assert r.returncode == 0, r.stderr
+    assert r.stdout.split() == [str(RAIZ_REPO / "data"), str(RAIZ_REPO / "artefatos")]
+
+
+@pytest.mark.parametrize("variavel", VARIAVEIS)
+def test_variavel_relativa_falha_na_importacao_com_mensagem(tmp_path, variavel):
+    # o servidor MCP sobe de qualquer cwd: um caminho relativo apontaria para outro lugar a cada vez
+    r = _rodar("from previa import caminhos", tmp_path, **{variavel: "rel/x"})
+    assert r.returncode != 0
+    assert "ValueError" in r.stderr
+    assert variavel in r.stderr and "absoluto" in r.stderr and "rel/x" in r.stderr
 
 
 def test_testes_nunca_usam_os_dados_reais():
