@@ -19,6 +19,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
+from previa.caminhos import CONFIGS
 from previa.dados import carregar_base
 from previa.metricas import (
     ic_par_a_par,
@@ -31,7 +32,6 @@ from previa.metricas import (
 )
 from previa.splits import folds_de_desenvolvimento, ler_avaliacao
 
-CONFIGS = Path("configs")
 BASELINES = ["p_madura", "p_com_imaturos"]
 
 

@@ -18,6 +18,8 @@ import pandas as pd
 import yaml
 from dateutil.easter import easter
 
+from previa.caminhos import CONFIGS
+
 HISTORICO = [
     "hist_n",
     "hist_mediana",
@@ -32,7 +34,7 @@ CALENDARIO = ["hora_local", "dia_semana_local", "feriado", "idade_canal_dias"]
 FEATURES = HISTORICO + CADENCIA + CALENDARIO  # as 13 colunas da 3.5 que vão para o modelo
 
 
-def ler_config(caminho=Path("configs") / "features.yaml") -> dict:
+def ler_config(caminho=CONFIGS / "features.yaml") -> dict:
     return yaml.safe_load(Path(caminho).read_text(encoding="utf-8"))
 
 

@@ -15,7 +15,8 @@ import numpy as np
 import pandas as pd
 import yaml
 
-CONFIGS = Path("configs")
+from previa.caminhos import CONFIGS
+
 DATAS = ("teste_inicio", "treino_inicio", "cal_inicio", "teste_fim")
 
 

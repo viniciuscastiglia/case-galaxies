@@ -27,11 +27,13 @@ from googleapiclient.errors import HttpError
 from httplib2 import ServerNotFoundError
 from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential_jitter
 
+from previa import caminhos
+
 PT = ZoneInfo("America/Los_Angeles")  # a cota zera à meia-noite do horário do Pacífico
 MUDOU_PARA_3_MIN = datetime(2024, 10, 15, tzinfo=timezone.utc)  # antes: Shorts até 60 s
 PARTES = "snippet,contentDetails,statistics,player"
 PARTES_CANAL = "snippet,contentDetails,statistics"
-DADOS = Path("data")
+DADOS = caminhos.DADOS  # absoluto; muitos módulos importam DADOS daqui
 
 
 def sem_chave(texto: str) -> str:

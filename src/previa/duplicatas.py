@@ -26,9 +26,10 @@ import yaml
 from PIL import Image
 from tenacity import retry, retry_if_exception, stop_after_attempt, wait_exponential
 
+from previa.caminhos import CONFIGS
 from previa.coletor import DADOS, sem_chave
 
-CONFIG = Path("configs") / "duplicatas.yaml"
+CONFIG = CONFIGS / "duplicatas.yaml"
 CACHE = DADOS / "thumb_hash.parquet"
 URL_THUMB = "https://i.ytimg.com/vi/{}/hqdefault.jpg"
 

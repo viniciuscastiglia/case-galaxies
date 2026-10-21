@@ -23,6 +23,7 @@ import lightgbm as lgb  # antes de qualquer torch no processo (hub, troubleshoot
 import numpy as np
 import pandas as pd
 
+from previa.caminhos import ARTEFATOS
 from previa.experimento import (
     Config,
     aplicar_pca,
@@ -34,7 +35,6 @@ from previa.experimento import (
 from previa.features import historico_do_canal, montar_features
 from previa.texto import manuais
 
-ARTEFATOS = Path("artefatos")
 NOVO = "__novo__"
 
 

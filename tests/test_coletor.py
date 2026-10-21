@@ -6,6 +6,7 @@ import pandas as pd
 import pytest
 from tenacity import wait_none
 
+from previa import caminhos
 from previa.coletor import (
     Cliente,
     CotaEsgotada,
@@ -359,9 +360,7 @@ def test_falha_de_canal_nao_vaza_a_chave_da_api(tmp_path):
 def test_main_nao_vaza_a_chave_em_erro_inesperado(tmp_path, monkeypatch, capsys):
     import previa.coletor as coletor
 
-    monkeypatch.chdir(tmp_path)
-    (tmp_path / "data").mkdir()
-    (tmp_path / "data" / "canais.csv").write_text(f"channel_id,incluido\n{CANAL_ID},sim\n")
+    (caminhos.DADOS / "canais.csv").write_text(f"channel_id,incluido\n{CANAL_ID},sim\n")
     monkeypatch.setenv("YOUTUBE_API_KEY", "AIzaSEGREDO")
 
     def explode(*args, **kwargs):
@@ -423,9 +422,7 @@ def _main_com(monkeypatch, tmp_path, vencidos):
     import previa.coletor as coletor
     import previa.esquema as esquema
 
-    monkeypatch.chdir(tmp_path)
-    (tmp_path / "data").mkdir()
-    (tmp_path / "data" / "canais.csv").write_text(f"channel_id,incluido\n{CANAL_ID},sim\n")
+    (caminhos.DADOS / "canais.csv").write_text(f"channel_id,incluido\n{CANAL_ID},sim\n")
     monkeypatch.setenv("YOUTUBE_API_KEY", "AIzaSEGREDO")
     resumo = {"falhas": {}, "parou_por_cota": None}
     monkeypatch.setattr(coletor, "coletar", lambda *a, **k: dict(resumo))

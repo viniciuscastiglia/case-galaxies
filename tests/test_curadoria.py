@@ -4,6 +4,7 @@ import httplib2
 import pandas as pd
 import pytest
 
+from previa import caminhos
 from previa.coletor import Cliente, abrir_base, parse_video, salvar
 from previa.curadoria import (
     aplicar_criterios,
@@ -250,9 +251,7 @@ def test_balde_de_busca_esgotado_so_desliga_a_busca():
 def test_main_da_curadoria_nao_vaza_a_chave(tmp_path, monkeypatch, capsys):
     import previa.curadoria as curadoria
 
-    monkeypatch.chdir(tmp_path)
-    (tmp_path / "data").mkdir()
-    (tmp_path / "data" / "candidatos.csv").write_text(
+    (caminhos.DADOS / "candidatos.csv").write_text(
         "handle,nome,setor,tipo,fonte,observacao\n@luminabeauty,Lumina,beleza,marca,lista manual,\n"
     )
     monkeypatch.setenv("YOUTUBE_API_KEY", "AIzaSEGREDO")
@@ -422,9 +421,7 @@ def test_balde_de_busca_esgotado_devolve_o_que_ja_foi_buscado():
 def test_main_buscar_anexa_candidatos_e_registra_as_buscas(tmp_path, monkeypatch):
     import previa.curadoria as curadoria
 
-    monkeypatch.chdir(tmp_path)
-    dados = tmp_path / "data"
-    dados.mkdir()
+    dados = caminhos.DADOS
     (dados / "candidatos.csv").write_text(
         "handle,nome,setor,tipo,fonte,observacao\n@luminabeauty,Lumina,beleza,marca,lista manual,\n"
     )

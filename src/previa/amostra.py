@@ -18,10 +18,10 @@ import numpy as np
 import pandas as pd
 import yaml
 
+from previa.caminhos import CONFIGS
 from previa.coletor import DADOS
 from previa.splits import ler_avaliacao, split_treino_cal_teste
 
-CONFIGS = Path("configs")
 COLUNAS = ["post_id", "channel_id", "published_at", "duplicate_group", "sector"]
 BLOCOS = ("treino", "cal", "teste")
 

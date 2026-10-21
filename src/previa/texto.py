@@ -23,6 +23,7 @@ from pathlib import Path
 import numpy as np
 import pandas as pd
 
+from previa.caminhos import CONFIGS
 from previa.coletor import DADOS
 
 EMOJI = re.compile("[\U0001f300-\U0001faff☀-➿⬀-⯿️]")
@@ -115,7 +116,7 @@ def main(argv=None) -> int:
     if (argv or sys.argv[1:] or ["embeddings"])[0] != "embeddings":
         print("uso: python -m previa.texto embeddings", file=sys.stderr)
         return 2
-    cfg = yaml.safe_load(Path("configs/features.yaml").read_text(encoding="utf-8"))["texto"]
+    cfg = yaml.safe_load((CONFIGS / "features.yaml").read_text(encoding="utf-8"))["texto"]
     base = pd.read_parquet(DADOS / "base_minima.parquet", columns=["post_id", "caption"])
     arquivo = DADOS / f"emb_titulo_v{cfg['versao']}.parquet"
     encoder = SentenceTransformer(cfg["modelo"], device="cpu")

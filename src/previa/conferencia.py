@@ -20,6 +20,7 @@ import numpy as np
 import pandas as pd
 import yaml
 
+from previa.caminhos import CONFIGS
 from previa.coletor import DADOS, MUDOU_PARA_3_MIN
 
 ARQUIVO = DADOS / "conferencia_shorts.csv"
@@ -27,7 +28,7 @@ GABARITO = DADOS / "conferencia_shorts_gabarito.csv"
 BORDA_S = 30  # segundos acima do limite da época que ainda contam como borda
 
 
-def ler_config(caminho=Path("configs") / "conferencia.yaml") -> dict:
+def ler_config(caminho=CONFIGS / "conferencia.yaml") -> dict:
     return yaml.safe_load(Path(caminho).read_text(encoding="utf-8"))
 
 

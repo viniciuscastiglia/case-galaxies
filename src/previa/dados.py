@@ -17,9 +17,8 @@ from pathlib import Path
 import pandas as pd
 import yaml
 
+from previa.caminhos import CONFIGS
 from previa.coletor import DADOS
-
-CONFIGS = Path("configs")
 
 
 def carregar_base(
