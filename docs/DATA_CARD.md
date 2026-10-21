@@ -200,6 +200,15 @@ Atualizar com as suas palavras, e o item 3 com o resultado da H5 -->
 4. **Capa da data da coleta.** (complemento do Claude, a revisar) A thumbnail é a de outubro de 2026, e o canal
    pode tê-la trocado depois da publicação. Na previsão, a capa de A e B é a que a marca escolher.
 
+5. **VLM recebe a URL pública.** (complemento do Claude, a revisar) A rubrica é extraída pelo Gemini a partir da URL
+   pública do Short, então há um risco pequeno de o modelo "lembrar" do vídeo do pré-treino em vez de só descrevê-lo
+   (aula 7.3). Não pedimos nem damos curtidas ao VLM; o risco não foi medido.
+6. **Sem varredura semanal completa do coletor.** (complemento do Claude, a revisar) A coleta diária é incremental e
+   para ao achar IDs conhecidos; a aula 1.5 pede uma varredura completa por semana, porque a ordem da API não é
+   garantida. Não a fizemos, e um Short fora de ordem pode ter ficado de fora.
+7. **Recall dos comparáveis não medido.** (complemento do Claude, a revisar) Não medimos quantos criativos parecidos
+   a busca de comparáveis recupera (RAG 6, recall@K).
+
 ## Esquema
 
 `src/previa/esquema.py`: `Post` (Pydantic, um registro) e `BaseShorts` (pandera, a tabela de treino). Campos:

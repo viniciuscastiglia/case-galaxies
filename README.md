@@ -228,6 +228,26 @@ Cada decisão, com a aula que a sustenta: [`docs/DECISOES.md`](docs/DECISOES.md)
   produto); os 6 campos passam do limiar de 0,6. O kappa mede a estabilidade do VLM com ele mesmo, não o acerto.
 - **Onde o modelo erra:** <!-- PREENCHER (M9): os 20 piores erros, classificados -->
 
+### Comparação com a literatura
+
+Os números da literatura são os do hub da liga (`leituras`, `troubleshooting` e `roadmap`); a coluna do Prévia só é
+preenchida depois da abertura do teste e das ablações.
+
+| O que a literatura reporta | Fonte | Prévia |
+| :--- | :--- | :--- |
+| Spearman de 0,55 a 0,85 antes da publicação (o intra-canal costuma ser menor que o global) | hub, `troubleshooting` ("Minhas métricas estão boas demais") | PREENCHER: Spearman global e intra-canal no teste (H1) |
+| Spearman de 0,71 e par-a-par de 76,3% em 11 mil YouTube Shorts educativos, com rubrica do VLM, K-Means e XGBoost (Gupta et al., arXiv:2512.21402) | hub, `leituras` | PREENCHER: par-a-par no teste (H1) |
+| Conteúdo visual soma de +0,02 a +0,04 de Spearman sobre as features do canal | hub, `roadmap` (aula 4.8) | PREENCHER: ganho do visual e da rubrica, com IC (ablação) |
+
+<!-- V: reescrever com as suas palavras (aula 6.7: "na mesma direção do que a literatura reporta"). Dizer em que ponto
+estamos dentro da faixa, acima ou abaixo, e o que isso sugere (acima de 0,85 seria alarme de vazamento). -->
+
+**Por que os números não são diretamente comparáveis.** O alvo do Prévia é a curtida relativa ao canal, e a régua
+que importa para a Galaxies é a ordenação dentro do mesmo canal; o artigo de 76,3% prevê curtidas/views, num split
+aleatório (70/15/15) que tende a ser otimista (aula 2.3), em Shorts educativos, não de beleza ou automotivo. A nossa
+base é de 70 canais brasileiros, avaliada no walk-forward de 2025 e num teste temporal depois dele; a idade do
+rótulo difere (seção 8). Por isso a comparação é de ordem de grandeza e de direção, não de placar.
+
 ## 8. Limitações
 
 - **Canais novos e pequenos:** com menos de 10 posts maduros o alvo relativo não existe e a previsão sai com
@@ -246,6 +266,15 @@ Cada decisão, com a aula que a sustenta: [`docs/DECISOES.md`](docs/DECISOES.md)
 - **O que é associação:** os fatores da explicação dizem o que o modelo aprendeu, não o que causa curtidas.
 - **Drift:** nada depois de ~19/09/2026; mudanças do algoritmo do YouTube depois disso ficam fora.
 - <!-- PREENCHER: P(A > B) supõe erros independentes (Tool 5) -->
+- **Memória do pré-treino do VLM:** o Gemini recebe a URL pública do Short (`file_data`), então existe um risco
+  pequeno de ele "lembrar" do vídeo ou do contador de curtidas em vez de só descrever o que vê (aula 7.3,
+  "Vazamento pelo pré-treino"). A rubrica não pede nem recebe curtidas, e o modelo só usa os 6 campos extraídos, mas
+  o risco não foi medido.
+- **Coletor sem varredura semanal completa:** a coleta diária para na primeira página de IDs já conhecidos, e a
+  aula 1.5 recomenda uma varredura completa por semana, porque a ordem da API não é garantida pela documentação. Não
+  rodamos essa varredura; um Short antigo inserido fora de ordem pode ter ficado fora da base.
+- **Recall dos comparáveis não medido:** a tool de comparáveis não teve o recall@K medido contra um conjunto de
+  vizinhos relevantes (RAG 6, "Retrieval"); não sabemos quantos criativos parecidos ela deixa de mostrar.
 
 ## 9. Evolução
 
