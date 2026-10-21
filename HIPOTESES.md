@@ -30,8 +30,8 @@ Métrica e limiar: manchete da #6 no teste temporal; aceito se o ganho for >= +3
   Os ~60% da Galaxies são referência, não meta.
 Controle: a mediana madura (49,7% na manchete em 2025, IC 49,2% a 50,1%)
 Tratamento: o GBM da M4
-Resultado:
-Decisão:
+Resultado (21/10, teste aberto uma vez, run `6b1f7e77`): temporal +5,6 pontos [IC +3,6; +7,1] (55,3% × 49,7%); canal novo +3,5 [+1,9; +4,9]. Modelo final da #39 (sem histórico e texto; capa, idade como controle, Huber).
+Decisão: H1 confirmada nos dois cenários (critério da #5 cumprido).
 
 ## H2: histórico do canal no GBM (M3)
 
