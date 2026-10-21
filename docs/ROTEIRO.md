@@ -6,26 +6,29 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
 
 ## Agora
 
-- **Fase (21/10, 18h):** dia da entrega (até 23h59; apresentação em 23/10). O lote da auditoria está no `main` e no
-  GitHub (F1, F13, F15, F18, F22, F25, F26, F33, F35, F39, F40 e os registros F4, F38 e F43; 363 testes, ruff ok;
-  o CI rodou pela primeira vez). Decididas hoje: #38 (corte 4, B), #32 (Huber testada: a H11 rodou e está lacrada,
-  `bfba1020`), #33 (B: teste no modelo de janeiro, uso numa v2 retreinada), #34 (B: número com `canal_novo`), #35
-  (A: transcrição e idioma fora, como limitação). As H2 a H9, a H11 e as ablações seguem **lacradas**.
-- **Próximo passo (sessão nova):**
-  1. as decisões #36 (F32, a leitura da ablação) e #37 (F23, o carregamento do modelo, aprovar ou vetar);
-  2. a H10, dele; depois, a F2 (rosto e texto nas capas), do Claude, em segundo plano;
-  3. a A1, com o caso à mão em `.superpowers/sdd/2026-10-20-a1/caso_a_mao.md` (com F19, F10, F34 e a cadeia da
-     #34);
-  4. o bloco 2 de decisões, com a F11;
-  5. abrir as H2 a H9 e a H11 (com a F32) e escolher os blocos (F17). Na H7: `produto_beleza` tem AUC 0,814 só em
-     beleza, e `roda` tem 0,670 e não passa;
-  6. a M6 e o flag (#14, com a regra de data da #33);
-  7. pelo corte #38: A2, A4, A7 e a pré-triagem da M9 pelo Claude; o teste final (F16) e depois a v2 da #33; README
-     (as 3 seções dele) e autoavaliação.
-- **Bloqueios:** a A1 trava o `prever_criativo`, o grafo (A6) e o MCP (A2); a abertura trava o modelo final, que
-  trava a M6, o teste final e a v2. Se às 22h a v2 não estiver pronta, a entrega sai com o modelo de janeiro (#33).
-  O Vinicius só leu até o módulo 2: cada peça abre com o conceito mínimo no chat (#29). Jobs longos como tarefas da
-  sessão.
+- **Fase (21/10, 20h40):** noite da entrega. No `main` e no GitHub: o lote 1 (F2, F3, F29, F42, #36, #37, H10) e o
+  lote 2 (F23, F16, M8, base v2, abertura, autoavaliação). No branch `feat/lote-noite-2`, revisados e ainda sem merge:
+  A1 (`schemas.py`), lote 3 (flag, âncora, capa), o modelo final (#39), o núcleo da M6 (`intervalo.py`) e as decisões
+  #39, #40 e as datas da v2. Ledgers: `.superpowers/sdd/2026-10-21-*/progress.md`.
+- **Decidido hoje à noite:** #36, #37, a troca do PaddleOCR, H10 (rodada, não fica), A1 (casos 1 a 8 + #34, F10, F34,
+  tipo), bloco 2 (#14 a #18, #23, F11), F14 (98%), **#39: o modelo final** (sem histórico e texto; capa, idade como
+  controle, Huber; conferido contra a H11, run `e684ac8c`, commit `8f3d83c`), **#40: o número é o do modelo testado**
+  (Huber), o intervalo é q10/q90 + CQR; datas da v2 confirmadas; a M6 resolvida à mão (6 perguntas).
+- **Em andamento (subagentes):** a M6 no teste final (`final.py`: cobertura, flag no teste) e no pacote (`modelo.py`:
+  quantis, q̂, limiares, âncora, `prever_intervalo`).
+- **Próximo passo, nesta ordem:**
+  1. revisar e commitar as duas integrações da M6;
+  2. **o teste final, uma vez, com o Vinicius vendo:** `uv run python -m previa.final configs/experimentos/final.yaml
+     --abrir-o-teste` (de um commit limpo);
+  3. o modelo de uso na v2: `uv run python -m previa.modelo treinar configs/experimentos/final.yaml
+     configs/avaliacao_v2.yaml` (antes das 22h; plano B: a mesma config na v1, o modelo de janeiro);
+  4. `prever_criativo` (`previsao.py`) → servidor MCP (A2, com as descrições e os erros escritos pelo Vinicius) → a
+     invariante e a injeção (A7) → a explicação por template (A4; o validador em aprovar ou vetar) → o grafo (A6) se
+     der tempo;
+  5. README (o Vinicius reescreve problema, resultados e limitações), o model card e a autoavaliação com os números
+     do teste; o review final; o merge e o push; `/fechar-sessao` às 23h30.
+- **Pendente do Vinicius:** A2 (as duas descrições e as três mensagens de erro); o validador da A4; as 3 seções do README.
+- **Bloqueios:** o teste final espera a M6 integrada; a v2 espera o teste aberto (`exige_teste_aberto`).
 
 ## Como funciona
 
