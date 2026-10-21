@@ -14,13 +14,18 @@ import pandera.pandas as pa
 import pytest
 from test_experimento import mlflow_temporario  # noqa: F401
 
+from previa.caminhos import CONFIGS
 from previa.esquema import validar_tabela_de_treino
 from previa.experimento import ler_config, preparar
+from previa.intervalo import escores_cqr
+from previa.intervalo import q_chapeu as calcular_q_chapeu
 from previa.modelo import (
+    Bundle,
     carregar,
     features_de_um_short,
     main,
     model_version,
+    prever_intervalo,
     prever_log,
     referencia,
     registrar_bundle,
@@ -33,7 +38,7 @@ AVALIACAO = """\
 teste_inicio: "2026-04-01"
 treino_inicio: "2021-07-01"
 gap_dias: 30
-cal_inicio: "2026-02-01"
+cal_inicio: "2025-10-01"
 teste_fim: "2026-09-15"
 walk_forward:
   n_folds: 4
@@ -82,9 +87,9 @@ def base():
             curt = int(np.expm1(5 + 0.3 * c + 0.02 * dur + rng.normal(0, 0.5)))
             titulo = "Comenta aqui! " * int(rng.integers(0, 2)) + f"Short {k} do canal {c}"
             linhas.append((pid, f"UC{c}", t, curt, "beleza" if c < 2 else "automotivo", pid, dur))
-            linhas[-1] += (titulo + "\ndescrição padrão",)
+            linhas[-1] += (titulo + "\ndescrição padrão", 10_000 * (c + 1) ** 2)
     cols = ["post_id", "channel_id", "published_at", "metric_target", "sector"]
-    cols += ["duplicate_group", "duration_s", "caption"]
+    cols += ["duplicate_group", "duration_s", "caption", "subscribers_at_collection"]
     return pd.DataFrame(linhas, columns=cols)
 
 
@@ -325,7 +330,7 @@ def test_registrar_bundle_poe_o_run_no_model_version(base, cfg, cfg_av, tmp_path
     assert tags["papel"] == "modelo_de_uso" and tags["hash_base"] == mv["hash_base"]
     assert {"git_commit", "data_corte", "config"} <= set(tags)
     # o corte do modelo de uso é o fim do treino (cal_inicio - gap), não o início do walk-forward
-    assert tags["data_corte"] == "2026-01-02"
+    assert tags["data_corte"] == "2025-09-01"
 
 
 @pytest.mark.usefixtures("mlflow_temporario")
@@ -403,3 +408,143 @@ def test_main_treina_com_a_base_da_config_de_avaliacao(base, cfg, tmp_path, monk
     cortada = base[base["published_at"] < pd.Timestamp("2026-04-01", tz="UTC")]
     assert mv["hash_base"] == hash_base(cortada.reset_index(drop=True))
     assert mv["rotulo"] in capsys.readouterr().out
+
+
+def _bundle(base, cfg, cfg_av):
+    b, dur, emb = _partes(base)
+    return treinar_bundle(cfg, b, dur, cfg_av, emb), (b, dur, emb)
+
+
+def test_bundle_guarda_quantis_qchapeu_limiares_e_ancora(base, cfg, cfg_av):
+    bundle, _ = _bundle(base, cfg, cfg_av)
+    assert sorted(bundle.quantis) == [0.1, 0.5, 0.9]
+    assert np.isfinite(bundle.q_chapeu)
+    assert bundle.calibracao["inicio"] == "2025-10-01"
+    assert bundle.calibracao["fim"] == "2026-04-01"
+    assert set(bundle.limiares_flag) >= {"largura_log", "min_posts", "ultimo_treino"}
+    assert bundle.limiares_flag["ultimo_treino"] == "2025-09-01"
+    assert len(bundle.ancora["coef"]) == 2 and set(bundle.ancora["mediana_setor"]) == {
+        "beleza",
+        "automotivo",
+    }
+    json.dumps(bundle.limiares_flag)  # serializável
+    json.dumps(bundle.ancora)
+
+
+def test_q_chapeu_vem_so_da_calibracao(base, cfg, cfg_av):
+    """Recalcula o q̂ à mão: só linhas da calibração, com o modelo do pacote."""
+    from previa.experimento import aplicar_pca
+    from previa.intervalo import ler_config as ler_cfg_q
+    from previa.intervalo import prever_quantis
+
+    alfa = ler_cfg_q(CONFIGS / "intervalo.yaml").alpha_cqr
+    bundle, (b, dur, emb) = _bundle(base, cfg, cfg_av)
+    d = preparar(b, dur, cfg_av, cfg.lacuna_dias)
+    ids = d.index[
+        d["linha"] & (d["published_at"] >= cfg_av["cal_inicio"])
+        & (d["published_at"] < cfg_av["teste_inicio"]) & d["y_rel"].notna()
+    ]  # fmt: skip
+    cal = d.loc[ids].copy()
+    tr = d.index[d["linha"] & (d["published_at"] < pd.Timestamp("2025-09-01", tz="UTC"))]
+    cols, _ = aplicar_pca(
+        emb["titulo"], d.loc[tr, "post_id"], cal["post_id"], 2, "titulo", cfg.seed
+    )
+    cal[list(cols.columns)] = cols.to_numpy()
+    q, _ = prever_quantis(bundle.quantis, cal[bundle.features], cal["ref"], cfg)
+    esperado = calcular_q_chapeu(escores_cqr(q[:, 0], q[:, 2], cal["y"]), alfa)
+    assert bundle.q_chapeu == pytest.approx(esperado)
+    assert len(ids) > 10 and bundle.calibracao["n"] == len(ids)
+
+
+def test_calibracao_nao_passa_pelo_teto_do_treino(base, cfg, cfg_av, tmp_path):
+    """`teto_por_canal` é do treino: a calibração tem o mesmo tamanho com ou sem teto."""
+    b, dur, emb = _partes(base)
+    sem = treinar_bundle(cfg, b, dur, cfg_av, emb)
+    (tmp_path / "t.yaml").write_text(CONFIG + "teto_por_canal: 150\n")
+    com = treinar_bundle(ler_config(tmp_path / "t.yaml"), b, dur, cfg_av, emb)
+    assert com.calibracao["n"] == sem.calibracao["n"] > 50
+
+
+def test_calibracao_exclui_linha_sem_ancora(base, cfg, cfg_av, tmp_path):
+    """Canal que só existe na calibração: tem y, mas ref NaN; não entra (alvo absoluto)."""
+    novo = base[base["channel_id"] == "UC0"].copy()
+    novo = novo[novo["published_at"] >= pd.Timestamp("2025-11-01", tz="UTC")]
+    novo["channel_id"] = "UC9"
+    novo["post_id"] = novo["post_id"].str.replace("c0", "c9", regex=False)
+    novo["duplicate_group"] = novo["post_id"]
+    base2 = pd.concat([base, novo], ignore_index=True)
+    (tmp_path / "a.yaml").write_text(CONFIG + "alvo: absoluto\n")
+    cfg_abs = ler_config(tmp_path / "a.yaml")
+    b, dur, emb = _partes(base2)
+    bundle = treinar_bundle(cfg_abs, b, dur, cfg_av, emb)
+    d = preparar(b, dur, cfg_av, cfg_abs.lacuna_dias)
+    nc = (
+        d["linha"] & (d["published_at"] >= cfg_av["cal_inicio"])
+        & (d["published_at"] < cfg_av["teste_inicio"])
+    )  # fmt: skip
+    assert (nc & d["y"].notna()).sum() > (nc & d["ref"].notna()).sum()  # o canal novo existe
+    assert bundle.calibracao["n"] == (nc & d["ref"].notna()).sum()
+
+
+def test_prever_intervalo_aceita_o_degrau_do_cold_start(base, cfg, cfg_av):
+    bundle, _ = _bundle(base, cfg, cfg_av)
+    x = pd.DataFrame([dict.fromkeys(bundle.features, 1.0)])
+    n, lo, hi = prever_intervalo(bundle, x, 6.0, "inscritos")
+    assert n == pytest.approx(prever_log(bundle, x, 6.0, "inscritos")) and lo <= n <= hi
+    with pytest.raises(ValueError, match="degrau"):
+        prever_intervalo(bundle, x, 6.0, "chute")
+
+
+def test_prever_intervalo_contem_o_numero_do_modelo_pontual(base, cfg, cfg_av):
+    bundle, (b, dur, emb) = _bundle(base, cfg, cfg_av)
+    posts = preparar(b, dur, cfg_av)[["channel_id", "published_at", "y"]]
+    posts = posts[posts["channel_id"] == "UC0"]
+    novo = {
+        "published_at": pd.Timestamp("2026-01-20T22:00Z"),
+        "caption": "Título novo",
+        "sector": "beleza",
+        "duration_s": 30.0,
+        "embeddings": {"titulo": np.zeros(5)},
+    }
+    x = features_de_um_short(bundle, posts, novo)
+    ref, _ = referencia(posts, novo["published_at"])
+    numero, baixo, alto = prever_intervalo(bundle, x, ref)
+    assert numero == pytest.approx(prever_log(bundle, x, ref))  # o número é o do pontual (#40)
+    assert baixo <= numero <= alto
+
+
+def test_pacote_antigo_sem_os_campos_novos_carrega(base, cfg, cfg_av, tmp_path):
+    bundle, _ = _bundle(base, cfg, cfg_av)
+    antigo = Bundle(
+        bundle.modelo, bundle.features, bundle.pcas, bundle.versao, bundle.lacuna_dias,
+        bundle.ultimo_treino, bundle.arvores,
+    )  # fmt: skip
+    salvar(antigo, tmp_path / "a")
+    lido = carregar(tmp_path / "a")
+    assert lido.quantis == {} and lido.q_chapeu is None and lido.limiares_flag == {}
+    with pytest.raises(ValueError, match="quantis"):
+        prever_intervalo(lido, pd.DataFrame(), 5.0)
+
+
+def test_model_version_traz_a_calibracao(base, cfg, cfg_av):
+    bundle, _ = _bundle(base, cfg, cfg_av)
+    bundle.run_id = "abcdef0123456789"
+    assert model_version(bundle)["calibracao"] == bundle.calibracao
+
+
+def test_bundle_sem_calibracao_falha_explicita(base, cfg, cfg_av):
+    b, dur, emb = _partes(base)
+    cfg_av = {**cfg_av, "cal_inicio": pd.Timestamp("2030-01-01", tz="UTC"),
+              "teste_inicio": pd.Timestamp("2030-02-01", tz="UTC")}  # fmt: skip
+    with pytest.raises(ValueError, match="calibração"):
+        treinar_bundle(cfg, b, dur, cfg_av, emb)
+
+
+def test_calibracao_sobreposta_ao_treino_falha(base, cfg, cfg_av, monkeypatch):
+    """5.3, erros 2 e 3: se a calibração tocar o treino, o pacote não sai."""
+    import previa.modelo as modelo
+
+    b, dur, emb = _partes(base)
+    monkeypatch.setattr(modelo, "fim_do_treino", lambda _: pd.Timestamp("2025-11-01", tz="UTC"))
+    with pytest.raises(AssertionError, match="treino"):
+        treinar_bundle(cfg, b, dur, cfg_av, emb)
