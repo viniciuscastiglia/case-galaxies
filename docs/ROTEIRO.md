@@ -15,7 +15,8 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
   (+5,6 [+3,6; +7,1] temporal; +3,5 [+1,9; +4,9] canal novo); cobertura 76,5% (beleza 71%, cai por mês); o flag separa
   o erro. Modelo de uso: v2.
 - **Em voo quando a sessão parou (arquivos NÃO commitados; revisar antes de commitar):**
-  1. o servidor MCP e os testes da A7 (`src/previa/servidor_mcp.py`, `configs/mcp.yaml`, `tests/test_servidor_mcp.py`
+  1. o servidor MCP e os testes da A7: o subagente TERMINOU (595 testes verdes; relatório
+     `.superpowers/sdd/2026-10-21-tool/report-mcp.md`), falta o review (`src/previa/servidor_mcp.py`, `configs/mcp.yaml`, `tests/test_servidor_mcp.py`
      e a seção "Usar pelo MCP" do README; brief em `.superpowers/sdd/2026-10-21-tool/brief-mcp.md`);
   2. os documentos com os números: o subagente TERMINOU (README 5 a 8, `MODEL_CARD.md`, `AUTOAVALIACAO.md`,
      `DATA_CARD.md`; relatório em `.superpowers/sdd/2026-10-21-tool/report-docs.md`); faltam PREENCHER sem fonte
