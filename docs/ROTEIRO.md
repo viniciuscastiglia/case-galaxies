@@ -6,7 +6,7 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
 
 ## Agora
 
-- **Fase (21/10, 20h40):** noite da entrega. No `main` e no GitHub: o lote 1 (F2, F3, F29, F42, #36, #37, H10) e o
+- **Fase (21/10, 21h00):** noite da entrega. No `main` e no GitHub: o lote 1 (F2, F3, F29, F42, #36, #37, H10) e o
   lote 2 (F23, F16, M8, base v2, abertura, autoavaliação). No branch `feat/lote-noite-2`, revisados e ainda sem merge:
   A1 (`schemas.py`), lote 3 (flag, âncora, capa), o modelo final (#39), o núcleo da M6 (`intervalo.py`) e as decisões
   #39, #40 e as datas da v2. Ledgers: `.superpowers/sdd/2026-10-21-*/progress.md`.
@@ -14,19 +14,15 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
   tipo), bloco 2 (#14 a #18, #23, F11), F14 (98%), **#39: o modelo final** (sem histórico e texto; capa, idade como
   controle, Huber; conferido contra a H11, run `e684ac8c`, commit `8f3d83c`), **#40: o número é o do modelo testado**
   (Huber), o intervalo é q10/q90 + CQR; datas da v2 confirmadas; a M6 resolvida à mão (6 perguntas).
-- **Em andamento (subagentes):** a M6 no teste final (`final.py`: cobertura, flag no teste) e no pacote (`modelo.py`:
-  quantis, q̂, limiares, âncora, `prever_intervalo`).
-- **Próximo passo, nesta ordem:**
-  1. revisar e commitar as duas integrações da M6;
-  2. **o teste final, uma vez, com o Vinicius vendo:** `uv run python -m previa.final configs/experimentos/final.yaml
-     --abrir-o-teste` (de um commit limpo);
-  3. o modelo de uso na v2: `uv run python -m previa.modelo treinar configs/experimentos/final.yaml
-     configs/avaliacao_v2.yaml` (antes das 22h; plano B: a mesma config na v1, o modelo de janeiro);
-  4. `prever_criativo` (`previsao.py`) → servidor MCP (A2, com as descrições e os erros escritos pelo Vinicius) → a
-     invariante e a injeção (A7) → a explicação por template (A4; o validador em aprovar ou vetar) → o grafo (A6) se
-     der tempo;
-  5. README (o Vinicius reescreve problema, resultados e limitações), o model card e a autoavaliação com os números
-     do teste; o review final; o merge e o push; `/fechar-sessao` às 23h30.
+- **Feito depois das 20h40:** a M6 integrada (`intervalo.py`, `final.py`, `modelo.py`); **o teste final aberto
+  uma vez** (run `6b1f7e77`, 20h34): H1 cumprida nos dois cenários (+5,6 [+3,6; +7,1] temporal; +3,5 [+1,9; +4,9]
+  canal novo), cobertura 76,5%; **o modelo de uso na v2** (run `de922be7`, em `artefatos/`); o `prever_criativo`
+  (`previsao.py`, em correção: canal externo e índice dos comparáveis).
+- **Em andamento (subagentes):** a correção do `prever_criativo`; o servidor MCP (A2, com a invariante e a injeção da
+  A7); os documentos com os números do teste (README 5 a 8, model card, autoavaliação, data card).
+- **Próximo passo:** revisar e commitar o que voltar; rodar `python -m previa.indice` (os comparáveis) na base real;
+  o texto da A2 do Vinicius em `configs/mcp.yaml`; o grafo (A6) se der tempo; o Vinicius reescreve as seções 1, 7 e 8
+  do README; review final; merge e push; `/fechar-sessao` às 23h30.
 - **Pendente do Vinicius:** A2 (as duas descrições e as três mensagens de erro); o validador da A4; as 3 seções do README.
 - **Bloqueios:** o teste final espera a M6 integrada; a v2 espera o teste aberto (`exige_teste_aberto`).
 
