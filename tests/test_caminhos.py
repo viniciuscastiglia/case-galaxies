@@ -7,6 +7,7 @@ testam isso de verdade, porque os caminhos são lidos na importação do `previa
 import os
 import subprocess
 import sys
+import uuid
 from pathlib import Path
 
 RAIZ_REPO = Path(__file__).resolve().parents[1]
@@ -58,8 +59,29 @@ def test_sem_variaveis_os_padroes_sao_da_raiz_do_repo(tmp_path):
 
 
 def test_testes_nunca_usam_os_dados_reais():
+    import mlflow
+
     from previa import caminhos
 
     assert caminhos.DADOS != caminhos.RAIZ / "data"
     assert caminhos.ARTEFATOS != caminhos.RAIZ / "artefatos"
     assert caminhos.DADOS.is_absolute() and caminhos.ARTEFATOS.is_absolute()
+    # o MLflow também: o endereço padrão seria o `mlflow.db` do projeto (dos runs lacrados)
+    assert mlflow.get_tracking_uri() != f"sqlite:///{caminhos.RAIZ / 'mlflow.db'}"
+    assert str(caminhos.RAIZ) not in mlflow.get_tracking_uri()
+    assert "MLFLOW_EXPERIMENT_ID" not in os.environ  # um id solto cairia no experimento real
+
+
+def test_mlflow_dos_testes_grava_artefatos_fora_do_repo():
+    """Sem `artifact_location`, o MLflow cria `./mlruns` no cwd (a pasta dos runs lacrados)."""
+    import mlflow
+
+    from previa import caminhos
+
+    # antes de criar qualquer coisa: se o endereço for o real, falha sem escrever nele
+    assert str(caminhos.RAIZ) not in mlflow.get_tracking_uri()
+    nome = f"sonda-{uuid.uuid4().hex}"
+    exp = mlflow.MlflowClient().get_experiment(mlflow.MlflowClient().create_experiment(nome))
+    destino = Path(exp.artifact_location.removeprefix("file://")).resolve()
+    assert caminhos.RAIZ not in destino.parents
+    assert Path(os.environ["PREVIA_DADOS"]).parent in destino.parents  # a pasta temporária

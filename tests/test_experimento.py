@@ -4,7 +4,9 @@ Base sintética pequena no formato da base mínima: 6 canais, 2021 a 2025, curti
 canal e da duração. O LightGBM roda com poucas árvores para o teste ser rápido.
 """
 
+import contextlib
 import json
+import os
 import warnings
 
 import mlflow
@@ -500,16 +502,48 @@ def test_painel_do_run_le_as_previsoes_salvas_sem_treinar(cfg_av, cfg, monkeypat
 # --- data de corte no run e importância por ganho (F22, F35; aulas 2.2 e 2.5) ---
 
 
+@contextlib.contextmanager
+def _mlflow_numa_pasta(pasta):
+    """O MLflow num sqlite de `pasta`, com os artefatos também lá (o padrão seria `./mlruns`).
+    `set_tracking_uri` e `set_experiment` escrevem no `os.environ`; o MonkeyPatch guarda o que
+    havia (ou a ausência) e devolve no fim. Restaura também o endereço e o experimento ativo."""
+    antes = mlflow.get_tracking_uri()
+    ativo_antes = mlflow.tracking.fluent._active_experiment_id
+    endereco = f"sqlite:///{pasta / 'mlflow.db'}"
+    with pytest.MonkeyPatch.context() as mp:
+        mp.setenv("MLFLOW_EXPERIMENT_ID", "x")  # só para o MonkeyPatch registrar o valor de antes
+        mp.delenv("MLFLOW_EXPERIMENT_ID")  # o `set_experiment` escreve de novo; o fim apaga
+        mp.setenv("MLFLOW_TRACKING_URI", endereco)
+        try:
+            mlflow.set_tracking_uri(endereco)
+            mlflow.create_experiment(EXPERIMENTO, artifact_location=str(pasta / "artefatos"))
+            yield pasta
+        finally:
+            mlflow.set_tracking_uri(antes)
+            mlflow.tracking.fluent._active_experiment_id = ativo_antes
+
+
 @pytest.fixture
 def mlflow_temporario(tmp_path):
-    """O MLflow num sqlite de tmp_path, com os artefatos também lá (o padrão seria `./mlruns`):
-    nenhum teste toca o `mlflow.db` do projeto. Restaura o endereço e o experimento ativo."""
-    antes = mlflow.get_tracking_uri()
-    mlflow.set_tracking_uri(f"sqlite:///{tmp_path / 'mlflow.db'}")
-    mlflow.create_experiment(EXPERIMENTO, artifact_location=str(tmp_path / "artefatos"))
-    yield tmp_path
-    mlflow.set_tracking_uri(antes)
-    mlflow.tracking.fluent._active_experiment_id = None
+    """Nenhum teste toca o `mlflow.db` do projeto (o conftest já aponta o MLflow para uma pasta
+    temporária; este redireciona de novo, por teste, e desfaz tudo no fim)."""
+    with _mlflow_numa_pasta(tmp_path) as pasta:
+        yield pasta
+
+
+def test_mlflow_temporario_devolve_o_ambiente_como_estava(tmp_path):
+    """`set_tracking_uri` e `set_experiment` escrevem MLFLOW_TRACKING_URI e MLFLOW_EXPERIMENT_ID
+    no `os.environ`: um id solto ("1") depois do teste cairia no experimento real."""
+    chaves = ("MLFLOW_TRACKING_URI", "MLFLOW_EXPERIMENT_ID")
+    antes = {k: os.environ.get(k) for k in chaves}
+    ativo_antes = mlflow.tracking.fluent._active_experiment_id
+    with _mlflow_numa_pasta(tmp_path):
+        mlflow.set_experiment(EXPERIMENTO)
+        assert os.environ["MLFLOW_EXPERIMENT_ID"]  # o MLflow escreveu no ambiente...
+        assert str(tmp_path) in os.environ["MLFLOW_TRACKING_URI"]
+    assert {k: os.environ.get(k) for k in chaves} == antes  # ...e o teardown desfez
+    assert mlflow.tracking.fluent._active_experiment_id == ativo_antes
+    assert str(tmp_path) not in mlflow.get_tracking_uri()
 
 
 def test_conferir_cortes_avisa_run_sem_tag_e_recusa_cortes_diferentes():
