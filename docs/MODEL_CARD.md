@@ -21,7 +21,7 @@
   e 5.3). O número da tool sai do q50 da M6 (decisão #32 registra essa frase; o desenho do intervalo é da M6, ainda
   por fazer). <!-- PREENCHER: confirmar o q50 como número da tool e os hiperparâmetros dos quantis e o q̂ da calibração, da M6 -->
 - **Versão em produção:** <!-- PREENCHER: `gbm-<nome>-<data>-<hash>` e o run id do MLflow do modelo de uso -->
-- **Qual modelo serve (decisão #33, 21/10):** o teste final mede o modelo treinado até 02/01/2026 na base congelada
+- **Qual modelo serve (decisão #33, 21/10):** o teste final mede o modelo treinado até 01/01/2026 (fim exclusivo em 02/01; `configs/avaliacao.yaml`) na base congelada
   v1, uma vez. O modelo de uso é a mesma receita (features e config) retreinada numa v2 da coleta diária, com Shorts
   até ~jun/2026, e o intervalo recalibrado numa janela recente e madura fora desse treino (~jul a set/2026). Se às
   22h a v2 não estiver pronta, a entrega sai com o modelo de janeiro. Este card vale para os dois casos:
@@ -89,7 +89,7 @@ Prefixo por bloco (aula 4.8). Fontes: README seção 5 e `configs/experimentos/`
 | Metadados | `duracao_s`, `setor` | base toda |
 | Texto do título | 10 manuais (`txt_*`) + PCA de 16 do MiniLM | base toda |
 | Capa | PCA de 16 do SigLIP 2, 10 sondas, brilho, contraste, saturação, colorfulness (`thumb_*`) | base toda |
-| Rosto e texto na capa | `det_*` (YuNet e PaddleOCR; decisão #31) | base toda, quando a H10 for medida |
+| Rosto e texto na capa | `det_*` (YuNet e o detector de texto PP-OCRv3 do opencv_zoo; decisão #31) | base toda, quando a H10 for medida |
 | Rubrica do VLM | gancho, energia e ritmo, rosto, produto em close, antes/depois, texto na tela (`vlm_*`) | amostra de 1.400 |
 | Vídeo e áudio | cortes, movimento e aparência dos frames, fala e energia do áudio | amostra de 1.400 |
 
@@ -97,8 +97,8 @@ Prefixo por bloco (aula 4.8). Fontes: README seção 5 e `configs/experimentos/`
 a quantidade por bloco no formato do template do hub -->
 
 Fora do modelo, de propósito: inscritos (são os do dia da coleta, 1.7), views, curtidas e comentários do próprio
-vídeo, o idioma e a transcrição do Whisper (decisão #35, registrada como limitação) e o texto na tela lido pelo OCR
-(`det_texto_tela_thumb`). Os PCAs e as escalas são ajustados só no treino. A mesma função calcula cada feature no
+vídeo, o idioma e a transcrição do Whisper (decisão #35, registrada como limitação). O texto na capa é só detectado
+(tem ou não, quantas caixas, área), não lido (DECISOES, 21/10, "Texto na capa sem o PaddleOCR"). Os PCAs e as escalas são ajustados só no treino. A mesma função calcula cada feature no
 treino e na previsão.
 
 ## Métricas
@@ -160,7 +160,7 @@ Intervalo nominal de 80%. Critério da M6: cobertura de 80% ± 3 pontos em dados
 
 ## `confidence_flag`
 
-Conjunto de regras explícitas, cada uma com código e frase (aula 5.4). A decisão #14 (regras e
+Conjunto de regras explícitas, cada uma com código e frase (aula 5.4); as regras abaixo são candidatas, não finais. A decisão #14 (regras e
 limiares) ainda está aberta no ROTEIRO. Estão decididos só o `canal_novo` (#34) e a regra de data contada do fim do
 treino (#33). Proposta, não decisão: o critério da aula, de o erro médio dos casos sinalizados ser maior que o dos
 não sinalizados no teste temporal, e a taxa-alvo de disparo de 15% a 35% (ROTEIRO, #14).
@@ -181,7 +181,7 @@ erro médio dos casos sinalizados contra os não sinalizados -->
 Com o modelo de janeiro, a regra 6 acenderia em todas as previsões de hoje; por isso a #33 manda servir a v2 se
 ela estiver pronta às 22h; senão, a entrega sai com o modelo de janeiro e o README diz por quê. Nos dois casos, o
 card diz com todas as letras: o envelhecimento do modelo vale para toda previsão e é limitação, não só
-flag (decisão #33). Retreinar a cada ~3 meses é a recomendação.
+flag (decisão #33). Retreinar a cada ~3 meses é a recomendação (decisão #33).
 
 ## Limitações e vieses
 
@@ -222,7 +222,7 @@ são termos de serviço, não licenças de pesos.
 | Whisper `small`, via faster-whisper 1.2.1 (`Systran/faster-whisper-small`) | fala e densidade de palavras na amostra | MIT | <https://huggingface.co/Systran/faster-whisper-small>; pesos originais da OpenAI: <https://github.com/openai/whisper/blob/main/LICENSE> (MIT) |
 | `paraphrase-multilingual-MiniLM-L12-v2` | embedding do título (384 dimensões) | Apache-2.0 | <https://huggingface.co/sentence-transformers/paraphrase-multilingual-MiniLM-L12-v2> |
 | YuNet (`face_detection_yunet_2023mar.onnx`, opencv_zoo) | presença, número e área de rosto na capa | MIT | <https://github.com/opencv/opencv_zoo/blob/main/models/face_detection_yunet/LICENSE> |
-| PaddleOCR (modelo `lang="pt"`) | texto na capa | Apache-2.0 (repositório) | <https://github.com/PaddlePaddle/PaddleOCR/blob/main/LICENSE> |
+| `text_detection_en_ppocrv3_2023may.onnx` (opencv_zoo) | caixas de texto na capa (só detecta, não lê) | Apache-2.0 | <https://github.com/opencv/opencv_zoo/tree/main/models/text_detection_ppocr> |
 | Gemini (`gemini-3.5-flash-lite`) | rubrica do VLM e explicador (API, sem pesos) | Gemini API Additional Terms of Service (atualização de 28/04/2026, em vigor desde 23/03/2026) | <https://ai.google.dev/gemini-api/terms> |
 | YouTube Data API v3 | origem dos dados | YouTube API Services Terms of Service e Developer Policies | <https://developers.google.com/youtube/terms/api-services-terms-of-service> |
 
@@ -231,8 +231,6 @@ são termos de serviço, não licenças de pesos.
   isso o Prévia só enviou URLs de Shorts já publicados, e um criativo não publicado nunca vai ao free tier
   (princípio 5). <!-- PREENCHER: se o explicador ou a tool servirem criativo não publicado, em que plano da API
   isso roda -->
-- **PaddleOCR:** a licença acima é a do repositório; <!-- PREENCHER: conferir a licença dos pesos PP-OCR baixados
-  (versão do modelo de reconhecimento em português), no model card oficial do PaddleOCR, antes de entregar -->
 - **MiniLM e SigLIP 2 em uso comercial:** Apache-2.0 permite. Se a Galaxies for usar comercialmente, a decisão é
   dela; a aula 7.4 pede o registro, não a escolha.
 

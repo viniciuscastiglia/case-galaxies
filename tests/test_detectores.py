@@ -268,5 +268,104 @@ def test_concordancia_kappa_e_divergentes():
     assert len(t) == 2
     rosto = t.iloc[0]
     assert rosto["n"] == 4 and rosto["concordancia"] == 0.75 and rosto["divergentes"] == 1
+    assert rosto["so_detector"] == 1 and rosto["so_vlm"] == 0
+    assert t.iloc[1]["so_detector"] == 0 and t.iloc[1]["so_vlm"] == 0
     assert not np.isnan(rosto["kappa"])
     assert np.isnan(t.iloc[1]["kappa"])
+
+
+# ---- Revisão final: princípio 7, paridade da capa, concordância nas duas direções -----------
+
+
+class DetectorQuebrado:
+    def setInputSize(self, tamanho):
+        pass
+
+    def detect(self, bgr):
+        raise RuntimeError("detector quebrou")
+
+
+def test_excecao_de_detector_propaga(tmp_path):
+    """Princípio 7: só a leitura da imagem é tolerada; um detector que falha derruba o lote."""
+    from previa.detectores import detectar_capas
+
+    ids = _capas(tmp_path / "thumbs", 2)
+    with pytest.raises(RuntimeError, match="detector quebrou"):
+        detectar_capas(
+            ids,
+            tmp_path / "thumbs",
+            tmp_path / "det",
+            DetectorQuebrado(),
+            DetectorTextoFalso(),
+            CFG_TEXTO,
+            2,
+            log=lambda *_: None,
+        )
+
+
+def test_carregar_deteccoes_sem_lotes_devolve_vazio_com_colunas(tmp_path):
+    from previa.detectores import carregar_deteccoes
+
+    df = carregar_deteccoes(tmp_path)
+    assert len(df) == 0 and df.index.name == "video_id"
+    assert set(df.columns) == SEIS
+
+
+def test_main_capas_sem_deteccao_devolve_1(tmp_path, monkeypatch, capsys):
+    import previa.detectores as d
+
+    monkeypatch.setattr(d, "DADOS", tmp_path)
+    monkeypatch.setattr(d, "criar_yunet", lambda cfg: DetectorFalso(None))
+    monkeypatch.setattr(d, "criar_detector_texto", lambda cfg: DetectorTextoFalso())
+    monkeypatch.setattr(
+        d, "detectar_capas", lambda *a, **k: {"novos": 0, "pulados": 0, "sem_thumb": 0, "erros": 0}
+    )
+    assert d.main(["capas"]) == 1
+    assert "nenhuma detecção" in capsys.readouterr().err
+    assert not list(tmp_path.glob("det_thumb_v*.parquet"))
+
+
+def test_main_capas_com_erros_devolve_1(tmp_path, monkeypatch, capsys):
+    import pandas as pd
+
+    import previa.detectores as d
+
+    monkeypatch.setattr(d, "DADOS", tmp_path)
+    monkeypatch.setattr(d, "criar_yunet", lambda cfg: DetectorFalso(None))
+    monkeypatch.setattr(d, "criar_detector_texto", lambda cfg: DetectorTextoFalso())
+    monkeypatch.setattr(
+        d, "detectar_capas", lambda *a, **k: {"novos": 1, "pulados": 0, "sem_thumb": 0, "erros": 2}
+    )
+    monkeypatch.setattr(
+        d, "carregar_deteccoes", lambda p: pd.DataFrame({"x": [1]}, index=pd.Index(["a"]))
+    )
+    assert d.main(["capas"]) == 1
+    assert "erro" in capsys.readouterr().err
+    assert not list(tmp_path.glob("det_thumb_v*.parquet"))
+
+
+def test_concordancia_cli_sem_deteccoes_falha(tmp_path, monkeypatch, capsys):
+    import previa.detectores as d
+
+    monkeypatch.setattr(d, "DADOS", tmp_path)
+    assert d.main(["concordancia"]) == 1
+    assert "nenhuma detecção" in capsys.readouterr().err
+
+
+def test_paridade_da_capa_mesma_forma_na_base_e_na_tool():
+    """F17: uma capa 1080x1920 chega aos detectores no tamanho 202x360 das capas da base."""
+    import cv2
+
+    from previa.detectores import features_da_capa
+
+    base = np.full((360, 202, 3), 90, np.uint8)
+    grande = cv2.resize(base, (1080, 1920), interpolation=cv2.INTER_LINEAR)
+    for img in (base, grande):
+        rosto = DetectorFalso(None)
+        features_da_capa(img, rosto, DetectorTextoFalso(), CFG_TEXTO, capa=(202, 360))
+        assert rosto.imagem.shape == (360, 202, 3)
+        assert rosto.tamanho == (202, 360)
+
+
+def test_capa_da_config_e_202x360():
+    assert ler_config_detectores()["capa"] == [202, 360]

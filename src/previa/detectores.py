@@ -129,9 +129,21 @@ def texto_na_capa(
     return {"n_linhas": n_linhas, "area_texto": float((mascara > 0).mean())}
 
 
-def features_da_capa(rgb: np.ndarray, yunet, detector_texto, cfg_texto: dict) -> dict:
+def features_da_capa(
+    rgb: np.ndarray, yunet, detector_texto, cfg_texto: dict, capa: tuple[int, int] | None = None
+) -> dict:
     """As 6 colunas `det_*` de uma capa já recortada 9:16 em RGB. A tool chama esta mesma função
-    na capa do criativo (paridade treino/uso)."""
+    na capa do criativo (paridade treino/uso).
+
+    `capa` é (largura, altura) das capas da base (`detectores.capa`, 202x360): o recorte é
+    redimensionado para lá antes dos dois detectores, então uma capa 1080x1920 da tool chega
+    com a mesma forma das 30 mil da base (na base é um no-op).
+    """
+    import cv2
+
+    capa = tuple(capa or ler_config_detectores()["capa"])
+    if rgb.shape[1::-1] != capa:
+        rgb = cv2.resize(rgb, capa, interpolation=cv2.INTER_AREA)
     rosto = rostos_na_capa(rgb, yunet)
     texto = texto_na_capa(
         rgb,
@@ -150,11 +162,23 @@ def features_da_capa(rgb: np.ndarray, yunet, detector_texto, cfg_texto: dict) ->
     }
 
 
+COLUNAS_DET = [
+    "det_rosto_thumb",
+    "det_n_rostos_thumb",
+    "det_area_rosto_thumb",
+    "det_texto_thumb",
+    "det_n_caixas_texto_thumb",
+    "det_area_texto_thumb",
+]
+
+
 def carregar_deteccoes(pasta: Path) -> pd.DataFrame:
     """Todos os lotes salvos: uma linha por vídeo (índice video_id)."""
     lotes = sorted(Path(pasta).glob("lote_*.parquet"))
     if not lotes:
-        return pd.DataFrame()
+        vazio = pd.DataFrame(columns=COLUNAS_DET)
+        vazio.index.name = "video_id"
+        return vazio
     return pd.concat([pd.read_parquet(p) for p in lotes]).set_index("video_id")
 
 
@@ -167,16 +191,19 @@ def detectar_capas(
     cfg_texto: dict,
     lote: int,
     log=print,
+    capa: tuple[int, int] | None = None,
 ) -> dict:
     """Detecta rosto e texto nas capas de `ids` que ainda não estão em `destino`, em lotes.
 
     Uma capa ausente conta em `sem_thumb`; uma corrompida vai para o `log` com o motivo, conta em
-    `erros` e o lote segue (o vídeo fica sem linha).
+    `erros` e o lote segue (o vídeo fica sem linha). Só a leitura da imagem é tolerada (`OSError`,
+    que inclui `UnidentifiedImageError` e JPEG truncado); uma exceção de detector propaga.
     """
     from PIL import Image
 
     from previa.thumbs import recortar_9_16
 
+    capa = tuple(capa or ler_config_detectores()["capa"])
     pasta_thumbs = Path(pasta_thumbs)
     destino = Path(destino)
     destino.mkdir(parents=True, exist_ok=True)
@@ -196,12 +223,12 @@ def detectar_capas(
             try:
                 with Image.open(pasta_thumbs / f"{v}.jpg") as img:
                     rgb = recortar_9_16(np.asarray(img.convert("RGB")))
-                linhas.append(
-                    {"video_id": v, **features_da_capa(rgb, yunet, detector_texto, cfg_texto)}
-                )
-            except Exception as e:  # capa corrompida: registra e segue (princípio 7)
+            except OSError as e:  # capa corrompida: registra e segue (princípio 7)
                 resumo["erros"] += 1
                 log(f"capa {v} ignorada: {type(e).__name__}: {e}")
+                continue
+            feats = features_da_capa(rgb, yunet, detector_texto, cfg_texto, capa)
+            linhas.append({"video_id": v, **feats})
         if linhas:
             arquivo = destino / f"lote_{n_lote:05d}.parquet"
             tmp = arquivo.with_suffix(".tmp")
@@ -224,6 +251,8 @@ def concordancia(det: pd.DataFrame, rotulos: pd.DataFrame) -> pd.DataFrame:
     comuns = det.index.intersection(rotulos.index)
     linhas = []
     for col_det, col_vlm in PARES:
+        # a rubrica é bool obrigatório no Pydantic (vlm.py) e as falhas vão para erros_v1.jsonl:
+        # não há NaN, então o astype(bool) não esconde nada
         a = det.loc[comuns, col_det].astype(bool)
         b = rotulos.loc[comuns, col_vlm].astype(bool)
         um_lado_so = a.nunique() < 2 or b.nunique() < 2
@@ -235,6 +264,10 @@ def concordancia(det: pd.DataFrame, rotulos: pd.DataFrame) -> pd.DataFrame:
                 "concordancia": float((a == b).mean()) if len(comuns) else float("nan"),
                 "kappa": float("nan") if um_lado_so else float(cohen_kappa_score(a, b)),
                 "divergentes": int((a != b).sum()),
+                # det=T e VLM=F: possível falso positivo do detector
+                "so_detector": int((a & ~b).sum()),
+                # det=F e VLM=T: esperado, o VLM rotula o vídeo inteiro e o detector vê só a capa
+                "so_vlm": int((~a & b).sum()),
             }
         )
     return pd.DataFrame(linhas)
@@ -244,7 +277,7 @@ def _divergentes(det: pd.DataFrame, rotulos: pd.DataFrame) -> pd.DataFrame:
     comuns = det.index.intersection(rotulos.index)
     partes = []
     for col_det, col_vlm in PARES:
-        a = det.loc[comuns, col_det].astype(bool)
+        a = det.loc[comuns, col_det].astype(bool)  # sem NaN: ver `concordancia`
         b = rotulos.loc[comuns, col_vlm].astype(bool)
         d = pd.DataFrame({"par": col_det, "detector": a, "vlm": b})[a != b]
         partes.append(d)
@@ -273,9 +306,18 @@ def main(argv=None) -> int:
         )
         print(resumo, flush=True)
         det = carregar_deteccoes(pasta)
+        if resumo["erros"] > 0:
+            print(f"{resumo['erros']} erro(s) nas capas: consolidado não gravado", file=sys.stderr)
+            return 1
+        if det.empty:
+            print("nenhuma detecção nos lotes: consolidado não gravado", file=sys.stderr)
+            return 1
         det.reset_index().to_parquet(DADOS / f"det_thumb_v{cfg['versao']}.parquet", index=False)
         return 0
     det = carregar_deteccoes(pasta)
+    if det.empty:
+        print(f"nenhuma detecção em {pasta}: rode `capas` antes", file=sys.stderr)
+        return 1
     linhas = [json.loads(x) for x in (DADOS / "vlm" / "rubrica_v1.jsonl").open()]
     rot = pd.DataFrame(linhas).drop_duplicates("post_id", keep="last").set_index("post_id")
     print(concordancia(det, rot).to_string(index=False))

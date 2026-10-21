@@ -801,7 +801,10 @@ def test_ler_extra_det_thumb(tmp_path, monkeypatch):
             "det_n_caixas_texto_thumb": [0, 3],
             "det_area_texto_thumb": [0.0, 0.2],
         }
-    ).to_parquet(tmp_path / "det_thumb_v1.parquet", index=False)
+    ).to_parquet(tmp_path / "det_thumb_v7.parquet", index=False)
+    monkeypatch.setattr(
+        "previa.detectores.ler_config_detectores", lambda: {"versao": 7}
+    )  # a versão vem da config, não de um v1 fixo
     t = experimento.ler_extra("det_thumb")
     assert t.index.name == "post_id" and len(t.columns) == 6
     assert (t.dtypes == "float64").all()

@@ -2,6 +2,8 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
+> **Emenda de 21/10 (aprovada pelo Vinicius; `docs/DECISOES.md`, "Texto na capa sem o PaddleOCR"):** o texto na capa é o detector PP-OCRv3 do `opencv_zoo` pelo `cv2.dnn.TextDetectionModel_DB` (só detecta, não lê), no lugar do PaddleOCR (que não instala na Stack 2026). São 6 colunas `det_*_thumb`, com `det_n_caixas_texto_thumb` no lugar de `det_n_linhas_thumb`, e sem `det_texto_tela_thumb`. Onde o texto abaixo diz PaddleOCR, vale esta emenda.
+
 **Goal:** rosto (YuNet) e texto na tela (PaddleOCR) nas capas, como colunas `det_*_thumb` prontas para a H10 e
 para a tool (F17); e os rascunhos do model card (F3), da comparação com a literatura (F29) e das limitações (F42).
 
@@ -10,6 +12,8 @@ para a tool (F17); e os rascunhos do model card (F3), da comparação com a lite
 em parquet que retoma de onde parou, e a concordância com a rubrica do VLM. O runner lê o bloco por `ler_extra`.
 Os documentos são rascunhos do Claude com `PREENCHER:` onde o número depende de run lacrado ou do teste.
 
+> Emenda: o OCR acima é o detector PP-OCRv3 do opencv_zoo via OpenCV (sem PaddleOCR; ver a nota do topo).
+
 **Tech Stack:** OpenCV 5.0.0.93 (`cv2.FaceDetectorYN`, YuNet 2023mar, MIT), PaddleOCR 3.7.0 + paddlepaddle 3.3.1
 (Stack 2026, Apache-2.0), pandas 3, scikit-learn (`cohen_kappa_score`), pytest.
 
@@ -17,6 +21,8 @@ Os documentos são rascunhos do Claude com `PREENCHER:` onde o número depende d
 (`~/autoestudos/autoestudos/docs/aulas/ml-preditivo-e-agentes/4-do-video-as-features/6-detectores-leves/index.mdx`).
 
 ## Global Constraints
+
+> Emenda: as restrições do PaddleOCR abaixo (BGR e caixas int16 valem; `lang="pt"`, `rec_scores` e `det_texto_tela_thumb` não) foram trocadas pelo detector PP-OCRv3 do OpenCV, 6 colunas, `det_n_caixas_texto_thumb` (nota do topo).
 
 - **Nada roda na base antes da H10 do Vinicius.** Os testes usam fakes; só a medição de tempo em 50 capas (Task 3,
   passo de custo) toca dados reais, e ela não lê curtidas nem métricas.
@@ -122,6 +128,8 @@ Os documentos são rascunhos do Claude com `PREENCHER:` onde o número depende d
   (como o `frame_texto.png` da 4.6); anote a saída e o tempo por imagem.
 
 ### Task 3: lote das capas, bloco do runner e concordância com o VLM
+
+> **Aviso (emenda de 21/10):** esta Task 3 foi reescrita em `.superpowers/sdd/2026-10-21-f2-e-documentos/task-3-brief-v2.md` (6 colunas, sem `det_texto_tela_thumb`, `det_n_caixas_texto_thumb`). Siga o brief v2.
 
 **Files:**
 - Modify: `src/previa/detectores.py`, `src/previa/experimento.py` (`ler_extra`, `FORA_DO_MODELO`)

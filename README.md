@@ -237,7 +237,7 @@ preenchida depois da abertura do teste e das ablações.
 | :--- | :--- | :--- |
 | Spearman de 0,55 a 0,85 antes da publicação (o intra-canal costuma ser menor que o global) | hub, `troubleshooting` ("Minhas métricas estão boas demais") | PREENCHER: Spearman global e intra-canal no teste (H1) |
 | Spearman de 0,71 e par-a-par de 76,3% em 11 mil YouTube Shorts educativos, com rubrica do VLM, K-Means e XGBoost (Gupta et al., arXiv:2512.21402) | hub, `leituras` | PREENCHER: par-a-par no teste (H1) |
-| Conteúdo visual soma de +0,02 a +0,04 de Spearman sobre as features do canal | hub, `roadmap` (aula 4.8) | PREENCHER: ganho do visual e da rubrica, com IC (ablação) |
+| Conteúdo visual soma de +0,02 a +0,04 de Spearman com a camada multimodal | hub, `roadmap` (aula 4.8) | PREENCHER: ganho do visual e da rubrica, com IC (ablação) |
 
 <!-- V: reescrever com as suas palavras (aula 6.7: "na mesma direção do que a literatura reporta"). Dizer em que ponto
 estamos dentro da faixa, acima ou abaixo, e o que isso sugere (acima de 0,85 seria alarme de vazamento). -->
@@ -270,7 +270,7 @@ rótulo difere (seção 8). Por isso a comparação é de ordem de grandeza e de
   pequeno de ele "lembrar" do vídeo ou do contador de curtidas em vez de só descrever o que vê (aula 7.3,
   "Vazamento pelo pré-treino"). A rubrica não pede nem recebe curtidas, e o modelo só usa os 6 campos extraídos, mas
   o risco não foi medido.
-- **Coletor sem varredura semanal completa:** a coleta diária para na primeira página de IDs já conhecidos, e a
+- **Coletor sem varredura semanal completa:** a coleta diária para quando uma página inteira de IDs já é conhecida, e a
   aula 1.5 recomenda uma varredura completa por semana, porque a ordem da API não é garantida pela documentação. Não
   rodamos essa varredura; um Short antigo inserido fora de ordem pode ter ficado fora da base.
 - **Recall dos comparáveis não medido:** a tool de comparáveis não teve o recall@K medido contra um conjunto de
