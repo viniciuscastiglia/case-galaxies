@@ -2,10 +2,12 @@
 
 O resíduo é `e = y - p`, em log1p(curtidas): positivo quer dizer que o modelo subestimou, e o fator
 e^|e| diz por quantas vezes errou. Roda nas previsões fora da amostra do walk-forward de 2025 de um
-run do MLflow: o teste fica trancado até a H1. Os cortes (setor, tipo e tamanho do canal, duração,
-histórico e horário) geram hipóteses, não conclusões (2.6, erro comum 6), por isso cada grupo vem
-com o nº de posts e de canais. Os piores saem com o link, para o Vinicius assistir e classificar
-nas categorias da 2.6 (M9; erro comum 7: dado quebrado e viral genuíno pedem ações opostas).
+run do MLflow: o teste fica trancado até a H1. Os cortes (setor, tipo e tamanho do canal, como o
+canal foi achado, duração, histórico e horário) geram hipóteses, não conclusões (2.6, erro comum 6),
+por isso cada grupo vem com o nº de posts e de canais. O corte "origem" responde à pergunta da 1.4:
+o modelo erra mais nos canais que vieram da busca? Os piores saem com o link, para o Vinicius
+assistir e classificar nas categorias da 2.6 (M9; erro comum 7: dado quebrado e viral genuíno pedem
+ações opostas).
 
 Uso: uv run python -m previa.erros RUN_ID
 """
@@ -32,10 +34,24 @@ CORTES = {  # coluna -> (bordas [a, b), rótulos); sem bordas, o próprio valor 
     "sector": (None, None),
     "tipo": (None, None),
     "faixa": (None, None),
+    "origem": (None, None),  # como o canal entrou na base (`origem_do_canal`), aula 1.4
     "duracao_s": ([0, 20, 40, 60, np.inf], ["< 20 s", "20 a 39 s", "40 a 59 s", "60 s ou mais"]),
     "hist_n": ([0, 10, 30, np.inf], ["< 10 maduros", "10 a 29", "30+"]),
     "hora_local": ([0, 12, 18, 24], ["manhã", "tarde", "noite"]),
 }
+
+
+def origem_do_canal(fonte: pd.Series) -> pd.Series:
+    """Como o canal entrou na base (aula 1.4): "busca" se a `fonte` do canais.csv cita a busca.
+
+    A fonte é texto livre ("busca:canal", "busca:video", "lista manual+busca", "lista manual"...):
+    qualquer texto com "busca", sem distinguir maiúsculas, é "busca"; o resto é "fora da busca".
+    Canal sem fonte (NaN, ou ausente do canais.csv no `map`) vira "sem registro", nunca "fora".
+    """
+    texto = fonte.astype("string")
+    achou = texto.str.contains("busca", case=False, na=False)
+    origem = np.where(achou, "busca", "fora da busca")
+    return pd.Series(np.where(texto.isna(), "sem registro", origem), index=fonte.index)
 
 
 def residuos(t: pd.DataFrame) -> pd.DataFrame:
@@ -93,6 +109,7 @@ def tabela_do_run(run_id: str) -> pd.DataFrame:
     t["canal"] = t["channel_id"].map(canais["nome"])
     t["tipo"] = t["channel_id"].map(canais["tipo"])
     t["faixa"] = t["channel_id"].map(canais["faixa_inscritos"])
+    t["origem"] = origem_do_canal(t["channel_id"].map(canais["fonte"]))
     return residuos(t)
 
 

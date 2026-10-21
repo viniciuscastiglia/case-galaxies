@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from previa.erros import agrupar, piores, por_corte, residuos
+from previa.erros import CORTES, agrupar, origem_do_canal, piores, por_corte, residuos
 
 
 def _tabela():
@@ -55,3 +55,36 @@ def test_bordas_dos_cortes():
     assert agrupar(t, "duracao_s").tolist() == ["< 20 s", "20 a 39 s", "60 s ou mais"]
     assert agrupar(t, "hist_n").tolist() == ["< 10 maduros", "10 a 29", "30+"]
     assert agrupar(t, "hora_local").tolist() == ["manhã", "tarde", "noite"]
+
+
+def test_origem_do_canal_separa_a_busca():
+    # 1.4: "o modelo erra mais nos canais que vieram da busca?"; a fonte é texto livre do canais.csv
+    fonte = pd.Series(
+        ["busca:canal", "lista manual+busca", "colab", "lista manual", None, "BUSCA:video"]
+    )
+    o = origem_do_canal(fonte)
+    assert o.tolist() == [
+        "busca",
+        "busca",
+        "fora da busca",
+        "fora da busca",
+        "sem registro",
+        "busca",  # sem distinguir maiúsculas
+    ]
+    assert CORTES["origem"] == (None, None)  # o próprio valor é o grupo
+
+    t = residuos(
+        pd.DataFrame(
+            {
+                "channel_id": ["UC1", "UC1", "UC2", "UC3"],
+                "y": [5.0, 7.0, 4.0, 6.0],
+                "p": [5.5, 5.0, 6.0, 6.0],
+                "origem": origem_do_canal(pd.Series(["busca:canal"] * 2 + ["lista manual"] * 2)),
+            }
+        )
+    )
+    r = por_corte(t, "origem")
+    assert r.loc["busca", "n"] == 2 and r.loc["busca", "canais"] == 1
+    assert r.loc["fora da busca", "n"] == 2 and r.loc["fora da busca", "canais"] == 2
+    assert r.loc["busca", "mae"] == pytest.approx((0.5 + 2.0) / 2)
+    assert r.loc["fora da busca", "vies"] == pytest.approx(-1.0)
