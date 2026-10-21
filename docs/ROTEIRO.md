@@ -6,25 +6,26 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
 
 ## Agora
 
-- **Fase (21/10, 10h):** dia da entrega (até 23h59; apresentação em 23/10; os cortes #24, #25 e #28 não tiram nada
-  do produto). As H2 a H9 e as duas ablações estão escritas, rodadas e **lacradas**. A auditoria #30 terminou
-  (`docs/AUDITORIA.md`): TAPI, hub, as 47 aulas, RAG e EDD lidos inteiros e cruzados com o código; F1 a F43, com as
-  decisões e a ordem do dia na seção 9. A F2 está decidida (#31, A: rosto e texto nas capas). 273 testes, ruff ok.
-- **Próximo passo (sessão nova):** a seção 9 da auditoria, nesta ordem:
-  1. o Claude faz os itens sem decisão (F18, F22, F26, F25, F1, F13, F15, F39, F40, F33, F35 e os registros F4, F38
-     e F43) e prepara a F2 (detectores nas capas, em segundo plano, depois da H10 do Vinicius);
-  2. as decisões, uma por vez: o próximo corte (o dia já somava ~12,5 h dele antes da auditoria, que acrescentou
-     ~1 h), F24, F31 com a F21, F27, F32 e F23 (#32 a #37);
-  3. a A1, com o caso à mão em `.superpowers/sdd/2026-10-20-a1/caso_a_mao.md` (8 casos, mais o 9º da F10), agora
-     com a F19, a F20 e a F34;
+- **Fase (21/10, 18h):** dia da entrega (até 23h59; apresentação em 23/10). O lote da auditoria está no `main` e no
+  GitHub (F1, F13, F15, F18, F22, F25, F26, F33, F35, F39, F40 e os registros F4, F38 e F43; 363 testes, ruff ok;
+  o CI rodou pela primeira vez). Decididas hoje: #38 (corte 4, B), #32 (Huber testada: a H11 rodou e está lacrada,
+  `bfba1020`), #33 (B: teste no modelo de janeiro, uso numa v2 retreinada), #34 (B: número com `canal_novo`), #35
+  (A: transcrição e idioma fora, como limitação). As H2 a H9, a H11 e as ablações seguem **lacradas**.
+- **Próximo passo (sessão nova):**
+  1. as decisões #36 (F32, a leitura da ablação) e #37 (F23, o carregamento do modelo, aprovar ou vetar);
+  2. a H10, dele; depois, a F2 (rosto e texto nas capas), do Claude, em segundo plano;
+  3. a A1, com o caso à mão em `.superpowers/sdd/2026-10-20-a1/caso_a_mao.md` (com F19, F10, F34 e a cadeia da
+     #34);
   4. o bloco 2 de decisões, com a F11;
-  5. abrir as H2 a H9 e decidir os blocos (F17);
-  6. a M6 e o flag, e o B da #28 antes da A2;
-  7. depois: M9, A4, A7, o teste final (F16), os teach-backs, o README e a autoavaliação.
-- **Bloqueios:** a A1 trava o `prever_criativo`, o grafo (A6) e o MCP (A2); a abertura das hipóteses trava o modelo
-  final, que trava a M6 e o teste final (H1 e cobertura). A F24 e a H10 vêm antes de rodar as variantes novas
-  (hipótese escrita antes, 2.5); se a escolha dos blocos espera a H10 é decisão dele. O Vinicius só leu até o
-  módulo 2: cada peça abre com o conceito mínimo da aula no chat (#29). Jobs longos como tarefas da sessão.
+  5. abrir as H2 a H9 e a H11 (com a F32) e escolher os blocos (F17). Na H7: `produto_beleza` tem AUC 0,814 só em
+     beleza, e `roda` tem 0,670 e não passa;
+  6. a M6 e o flag (#14, com a regra de data da #33);
+  7. pelo corte #38: A2, A4, A7 e a pré-triagem da M9 pelo Claude; o teste final (F16) e depois a v2 da #33; README
+     (as 3 seções dele) e autoavaliação.
+- **Bloqueios:** a A1 trava o `prever_criativo`, o grafo (A6) e o MCP (A2); a abertura trava o modelo final, que
+  trava a M6, o teste final e a v2. Se às 22h a v2 não estiver pronta, a entrega sai com o modelo de janeiro (#33).
+  O Vinicius só leu até o módulo 2: cada peça abre com o conceito mínimo no chat (#29). Jobs longos como tarefas da
+  sessão.
 
 ## Como funciona
 
@@ -89,7 +90,8 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
   - [x] o esqueleto de experimentos (YAML + dataclass, MLflow com commit, hash e corte, teste de perturbação) (19/10)
   - [x] `auditar_datas` (1.7) (19/10)
   - [ ] a tabela de baselines na base real, com a mediana madura e o fallback por degrau: a tabela e a manchete
-    existem (19/10); falta o fallback por degrau
+    existem (19/10); os baselines mais fortes da 2.1 entraram em 21/10 (k = 10, manchete 0,501, empate com a
+    mediana madura, 0,497); o fallback por degrau é a cadeia da #34, na A1
   - [x] a lista dos 50 Shorts para conferir (19/10)
 - **Pronta quando:** existe a tabela de baselines na base real, com o split definitivo e o run id, e as hipóteses
   estão escritas antes de rodar.
@@ -184,7 +186,8 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
   - [ ] `Passos` do grafo
   - [x] golden set congelado (canais fora do treino) (19/10: 30 Shorts de 6 canais, `data/golden/`)
   - [ ] testes de contrato e de regressão
-  - [x] CI no GitHub Actions (pytest e ruff, sem dados e sem LLM) (19/10; roda no primeiro push)
+  - [x] CI no GitHub Actions (pytest e ruff, sem dados e sem LLM) (19/10; o primeiro run, em 21/10, passou em
+    ~2 min 20 s no Ubuntu: run `39647277817`, commit `1b25813`)
 - **Pronta quando:** o agente passa nos testes (invariante, injeção, golden set) e a explicação é validada.
 
 ### Fase 6 · 21/10 entrega (até 23h59) · 22 e 23/10 apresentação
@@ -215,6 +218,8 @@ a peça.
 | Qua 21/10 | o conceito mínimo de cada aula dentro da peça (#29) | o que sobrou de 20/10 (A1, bloco 2 de decisões, abrir H2 a H9 e o marco 1, M6) e as decisões da auditoria (#30: a #31 feita; #32 a #37) e a H10; a B da #28; M9 (20 piores erros); A2; A4 (validador); A7 (invariante); os rótulos do juiz da explicação (F8) e a conferência dos 50 Shorts (#19, F14); teach-back de A5, A6, M8, do bootstrap da M9, do prompt da A4 e da injeção da A7; README (reescrever o rascunho); autoavaliação; **entrega até 23h59** | ~12,5 |
 | Qui 22/10 | de manhã, a leitura dirigida de 3.4, 3.5, 4.8, 5.2, 5.3, 5.6, 6.1, 6.2, 6.5 e 6.6, com as perguntas prováveis da banca (#29) | à tarde, ensaio cronometrado da demo e ensaio de perguntas | ~3,5 + ensaios |
 | Sex 23/10 | — | **apresentação** | — |
+
+Em 21/10, às 13h30, o resto do dia somava ~12,9 h dele para ~8,5 h úteis; o corte #38 (B) leva a ~8,3 h.
 
 Com a #28 (A), 20 e 21/10 somam ~13,2 h para ~10,4 h: ~2,8 h de estouro. A B (a A2 para o Claude, ~1,8 h com
 a 6.5) volta no fechamento de 20/10, com o dia medido, antes de a A2 começar.
@@ -278,19 +283,28 @@ O Claude traz cada uma na hora certa, com contexto e opções. A recomendação 
 | 29 | Leitura dos módulos 3 a 6 (21/10): ele não leu nada depois do módulo 2 | ROTEIRO, hub | 6 | A: o conceito mínimo dentro de cada peça hoje; a leitura dirigida das aulas da apresentação em 22/10 | **decidida 21/10 (A; se sobrar tempo, adianta parte de 22/10)** |
 | 30 | Auditoria de conformidade e completude contra o TAPI, o hub e as aulas (21/10) | protocolo do material | 6 | fazer já, antes das peças do Claude; ele confere por amostragem | **decidida 21/10; feita** (`docs/AUDITORIA.md`: F1 a F43) |
 | 31 | Camada 1 do multimodal (F2): o TAPI §6.3 a chama de obrigatória; hoje há SigLIP só na capa, e rosto, texto e produto só pela rubrica, na amostra | 4.6, 4.7, 4.1 | 6 | A: rosto (YuNet) e texto (PaddleOCR) nas 30.981 capas, sem objetos; concordância com o VLM; H10 escrita antes de rodar | **decidida 21/10 (A)** |
-| 32 | Perda do GBM (F24): L2 em todas as configs, sem decisão registrada; Huber é o padrão das aulas | 1.2, 3.3, 3.4 | 6 | rodar Huber (δ = 1) como variante do completo, com hipótese escrita antes, e decidir pela régua #27 antes de abrir o teste | aberta |
-| 33 | Base do treino final e regra de data do flag (F31 e F21): a `data_fora_do_periodo` dispararia em toda previsão de hoje | 5.4, 6.3, 7.5, hub (`monte-sua-base`) | 6 | teste final na v1 congelada; modelo de uso retreinado na v2 (recoleta), até set/2026, com recalibração numa janela recente e madura | aberta |
-| 34 | Canal com menos de 3 posts maduros (F20): hoje a previsão recusa | 2.1, 5.4 | 6 | a cadeia da 2.1 (mediana; regressão em log dos inscritos; mediana do setor), sempre com o flag `canal_novo`; decide-se no caso à mão da A1 | aberta |
-| 35 | Transcrição no bloco de texto (F27): guardada, mas descartada em silêncio | 4.5 | 6 | limitação escrita e o comentário corrigido: do Whisper, o TAPI pede idioma, palavras e densidade de fala, que já entram (`aud_*`), e o efeito na amostra seria inconclusivo por tamanho (#101) | aberta |
+| 32 | Perda do GBM (F24): L2 em todas as configs, sem decisão registrada; Huber é o padrão das aulas | 1.2, 3.3, 3.4 | 6 | rodar Huber (δ = 1) como variante do completo, com hipótese escrita antes, e decidir pela régua #27 antes de abrir o teste | **decidida 21/10 (A); H11 rodada e lacrada (`bfba1020`)** |
+| 33 | Base do treino final e regra de data do flag (F31 e F21): a `data_fora_do_periodo` dispararia em toda previsão de hoje | 5.4, 6.3, 7.5, hub (`monte-sua-base`) | 6 | teste final na v1 congelada; modelo de uso retreinado na v2 (recoleta), até set/2026, com recalibração numa janela recente e madura | **decidida 21/10 (B): v2 com treino até ~jun/2026 e CQR em ~jul–set; plano B às 22h** |
+| 34 | Canal com menos de 3 posts maduros (F20): hoje a previsão recusa | 2.1, 5.4 | 6 | a cadeia da 2.1 (mediana; regressão em log dos inscritos; mediana do setor), sempre com o flag `canal_novo`; decide-se no caso à mão da A1 | **decidida 21/10 (B): número com `canal_novo`; a âncora sai do caso à mão da A1** |
+| 35 | Transcrição no bloco de texto (F27): guardada, mas descartada em silêncio | 4.5 | 6 | limitação escrita e o comentário corrigido: do Whisper, o TAPI pede idioma, palavras e densidade de fala, que já entram (`aud_*`), e o efeito na amostra seria inconclusivo por tamanho (#101) | **decidida 21/10 (A); corrigido: o idioma também ficava fora (`FORA_DO_MODELO`)** |
 | 36 | Leitura da ablação na abertura (F32): as três leituras da 2.6 lado a lado | 2.6 | 6 | mostrar escada, todos menos um e ruído juntos; a régua #27 continua sendo a regra | aberta |
 | 37 | Carregamento do modelo de uso (F23): a 2.5 e a 7.1 pedem o MLflow (`models:/...`); a 6.1 e a 6.6 usam pasta mais variável de ambiente | 2.5, 6.1, 6.6, 7.1 | 6 | seguir a 6.x e registrar o bundle como artefato do run de treino final, com o run id no `model_version`; vai para `conflitos.md` | aberta (aprovar ou vetar) |
+| 38 | Corte 4 (21/10, 13h30): ~12,9 h de trabalho dele para ~8,5 h úteis até 23h59 | "Se atrasar" | 6 | B: A2 para o Claude (ele escreve descrições e erros); teach-backs para 22/10; autoavaliação e F14 do rascunho do Claude; M9 com pré-triagem do Claude; A4 e A7 do Claude com o caso à mão dele; README: ele reescreve 3 seções | **decidida 21/10 (B)** |
 
 **Pendências do Claude:**
 
 - resumos de 3 linhas da 3.4, 3.5, 4.8, 5.6, 6.7 e das EDD (corte #28), cada um entregue com a peça que o usa;
 - recoleta das estatísticas antes do treino final (Fase 2);
 - apagar os dados brutos em 30/10, pelo passo a passo do data card v1 (inclui as pastas do módulo 4 e do golden set); o MLflow é decisão do Vinicius;
-- inscritos da API versionados em `data/canais.csv` até 30/10.
+- inscritos da API versionados em `data/canais.csv` até 30/10;
+- adiados da revisão final do lote de 21/10 (nenhum bloqueia; o detalhe estava no ledger do plano
+  `2026-10-21-lote-auditoria`):
+  - antes da A1: `faixa_do_canal` com escalar devolve um array 0-d (a tool precisa de `.item()`);
+  - antes do teste final: `k_escolhido` depende da ordem de `ks` e pula NaN em silêncio; `painel_do_run` e
+    `previa.erros` não chamam `conferir_cortes`; o `avaliacao.json` do run é lido do arquivo, e não do `cfg_av`;
+  - polimento: o F1 do painel por `bincount` (~6 s a menos por avaliação); o `auditoria.py:43` com caminho
+    relativo; o check do pandera poderia exigir a lacuna (`<= published_at − lacuna`); a `linha` vazia passa no
+    contrato; o `LIMITE_IMPORTANCIA` no código, e não na config.
 
 **README (texto do Vinicius, na A8):** o porquê do alvo e "posts anteriores **e maduros**"; o critério de sucesso.
 
@@ -324,9 +338,12 @@ Corte nesta ordem:
     da #27);
 13. A2: o Claude escreve o servidor e o Vinicius faz teach-back, ou o Vinicius escreve só as descrições das tools e
     as mensagens de erro (~20 min). Decide-se no fechamento de 20/10, antes de a A2 começar.
+14. (#38) a A2 com o Vinicius só nas descrições e nos erros; os teach-backs em 22/10; autoavaliação e F14 do
+    rascunho do Claude; M9 com pré-triagem do Claude e confirmação dele (~1 min por vídeo); A4 e A7 escritas pelo
+    Claude a partir do caso à mão dele; no README, ele reescreve problema, resultados e limitações.
 
 Os itens 1 a 6 valem desde 15/10 (#24); os itens 7 a 10, desde 18/10 (#25); os itens 11 e 12, desde 20/10
-(#28).
+(#28); os itens 13 e 14, desde 21/10 (#38).
 
 **Sempre raciocinadas pelo Vinicius (caso à mão e passos, #26):** M1 a M4, M6, A1, A2, o validador da A4, a invariante da A7 e o texto da A8.
 

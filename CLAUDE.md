@@ -22,7 +22,8 @@ O briefing oficial é o TAPI (`escopo_projeto.md`), que é o nome do documento, 
   runner (`previa.experimento`, MLflow); modelo de uso em `previa.modelo`. Ainda não há intervalo (M6) nem agente.
 - **Auditoria (21/10, #30):** `docs/AUDITORIA.md` lista as faltas (F1 a F43, por prioridade). A seção 3 diz o que
   cada peça de hoje precisa cumprir; a seção 9 traz as decisões e a ordem do dia. O Vinicius só leu até o módulo 2: cada peça abre com o
-  conceito mínimo da aula no chat, antes do caso à mão (#29).
+  conceito mínimo da aula no chat, antes do caso à mão (#29). Os itens sem decisão estão feitos e no `main` (21/10);
+  o corte #38 tirou dele a A2, a A4, a A7 e parte da M9 e do README.
 
 ## Papéis
 
@@ -142,6 +143,8 @@ uv run python -m previa.experimento comparar RUN_A RUN_B   # B sobre A nas duas 
 uv run python -m previa.ablacao configs/ablacao.yaml   # escada, todos menos um e ruído (2.6, 4.8)
 uv run python -m previa.erros RUN_ID     # resíduos por corte e os 20 piores para a M9 (2.6)
 uv run python -m previa.baselines janela   # a manchete da #6 para os baselines
+uv run python -m previa.experimento painel RUN_ID   # painel com IC por canal das previsões salvas (só na abertura)
+uv run python -m previa.sondas             # AUC das sondas da capa contra a rubrica do VLM (F26)
 uv run python -m previa.vlm rodar          # rubrica do VLM (precisa do .env; ~500 pedidos por dia)
 uv run python -m previa.thumbs             # thumbnails da base (retoma do cache)
 uv run python -m previa.midia amostra      # frames, cortes e áudio da amostra: SÓ do IP de casa
@@ -182,6 +185,10 @@ Nunca mostre chaves em saída de terminal ou log. Erros da API do Google trazem 
 - **shap 0.52:** o modo intervencional não aceita splits categóricos do LightGBM (o setor é código 0/1); no Mac Intel,
   o numba dele não resolve com o numpy 2.5 (o uv só resolve Apple Silicon e Linux).
 - **faster-whisper 1.2.1 + PyAV 19:** passe o áudio como array (o `decode_audio` quebra).
+- **Caminhos (F18):** `previa.caminhos` é absoluto; `PREVIA_DADOS` e `GALAXIES_ARTEFATOS` trocam dados e artefatos
+  (vazio vira o padrão; relativo é erro). O `tests/conftest.py` aponta os dois e o MLflow para uma pasta temporária.
+- **MLflow 3.16:** `set_tracking_uri` e `set_experiment` escrevem `MLFLOW_TRACKING_URI` e `MLFLOW_EXPERIMENT_ID` no
+  ambiente do processo; num teste, use a fixture `mlflow_temporario`, nunca o `mlflow.db` real.
 
 ## Datas
 

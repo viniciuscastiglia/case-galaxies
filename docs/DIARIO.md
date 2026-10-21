@@ -3,6 +3,18 @@
 Histórico das sessões. As entradas novas ficam no topo, com 3 a 5 linhas por sessão (`/fechar-sessao`). O plano
 vivo está em `docs/ROTEIRO.md` e as decisões em `docs/DECISOES.md`.
 
+## 21/10 (tarde, 13h30 a 18h) · lote da auditoria no main e as decisões #32 a #35 e #38
+
+- O lote sem decisão da auditoria rodou em 9 tasks com subagentes, cada uma revisada, e passou numa revisão final
+  (com 5 consertos). Está no `main` e no GitHub, com 363 testes e o primeiro CI.
+- Números para a abertura: os baselines mais fortes da 2.1 empatam com a mediana madura (k = 10, 0,501 × 0,497).
+  Nas sondas da capa, `produto_beleza` tem AUC 0,814 só em beleza (o 0,53 misturava os setores) e `roda` tem 0,670.
+  A H11 (Huber) rodou e está lacrada: `bfba1020`, commit `d845a0c`.
+- Decididas: #38 (corte B), #32 (Huber testada, com a H11 escrita por ele), #33 (B), #34 (B) e #35 (A). Ele notou o
+  próprio viés pela recomendação do material; o argumento que decidiu a #34 não dependia da aula. Corrigido o erro da
+  auditoria: o idioma do Whisper também ficava fora do modelo.
+- Ficou para a sessão nova: #36 e #37, a H10, a A1 e o resto pelo "Agora" do ROTEIRO.
+
 ## 21/10 (manhã, até ~10h) · auditoria completa (#30)
 
 - Segunda passada da auditoria (`docs/AUDITORIA.md`): TAPI, as 10 páginas do hub, as 47 aulas, RAG e EDD lidos
