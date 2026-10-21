@@ -37,6 +37,7 @@ O que é decisão do Vinicius vai para a tabela "Decisões pendentes" do `docs/R
 | 16 | Segfault no macOS: importar `lightgbm` antes de `torch` × wrapper com `n_jobs=1` × processos separados × `OMP_NUM_THREADS=1` | 4.1 × 3.6 × 4.8 × 6.4 | extrair com torch num processo e treinar noutro (cache em parquet); `OMP_NUM_THREADS=1` no `__init__` quando o FAISS entrar. 20/10, medido no Mac M4: importar o `lightgbm` antes não basta (segfault no 1º `encode`, também só prevendo); no processo que serve a tool, `previa.openmp.um_runtime()` fixa `OMP_NUM_THREADS=1` antes dos imports |
 | 17 | Faixa de complexidade do GBM: profundidade 3–6 ou 15–63 folhas × 7–63 folhas ou profundidade 4–8 | 3.3 × 3.4 | partir de 15 folhas e `min_child_samples` de 20 a 40, com early stopping temporal; ajustar só na validação |
 | 18 | `min_child_samples` igual nos três quantis; sem early stopping por quantil; quantil com interpolação | código da 6.1 × 5.2/5.3 | seguir a 5.2 e a 5.3: folhas maiores nos extremos, early stopping com `metric="quantile"`, quantil por estatística de ordem |
+| 19 | Onde mora o modelo de uso: registro do MLflow (`models:/...`) × pasta de artefatos com variável de ambiente | 2.5 NP e 7.1 × 6.1, 6.5 e 6.6 | decisão #37 (21/10, A): a tool lê da pasta (`GALAXIES_ARTEFATOS`), que funciona em qualquer processo MCP; o mesmo pacote é registrado como artefato do run do treino final, e o run id vai no `model_version` de toda resposta |
 
 ## Lacunas
 
