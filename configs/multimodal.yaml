@@ -55,3 +55,16 @@ detectores:                         # camada 1: rosto e texto na capa (aula 4.6;
     score_threshold: 0.9            # padrão da demo do zoo; o 0,5 da aula é do BlazeFace
     nms_threshold: 0.3
     top_k: 5000
+  texto:                            # detector de texto PP-OCRv3 do opencv_zoo (cv2.dnn.TextDetectionModel_DB); só detecta, não lê; Apache-2.0 (PaddlePaddle Authors, LICENSE do diretório text_detection_ppocr)
+    arquivo: "text_detection_en_ppocrv3_2023may.onnx"
+    url: "https://github.com/opencv/opencv_zoo/raw/main/models/text_detection_ppocr/text_detection_en_ppocrv3_2023may.onnx"
+    sha256: "03f550c6b406fda8bf54bd8327815f6c7e2edd98cea02348c93d879254366587"
+    entrada: [416, 736]             # largura, altura (múltiplos de 32; ~9:16 do recorte; lado maior 736 como a demo)
+    binary_threshold: 0.3           # valores da demo do zoo (demo.py)
+    polygon_threshold: 0.5
+    max_candidates: 200
+    unclip_ratio: 2.0
+    media: [123.675, 116.28, 103.53]   # a demo usa média ImageNet e escala 1/255/std (não 1/255 e média do Paddle)
+    desvio: [0.229, 0.224, 0.225]
+    score_min: 0.5                  # provisório: validar depois pela concordância com o VLM
+    area_min: 0.002                 # provisório, fração do quadro; descarta caixas minúsculas

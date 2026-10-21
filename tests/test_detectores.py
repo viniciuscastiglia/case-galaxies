@@ -6,7 +6,12 @@ Detectores falsos: sem rede, sem modelo.
 import numpy as np
 import pytest
 
-from previa.detectores import criar_yunet, ler_config_detectores, rostos_na_capa
+from previa.detectores import (
+    criar_yunet,
+    ler_config_detectores,
+    rostos_na_capa,
+    texto_na_capa,
+)
 
 
 class DetectorFalso:
@@ -67,3 +72,77 @@ def test_sha256_errado_levanta(tmp_path, monkeypatch):
     (tmp_path / "modelos" / cfg["arquivo"]).write_bytes(b"qualquer coisa")
     with pytest.raises(ValueError, match="sha256"):
         criar_yunet(cfg)
+
+
+ENTRADA = (416, 736)
+
+
+class DetectorTextoFalso:
+    """Como o `TextDetectionModel_DB`: `detect(bgr) -> (caixas, scores)`."""
+
+    def __init__(self, caixas=(), scores=()):
+        self.caixas = caixas
+        self.scores = scores
+        self.imagem = None
+
+    def detect(self, bgr):
+        self.imagem = bgr
+        return self.caixas, self.scores
+
+
+def _caixa(x, y, w, h):
+    return np.array([[x, y], [x + w, y], [x + w, y + h], [x, y + h]], dtype=np.float32)
+
+
+def _capa():
+    return np.zeros((360, 202, 3), np.uint8)
+
+
+def test_texto_filtra_score_e_area_minima():
+    det = DetectorTextoFalso(
+        [_caixa(10, 10, 200, 50), _caixa(10, 100, 200, 50), _caixa(300, 300, 2, 2)],
+        [0.9, 0.3, 0.9],
+    )
+    r = texto_na_capa(_capa(), det, ENTRADA, score_min=0.5, area_min=0.002)
+    assert r["n_linhas"] == 1
+
+
+def test_area_texto_uniao_sem_contar_duas_vezes():
+    det = DetectorTextoFalso([_caixa(0, 0, 100, 100), _caixa(50, 0, 100, 100)], [0.9, 0.9])
+    r = texto_na_capa(_capa(), det, ENTRADA, score_min=0.5, area_min=0.002)
+    assert r["n_linhas"] == 2
+    assert r["area_texto"] == pytest.approx(15000 / (416 * 736), rel=0.02)
+
+
+def test_texto_recebe_bgr_no_tamanho_de_entrada():
+    rgb = np.zeros((360, 202, 3), np.uint8)
+    rgb[:, :] = (255, 0, 0)
+    det = DetectorTextoFalso()
+    texto_na_capa(rgb, det, ENTRADA, score_min=0.5, area_min=0.002)
+    assert det.imagem.shape == (736, 416, 3)
+    assert det.imagem.flags["C_CONTIGUOUS"]
+    assert tuple(det.imagem[0, 0]) == (0, 0, 255)
+
+
+def test_texto_vazio():
+    r = texto_na_capa(_capa(), DetectorTextoFalso((), ()), ENTRADA, score_min=0.5, area_min=0.002)
+    assert r == {"n_linhas": 0, "area_texto": 0.0}
+
+
+def test_download_com_hash_errado_nao_fica_no_lugar(tmp_path, monkeypatch):
+    import httpx
+
+    import previa.detectores as d
+
+    class Resp:
+        content = b"bytes quaisquer"
+
+        def raise_for_status(self):
+            pass
+
+    monkeypatch.setattr(d, "DADOS", tmp_path)
+    monkeypatch.setattr(httpx, "get", lambda *a, **k: Resp())
+    cfg = dict(ler_config_detectores()["texto"])
+    with pytest.raises(ValueError, match="sha256"):
+        d.criar_detector_texto(cfg)
+    assert list((tmp_path / "modelos").glob("*")) == []
