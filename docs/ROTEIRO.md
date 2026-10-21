@@ -22,11 +22,8 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
      `DATA_CARD.md`; relatório em `.superpowers/sdd/2026-10-21-tool/report-docs.md`); faltam PREENCHER sem fonte
      (mae_log e Spearman do teste estão no run `6b1f7e77` do MLflow); 7.075 avaliados × 7.265 do split = canônicos ×
      todas as linhas, conferir a frase;
-  3. o retreino da v2 depois da correção do pickle: conferir `data/logs/modelo_v2b.log` e
-     `artefatos/model_version.json` (o run id deve ser novo, não `de922be7`); se falhou, rodar de um worktree limpo
-     em `a98075b`: `PYTHONPATH=<wt>/src PREVIA_DADOS=<raiz>/data GALAXIES_ARTEFATOS=<raiz>/artefatos
-     MLFLOW_TRACKING_URI=sqlite:///<raiz>/mlflow.db .venv/bin/python -m previa.modelo treinar
-     configs/experimentos/final.yaml configs/avaliacao_v2.yaml`; depois remover o worktree `wt-v2b` do scratchpad.
+  3. o retreino da v2 depois da correção do pickle: FEITO (run `5373921a`, em `artefatos/`; o `de922be7` ficou com o
+     pickle `__main__`, não usar); registrar no `DECISOES.md`.
 - **Próximo passo, nesta ordem:** (1) conferir os três itens acima, revisar e commitar; (2) `uv run python -m
   previa.indice` (índice dos comparáveis, depois da v2 nova) e um teste de fumaça do `prever_criativo` com o pacote
   real e um Short do golden; (3) colocar no `configs/mcp.yaml` o texto da A2 do Vinicius (as descrições de
