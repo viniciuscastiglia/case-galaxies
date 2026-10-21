@@ -617,10 +617,12 @@ def data_de_corte(cfg_av: dict) -> str:
 
 
 def conferir_cortes(tags: dict[str, dict], corte_atual: str) -> None:
-    """Recusa comparar runs com datas de corte diferentes entre si ou da atual (2.5, erro 3; F22).
+    """Recusa comparar runs com datas de corte (ou gaps) diferentes (2.2, 2.5, erro 3; F22).
 
-    `tags` é run_id -> tags do run. Run lacrado antes da F22 não tem `data_corte`: avisa e segue,
-    conferido só pelo hash da base. Cortes diferentes levantam ValueError.
+    `tags` é run_id -> tags do run. Run lacrado antes da F22 não tem `data_corte` nem `gap_dias`:
+    avisa e segue, conferido só pelo hash da base. Cortes diferentes entre os runs, ou da data
+    atual, levantam ValueError; o gap é conferido entre os runs que têm a tag (ele muda quais posts
+    entram no treino), e o MLflow guarda tag como texto, então "30" e 30 são o mesmo gap.
     """
     cortes = {}
     for run, t in tags.items():
@@ -635,6 +637,12 @@ def conferir_cortes(tags: dict[str, dict], corte_atual: str) -> None:
         raise ValueError(
             f"os runs têm datas de corte diferentes (data_corte): {cortes}; atual {corte_atual}. "
             "Rode de novo com o mesmo corte (aula 2.5, erro comum 3)"
+        )
+    gaps = {run: str(t["gap_dias"]) for run, t in tags.items() if "gap_dias" in t}
+    if len(set(gaps.values())) > 1:
+        raise ValueError(
+            f"os runs têm gaps de treino diferentes (gap_dias): {gaps}. "
+            "Rode de novo com o mesmo gap (aula 2.2)"
         )
 
 

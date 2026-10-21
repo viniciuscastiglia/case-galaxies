@@ -562,6 +562,26 @@ def test_conferir_cortes_avisa_run_sem_tag_e_recusa_cortes_diferentes():
         conferir_cortes({"a": {"data_corte": "2024-07-01"}}, "2025-01-01")
 
 
+def test_conferir_cortes_recusa_gaps_diferentes_e_so_compara_quem_tem_a_tag():
+    # o gap muda quais posts entram no treino: dois runs com gaps diferentes não se comparam (2.2)
+    corte = "2025-01-01"
+
+    def com_gap(gap):
+        return {"data_corte": corte, "gap_dias": gap}
+
+    with pytest.raises(ValueError, match="gap_dias"):
+        conferir_cortes({"a": com_gap("30"), "b": com_gap("60")}, corte)
+    with pytest.raises(ValueError, match="gap_dias"):
+        conferir_cortes({"a": com_gap(30), "b": com_gap("45")}, corte)  # int ou str (tag do MLflow)
+    with warnings.catch_warnings():
+        warnings.simplefilter("error")  # mesmo gap, dois formatos: nem um aviso
+        conferir_cortes({"a": com_gap(30), "b": com_gap("30")}, corte)
+    # run lacrado sem a tag (anterior à F22): o aviso do corte já cobre; o gap é conferido só
+    # entre os runs que o têm
+    with pytest.warns(UserWarning, match="a sem data_corte"):
+        conferir_cortes({"a": {}, "b": com_gap("30")}, corte)
+
+
 def test_importancia_soma_1_e_pega_a_feature_vazada(cfg_av, cfg):
     base, dur = _base()
     r = rodar(cfg, base, dur, cfg_av, n_boot=100, seed=0)
