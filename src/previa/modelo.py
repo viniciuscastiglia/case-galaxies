@@ -375,4 +375,9 @@ def prever_intervalo(
 
 
 if __name__ == "__main__":
-    raise SystemExit(main())
+    # Rodado como `python -m previa.modelo`, este arquivo é o `__main__`, e o pickle do pacote
+    # gravaria `__main__.Bundle`, que nenhum outro processo (o MCP, o índice) consegue carregar.
+    # Chamar o `main` do módulo importado faz o pacote referenciar `previa.modelo.Bundle`.
+    from previa import modelo as _modelo
+
+    raise SystemExit(_modelo.main())

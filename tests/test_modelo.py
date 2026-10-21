@@ -548,3 +548,13 @@ def test_calibracao_sobreposta_ao_treino_falha(base, cfg, cfg_av, monkeypatch):
     monkeypatch.setattr(modelo, "fim_do_treino", lambda _: pd.Timestamp("2025-11-01", tz="UTC"))
     with pytest.raises(AssertionError, match="treino"):
         treinar_bundle(cfg, b, dur, cfg_av, emb)
+
+
+def test_cli_grava_pacote_que_outro_processo_carrega():
+    """O `python -m previa.modelo` não pode gravar `__main__.Bundle` no pickle (21/10)."""
+    from pathlib import Path
+
+    fonte = (Path(__file__).parents[1] / "src" / "previa" / "modelo.py").read_text(encoding="utf-8")
+    bloco = fonte.split('if __name__ == "__main__":')[-1]
+    assert "from previa import modelo as _modelo" in bloco
+    assert "_modelo.main()" in bloco
