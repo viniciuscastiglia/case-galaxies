@@ -191,3 +191,31 @@ def test_treinar_quantis_ordena_e_usa_metric_quantile(monkeypatch):
     assert q.shape == (len(d), 3)
     assert (np.diff(q, axis=1) >= 0).all()
     assert n_cruz < len(d) * 0.5  # na maioria, q10 <= q50 <= q90 sem precisar ordenar
+
+
+# Guardas do princípio 7 (falha nunca silenciosa)
+def test_escores_e_q_chapeu_recusam_nan():
+    with pytest.raises(ValueError, match="NaN"):
+        escores_cqr([6.0], [7.0], [np.nan])
+    with pytest.raises(ValueError, match="NaN"):
+        q_chapeu(np.array([0.1, np.nan, 0.3]), 0.2)
+
+
+def test_prever_quantis_recusa_indice_diferente_e_ref_nan():
+    modelos = {a: _FalsoModelo(v) for a, v in {0.1: -1.0, 0.5: 0.0, 0.9: 1.0}.items()}
+    cfg = Config(nome="t", hipotese="t", descricao="t", features=["a"], alvo="relativo")
+    x = pd.DataFrame({"a": [1.0, 2.0]}, index=[10, 11])
+    with pytest.raises(ValueError, match="índice"):
+        prever_quantis(modelos, x, pd.Series([5.0, 5.0], index=[0, 1]), cfg)
+    with pytest.raises(ValueError, match="NaN"):
+        prever_quantis(modelos, x, pd.Series([5.0, np.nan], index=x.index), cfg)
+
+
+def test_cobertura_recusa_nan():
+    y, lo, hi = np.array([1.0, 2.0]), np.zeros(2), np.full(2, 3.0)
+    with pytest.raises(ValueError, match="NaN"):
+        cobertura(np.array([1.0, np.nan]), lo, hi, None)
+    with pytest.raises(ValueError, match="NaN"):
+        cobertura(y, lo, np.array([3.0, np.nan]), None)
+    with pytest.raises(ValueError, match="NaN"):
+        cobertura(y, lo, hi, pd.Series(["a", None]))

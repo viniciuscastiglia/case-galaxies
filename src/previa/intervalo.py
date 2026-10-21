@@ -75,6 +75,12 @@ def prever_quantis(modelos, x: pd.DataFrame, ref: pd.Series, cfg: Config) -> tup
 
     Publicar sem ordenar é o erro comum 4: um criativo estranho pode cruzar em produção.
     """
+    if isinstance(ref, pd.Series) and not ref.index.equals(x.index):
+        raise ValueError("prever_quantis: o índice de ref difere do de x")
+    if cfg.alvo == "relativo" and pd.isna(np.asarray(ref, dtype=float)).any():
+        raise ValueError(
+            "prever_quantis: ref com NaN no alvo relativo (sem histórico maduro: use a âncora)"
+        )
     cols = [modelos[a].predict(x) for a in sorted(modelos)]
     q = np.column_stack(cols)
     if cfg.alvo == "relativo":
@@ -89,7 +95,10 @@ def escores_cqr(q10, q90, y) -> np.ndarray:
     Negativo se o y caiu dentro de [q10, q90]; positivo se caiu fora, e o valor é o quanto.
     """
     q10, q90, y = (np.asarray(v, dtype=float) for v in (q10, q90, y))
-    return np.maximum(q10 - y, y - q90)
+    escores = np.maximum(q10 - y, y - q90)
+    if np.isnan(escores).any():  # NaN iria para o fim da ordenação e poderia virar q̂
+        raise ValueError("escores_cqr: há NaN em q10, q90 ou y")
+    return escores
 
 
 def q_chapeu(escores, alpha: float) -> float:
@@ -99,6 +108,8 @@ def q_chapeu(escores, alpha: float) -> float:
     limite, falha explícita em vez de promessa falsa).
     """
     ordenados = np.sort(np.asarray(escores, dtype=float))
+    if np.isnan(ordenados).any():
+        raise ValueError("q_chapeu: há NaN nos escores")
     n = len(ordenados)
     k = math.ceil(round((n + 1) * (1 - alpha), 9))  # round: 10 * 0,8 não pode virar 9
     if k > n:
@@ -135,6 +146,9 @@ def cobertura(y, lo, hi, grupos: pd.Series | None) -> pd.DataFrame:
 
     Traz n, erro-padrão sqrt(0,8·0,2/n) e a largura média em log, que vai ao lado.
     """
+    arrays = [np.asarray(v, dtype=float) for v in (y, lo, hi)]
+    if any(np.isnan(a).any() for a in arrays) or (grupos is not None and pd.isna(grupos).any()):
+        raise ValueError("cobertura: há NaN em y, lo, hi ou nos grupos")
     t = pd.DataFrame(
         {
             "dentro": (np.asarray(y) >= np.asarray(lo)) & (np.asarray(y) <= np.asarray(hi)),
