@@ -99,7 +99,8 @@ def conferir_cobertura(caminho_base, cfg_av: dict, obrigatorios: dict, extras: d
     canonicos = ids.loc[na_janela & (ids["duplicate_group"] == ids["post_id"]), "post_id"]
     n = len(canonicos)
     # a duração e o embedding da capa valem como extras: um vídeo removido não tem nenhum dos
-    # dois, e o GBM trata a ausência como no treino (99%; 21/10, a 1ª tentativa recusou por 2 de 7.075)
+    # dois, e o GBM trata a ausência como no treino (99%; em 21/10, a 1ª tentativa recusou por 2 de
+    # 7.075)
     parciais = {k: obrigatorios[k] for k in obrigatorios if k in ("thumb", "duracoes")}
     faltam = {
         k: int((~canonicos.isin(b.index)).sum())
