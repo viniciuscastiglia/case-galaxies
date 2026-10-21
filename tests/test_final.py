@@ -330,10 +330,15 @@ def test_cobertura_duplicata_nao_canonica_sem_extra_nao_bloqueia(mini, capsys):
     assert "200/200 (100.0%)" in capsys.readouterr().out  # a cobertura é sempre impressa
 
 
-def test_cobertura_canonico_sem_duracao_bloqueia(mini):
-    dur = mini["tudo"].drop(index=["p007"])
-    with pytest.raises(ValueError, match=r"NÃO foi aberto.*'duracoes': 1"):
-        conferir_cobertura(mini["caminho"], mini["cfg_av"], {"duracoes": dur}, {})
+def test_cobertura_da_duracao_vale_como_extra(mini, capsys):
+    # 1 de 200 sem duração (99,5%) passa e é impresso; 5 de 200 (97,5%) bloqueiam
+    conferir_cobertura(
+        mini["caminho"], mini["cfg_av"], {"duracoes": mini["tudo"].drop(index=["p007"])}, {}
+    )
+    assert "duracoes: 199/200 (99.5%)" in capsys.readouterr().out
+    sem5 = mini["tudo"].drop(index=["p001", "p002", "p003", "p004", "p005"])
+    with pytest.raises(ValueError, match=r"NÃO foi aberto.*duracoes 97.5%"):
+        conferir_cobertura(mini["caminho"], mini["cfg_av"], {"duracoes": sem5}, {})
 
 
 def test_cobertura_do_extra_98_bloqueia_e_995_passa(mini, capsys):

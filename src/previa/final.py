@@ -87,10 +87,10 @@ def conferir_cobertura(caminho_base, cfg_av: dict, obrigatorios: dict, extras: d
     """Antes de abrir: cobertura dos blocos nos posts canônicos do período de teste.
 
     Só os canônicos (`duplicate_group == post_id`) são avaliados. Lê `post_id`, `published_at` e
-    `duplicate_group` do arquivo, sem curtidas. Duração e o embedding do título (calculados para
-    todo post) exigem 100%; o embedding `thumb` e cada extra, `final.cobertura_min_extra` (NaN sem
-    mídia é legítimo). A cobertura
-    desses blocos é sempre impressa. Falhou: `ValueError`, e o teste não é aberto.
+    `duplicate_group` do arquivo, sem curtidas. O embedding do título (calculado para todo post)
+    exige 100%; a duração, o embedding `thumb` e cada extra, `final.cobertura_min_extra` (NaN é
+    legítimo: um vídeo removido não tem duração nem capa, e o GBM trata a ausência como no treino).
+    A cobertura desses blocos é sempre impressa. Falhou: `ValueError`, e o teste não é aberto.
     """
     minimo = limites(cfg_av)["cobertura_min_extra"]
     ids = pd.read_parquet(caminho_base, columns=["post_id", "published_at", "duplicate_group"])
@@ -98,8 +98,9 @@ def conferir_cobertura(caminho_base, cfg_av: dict, obrigatorios: dict, extras: d
     na_janela = (datas >= cfg_av["teste_inicio"]) & (datas < cfg_av["teste_fim"])
     canonicos = ids.loc[na_janela & (ids["duplicate_group"] == ids["post_id"]), "post_id"]
     n = len(canonicos)
-    # o embedding da capa vale como um extra: as sondas vêm dele e a imagem pode faltar (99%)
-    parciais = {k: obrigatorios[k] for k in obrigatorios if k == "thumb"}
+    # a duração e o embedding da capa valem como extras: um vídeo removido não tem nenhum dos
+    # dois, e o GBM trata a ausência como no treino (99%; 21/10, a 1ª tentativa recusou por 2 de 7.075)
+    parciais = {k: obrigatorios[k] for k in obrigatorios if k in ("thumb", "duracoes")}
     faltam = {
         k: int((~canonicos.isin(b.index)).sum())
         for k, b in obrigatorios.items()
