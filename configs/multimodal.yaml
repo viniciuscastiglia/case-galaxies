@@ -28,6 +28,9 @@ siglip:                             # embeddings visuais (aula 4.4); só no proc
     texto: "texto grande escrito na tela"
     logo: "um logotipo com o nome de uma marca"
     falando: "uma pessoa falando para a câmera"
+  validacao:                        # F26: AUC de cada sonda contra um campo da rubrica do VLM, nas capas da amostra
+    auc_min: 0.7                    # 4.4, exercício: "fique com as que passam de ~0,7"
+    pares: {rosto: tem_rosto, falando: tem_rosto, texto: texto_na_tela, produto_beleza: close_up_produto}
 
 midia:                              # frames, cortes e áudio da amostra (aulas 4.2, 4.3 e 4.5)
   whisper: "small"                  # 4.5: "tiny" só para testar; "small" no projeto (CPU, int8)
