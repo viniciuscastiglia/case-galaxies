@@ -20,6 +20,9 @@ O briefing oficial é o TAPI (`escopo_projeto.md`), que é o nome do documento, 
 - **Base pronta:** 70 canais (35 por setor) e ~31 mil Shorts rotulados; coleta diária (launchd, 5h15) até 30/10.
 - **Modelo (19/10):** GBM com alvo relativo ao canal, avaliado no walk-forward de 2025 e no "canal novo" pelo
   runner (`previa.experimento`, MLflow); modelo de uso em `previa.modelo`. Ainda não há intervalo (M6) nem agente.
+- **Auditoria (21/10, #30):** `docs/AUDITORIA.md` lista as faltas (F1 a F43, por prioridade). A seção 3 diz o que
+  cada peça de hoje precisa cumprir; a seção 9 traz as decisões e a ordem do dia. O Vinicius só leu até o módulo 2: cada peça abre com o
+  conceito mínimo da aula no chat, antes do caso à mão (#29).
 
 ## Papéis
 

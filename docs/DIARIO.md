@@ -3,6 +3,36 @@
 Histórico das sessões. As entradas novas ficam no topo, com 3 a 5 linhas por sessão (`/fechar-sessao`). O plano
 vivo está em `docs/ROTEIRO.md` e as decisões em `docs/DECISOES.md`.
 
+## 21/10 (manhã, até ~10h) · auditoria completa (#30)
+
+- Segunda passada da auditoria (`docs/AUDITORIA.md`): TAPI, as 10 páginas do hub, as 47 aulas, RAG e EDD lidos
+  inteiros e cruzados com o código. Saíram F1 a F43. Quatro estão no caminho crítico:
+  - não há código do teste final (F16);
+  - o bundle recusa os blocos extras (F17);
+  - os caminhos relativos quebram o MCP (F18);
+  - falta o `features_used` no contrato (F19).
+- Três "ok" da primeira passada foram corrigidos (2.1, 2.5, 4.4). A transcrição era descartada em silêncio, apesar
+  do comentário no código (F27).
+- A compactação da conversa caiu no meio do módulo 6. Ele perguntou se algo se perdeu. A conferência de 6.1 a 6.5
+  contra as aulas repôs 10 itens de revisão e trouxe a F43. Lição: notas no arquivo a cada aula.
+- Decidida a #31 (F2, opção A: rosto e texto nas capas, com a H10 antes de rodar). Nenhum código novo; 273 testes,
+  ruff ok.
+- Próxima sessão: a seção 9 da auditoria. O Claude faz os itens sem decisão; as decisões #32 a #37 e o próximo corte
+  vêm uma por vez; depois, a A1.
+
+## 20/10 (tarde e noite) e 21/10 (manhã) · hipóteses fechadas, mídia completa, leitura e auditoria
+
+- O Vinicius escreveu a H3 e da H5 à H9 (`8e8935a`). Na H9, "não sei" virou hipótese honesta: os sinais ajudam no
+  número; se acrescentam algo além da rubrica, a ablação decide. "Mais informação" não basta: o controle de ruído da
+  ablação mostra por quê. A recoleta de 20/10 mediu a cauda da maturação (0% de 21 dias a anos).
+- A mídia da amostra fechou (1.399 de 1.400, 0h15 de 21/10); a H9 (`601b2217`) e a ablação da amostra (14 runs,
+  `554e0abb` o completo) rodaram em 2h20 (a estimativa era 10 min) e estão lacradas, com a H2 a H8 e a base toda.
+- 21/10: ele percebeu que não leu nada depois do módulo 2 (as leituras dirigidas escorregaram dia a dia e o Claude
+  não avisou). #29: o conceito mínimo da aula dentro de cada peça hoje, a leitura das aulas da apresentação em 22/10.
+  #30: auditoria de conformidade e completude (`docs/AUDITORIA.md`): F1 a F15 até aqui; a segunda passada continua.
+- Ficou para a sessão nova: terminar a auditoria, a F2 (frames e detectores, decisão dele), a A1 (o caso à mão
+  espera as respostas) e o resto do dia no "Agora" do ROTEIRO.
+
 ## 19/10 (tarde e noite) · hipóteses H1, H2 e H4, régua dos blocos e base congelada
 
 - O Vinicius escreveu o mecanismo da H1 (no feed o vídeo começa sozinho; assunto, duração e horário decidem quem fica),

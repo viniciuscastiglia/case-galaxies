@@ -6,30 +6,25 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
 
 ## Agora
 
-- **Prazo:** a liga antecipou a entrega para **21/10, até 23h59** (aviso no grupo, 15/10); a apresentação
-  continua em 23/10. Os cortes para caber no prazo são a #24 (15/10) e a #25 (18/10): nada sai do produto. 22 e
-  23/10 são de preparo da apresentação.
-- **Fase (20/10, 12h15):** fim da 1, meio da 2 e da 4. No `HIPOTESES.md`, H1 (mecanismo), H2 e H4 escritas, e a
-  #27 decidida (régua dos blocos). Do Claude: base congelada v1 (`09f6035c11c9`), IC do `mae_log` no `comparar`,
-  thumbnails e embeddings (30.981), rubrica do VLM (1.400, kappa de 0,72 a 1,00) e H8 (`e97356c6` e `59961a2f`).
-  De manhã (20/10, sem o Vinicius): a H7 tinha rodado sem a cor e o brilho (a config não os listava; agora o runner
-  recusa bloco extra sem feature) e foi refeita (`f405ee37`, 71 features); a ablação da base toda (`previa.ablacao`:
-  escada, todos menos um e ruído, 10 runs) rodou e está lacrada; a guarda do OpenMP (o segfault de torch +
-  LightGBM acontece em qualquer ordem de import neste Mac); o rascunho do README; o data card v1 (com o
-  apagamento de 30/10 cobrindo as pastas novas); a lista dos 20 piores erros e os cortes para a M9 (lacrados).
-  Mídia da amostra em 467/1.400 (roda à noite, do IP de casa). 272 testes. Sem commit desde 19/10: o commit
-  automático foi bloqueado pela permissão, e o Vinicius aprova às 13h.
-- **Próximo passo (sessão de 20/10, 13h):** (0) aprovar o commit do trabalho de 19 e 20/10; (1) a #28 está
-  decidida (A; a B volta no fechamento de hoje, antes de a A2 começar); (2) H3 (lacuna × maturação: +69% de 0 a 3
-  dias, +4,1% de 3 a 7, +0,8% de 7 a 14; o backtest tem todos os rótulos maduros e por isso favorece lacunas
-  curtas), H5, H6 e H7 a H9, curtas; (3) abrir H2, H3 e H4 com a tabela da ablação, e o marco 1 (com os resumos da
-  3.4 e da 3.5); (4) 6.1 e a A1 (o caso à mão está pronto em `.superpowers/sdd/2026-10-20-a1/caso_a_mao.md`);
-  (5) o bloco 2 de decisões, em aprovar ou vetar; (6) 5.2, 5.3 e a M6.
-- **Bloqueios:** a A1 trava o `prever_criativo`, o grafo (A6) e o MCP (A2). À noite, do IP de casa: a mídia
-  (`uv run python -m previa.midia amostra >> data/logs/midia.log 2>&1`, retoma do cache e consolida os parquets no
-  fim) e, quando ela terminar, a H9 (`configs/experimentos/h9_video_audio.yaml`) e a ablação da amostra
-  (`uv run python -m previa.ablacao configs/ablacao_amostra.yaml`, 14 runs). Jobs longos sempre como tarefas da
-  sessão (`run_in_background`), para aparecerem no painel.
+- **Fase (21/10, 10h):** dia da entrega (até 23h59; apresentação em 23/10; os cortes #24, #25 e #28 não tiram nada
+  do produto). As H2 a H9 e as duas ablações estão escritas, rodadas e **lacradas**. A auditoria #30 terminou
+  (`docs/AUDITORIA.md`): TAPI, hub, as 47 aulas, RAG e EDD lidos inteiros e cruzados com o código; F1 a F43, com as
+  decisões e a ordem do dia na seção 9. A F2 está decidida (#31, A: rosto e texto nas capas). 273 testes, ruff ok.
+- **Próximo passo (sessão nova):** a seção 9 da auditoria, nesta ordem:
+  1. o Claude faz os itens sem decisão (F18, F22, F26, F25, F1, F13, F15, F39, F40, F33, F35 e os registros F4, F38
+     e F43) e prepara a F2 (detectores nas capas, em segundo plano, depois da H10 do Vinicius);
+  2. as decisões, uma por vez: o próximo corte (o dia já somava ~12,5 h dele antes da auditoria, que acrescentou
+     ~1 h), F24, F31 com a F21, F27, F32 e F23 (#32 a #37);
+  3. a A1, com o caso à mão em `.superpowers/sdd/2026-10-20-a1/caso_a_mao.md` (8 casos, mais o 9º da F10), agora
+     com a F19, a F20 e a F34;
+  4. o bloco 2 de decisões, com a F11;
+  5. abrir as H2 a H9 e decidir os blocos (F17);
+  6. a M6 e o flag, e o B da #28 antes da A2;
+  7. depois: M9, A4, A7, o teste final (F16), os teach-backs, o README e a autoavaliação.
+- **Bloqueios:** a A1 trava o `prever_criativo`, o grafo (A6) e o MCP (A2); a abertura das hipóteses trava o modelo
+  final, que trava a M6 e o teste final (H1 e cobertura). A F24 e a H10 vêm antes de rodar as variantes novas
+  (hipótese escrita antes, 2.5); se a escolha dos blocos espera a H10 é decisão dele. O Vinicius só leu até o
+  módulo 2: cada peça abre com o conceito mínimo da aula no chat (#29). Jobs longos como tarefas da sessão.
 
 ## Como funciona
 
@@ -153,11 +148,11 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
   - [ ] M9: assistir e classificar os 20 piores erros (a lista está pronta e lacrada: `data/erros/piores_2d1bb463.csv`, 20/10)
 - **Claude:**
   - [x] thumbnails da base toda (SigLIP 2, sondas, OpenCV, PCA no treino) (20/10: 30.981 capas com embedding, 10 sondas e cor e brilho da faixa 9:16)
-  - [ ] amostra com frames, cortes e transcrição (apagando a mídia depois de extrair): código pronto e testado em 19/10 (`previa.midia`); roda do IP de casa
+  - [x] amostra com frames, cortes e transcrição (apagando a mídia depois de extrair) (21/10, 0h15: 1.399 de 1.400; H9 e ablação da amostra rodadas e lacradas)
   - [x] rubrica do VLM na amostra (20/10: 1.400 Shorts, 0 erros; reteste em 50 com kappa de 0,72 a 1,00, os 6 campos acima de 0,6)
   - [x] bootstrap pareado por canal da M9 (corte #24; o Vinicius faz teach-back): o da ablação, nas duas réguas (20/10)
   - [x] fusão com prefixos (19/10, no runner)
-  - [x] o runner da ablação (20/10: `previa.ablacao`, escada + todos menos um + ruído; base toda rodada e lacrada; a da amostra quando a mídia terminar)
+  - [x] o runner da ablação (20/10: `previa.ablacao`, escada + todos menos um + ruído; base toda e amostra rodadas e lacradas)
   - [ ] o `confidence_flag` com as regras decididas
   - [x] a medição da maturação (19/10: crescimento mediano de 0% depois de 21 dias; `previa.maturacao`)
 - **Pronta quando:** existe a tabela de ablação com IC e a cobertura do intervalo de 80% está medida, total e por
@@ -217,8 +212,8 @@ a peça.
 | Dom 18/10 | 2.4 (feita), 2.5 | decisão #25 (feita); #5 e `HIPOTESES.md`; M2; bloco 1 de decisões (#6–#13, #20–#22); conferir os 50 Shorts (#19); criar a `GOOGLE_API_KEY` no AI Studio e pôr no `.env` (5 min) | 4,3 |
 | Seg 19/10 | 3.5, 3.4, 6.1 | M3; M4; leitura do marco 1; A1 | 5,7 |
 | Ter 20/10 | 6.1, 5.2, 5.3 (3.4 e 3.5 viram resumo) | #28 (feita); H3 e H5 a H9, curtas; abrir a ablação e o marco 1; A1; bloco 2 de decisões (aprovar ou vetar); M6 | 5,7 |
-| Qua 21/10 | 2.6, 6.5, 5.7, 6.6 (4.8, 6.7 e as EDD viram resumo) | M9 (20 piores erros); A2; A4 (validador); A7 (invariante); teach-back de A5, A6, M8, do bootstrap da M9, do prompt da A4 e da injeção da A7; README (reescrever o rascunho); autoavaliação; **entrega até 23h59** | 7,5 |
-| Qui 22/10 | — | ensaio cronometrado da demo; ensaio de perguntas | — |
+| Qua 21/10 | o conceito mínimo de cada aula dentro da peça (#29) | o que sobrou de 20/10 (A1, bloco 2 de decisões, abrir H2 a H9 e o marco 1, M6) e as decisões da auditoria (#30: a #31 feita; #32 a #37) e a H10; a B da #28; M9 (20 piores erros); A2; A4 (validador); A7 (invariante); os rótulos do juiz da explicação (F8) e a conferência dos 50 Shorts (#19, F14); teach-back de A5, A6, M8, do bootstrap da M9, do prompt da A4 e da injeção da A7; README (reescrever o rascunho); autoavaliação; **entrega até 23h59** | ~12,5 |
+| Qui 22/10 | de manhã, a leitura dirigida de 3.4, 3.5, 4.8, 5.2, 5.3, 5.6, 6.1, 6.2, 6.5 e 6.6, com as perguntas prováveis da banca (#29) | à tarde, ensaio cronometrado da demo e ensaio de perguntas | ~3,5 + ensaios |
 | Sex 23/10 | — | **apresentação** | — |
 
 Com a #28 (A), 20 e 21/10 somam ~13,2 h para ~10,4 h: ~2,8 h de estouro. A B (a A2 para o Claude, ~1,8 h com
@@ -280,6 +275,15 @@ O Claude traz cada uma na hora certa, com contexto e opções. A recomendação 
 | 26 | Formato das peças "Vinicius escreve" (19/10): o esqueleto com `TODO(human)` não ensinava (a M2 travou sem contexto) | — | 1 | o raciocínio é dele (caso à mão + passos em português), o código é do Claude; treinar a sintaxe de pandas e numpy vai para depois de 23/10 | **decidida 19/10** |
 | 27 | Régua dos blocos nas H2 a H6 (19/10): o histórico pode somar quase nada na ordem e muito no número | 2.4, 2.6 | 1 | duas réguas: fica se melhorar a manchete ou o `mae_log` (IC pareado sem o zero), sem piorar a outra; +3 pontos só na H1 | **decidida 19/10 (A)** |
 | 28 | Corte 3 (19/10, noite): ~3,7 h de 19/10 ficaram para trás; 20 e 21/10 somam ~16 h de trabalho do Vinicius para ~10,4 h | ROTEIRO ("Se atrasar") | 1 | A: leitura dirigida só nas aulas das peças dele, M8 para o Claude, bloco 2 em aprovar ou vetar, H3 e H5 a H9 curtas; a B (a A2 para o Claude) volta no fechamento de 20/10, antes de a A2 começar | **decidida 20/10 (A; a B no fechamento)** |
+| 29 | Leitura dos módulos 3 a 6 (21/10): ele não leu nada depois do módulo 2 | ROTEIRO, hub | 6 | A: o conceito mínimo dentro de cada peça hoje; a leitura dirigida das aulas da apresentação em 22/10 | **decidida 21/10 (A; se sobrar tempo, adianta parte de 22/10)** |
+| 30 | Auditoria de conformidade e completude contra o TAPI, o hub e as aulas (21/10) | protocolo do material | 6 | fazer já, antes das peças do Claude; ele confere por amostragem | **decidida 21/10; feita** (`docs/AUDITORIA.md`: F1 a F43) |
+| 31 | Camada 1 do multimodal (F2): o TAPI §6.3 a chama de obrigatória; hoje há SigLIP só na capa, e rosto, texto e produto só pela rubrica, na amostra | 4.6, 4.7, 4.1 | 6 | A: rosto (YuNet) e texto (PaddleOCR) nas 30.981 capas, sem objetos; concordância com o VLM; H10 escrita antes de rodar | **decidida 21/10 (A)** |
+| 32 | Perda do GBM (F24): L2 em todas as configs, sem decisão registrada; Huber é o padrão das aulas | 1.2, 3.3, 3.4 | 6 | rodar Huber (δ = 1) como variante do completo, com hipótese escrita antes, e decidir pela régua #27 antes de abrir o teste | aberta |
+| 33 | Base do treino final e regra de data do flag (F31 e F21): a `data_fora_do_periodo` dispararia em toda previsão de hoje | 5.4, 6.3, 7.5, hub (`monte-sua-base`) | 6 | teste final na v1 congelada; modelo de uso retreinado na v2 (recoleta), até set/2026, com recalibração numa janela recente e madura | aberta |
+| 34 | Canal com menos de 3 posts maduros (F20): hoje a previsão recusa | 2.1, 5.4 | 6 | a cadeia da 2.1 (mediana; regressão em log dos inscritos; mediana do setor), sempre com o flag `canal_novo`; decide-se no caso à mão da A1 | aberta |
+| 35 | Transcrição no bloco de texto (F27): guardada, mas descartada em silêncio | 4.5 | 6 | limitação escrita e o comentário corrigido: do Whisper, o TAPI pede idioma, palavras e densidade de fala, que já entram (`aud_*`), e o efeito na amostra seria inconclusivo por tamanho (#101) | aberta |
+| 36 | Leitura da ablação na abertura (F32): as três leituras da 2.6 lado a lado | 2.6 | 6 | mostrar escada, todos menos um e ruído juntos; a régua #27 continua sendo a regra | aberta |
+| 37 | Carregamento do modelo de uso (F23): a 2.5 e a 7.1 pedem o MLflow (`models:/...`); a 6.1 e a 6.6 usam pasta mais variável de ambiente | 2.5, 6.1, 6.6, 7.1 | 6 | seguir a 6.x e registrar o bundle como artefato do run de treino final, com o run id no `model_version`; vai para `conflitos.md` | aberta (aprovar ou vetar) |
 
 **Pendências do Claude:**
 

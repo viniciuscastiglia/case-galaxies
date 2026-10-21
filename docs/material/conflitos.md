@@ -26,6 +26,7 @@ O que é decisão do Vinicius vai para a tabela "Decisões pendentes" do `docs/R
 | 12 | Regra de "fora da distribuição": distância ao 10º vizinho num PCA padronizado (p99) × similaridade de cosseno ao vizinho mais próximo (p1) | 5.4 × 6.x | a da 6.x, no mesmo espaço dos comparáveis (entra na #14 do ROTEIRO, regras do flag) | V | Fase 4 |
 | 13 | Payload do explicador: o da 5.7 tem mais campos que o `ConfidenceFlag` da 6.1; a 6.3 perdeu a checagem "sem ressalvas" | 5.7 × 6.3 | o payload da 6.3, mais a checagem de ressalvas da 5.7 (#23 do ROTEIRO) | V | Fase 5 |
 | 14 | Setores: o material usa `Literal` com 3 setores; o Prévia tem 2 | 6.1, 5.4 | `Literal["beleza", "automotivo"]`, e a regra `setor_desconhecido` vira erro de validação do contrato (#22 do ROTEIRO, na A1) | V | Fase 3 |
+| 19 | Carregamento do modelo de uso. A 2.5 e a 7.1 pedem o MLflow (`log_model`, URI no config, "nunca o último .pkl da pasta", `@champion` promovido por pessoa); a 6.1, a 6.5 e a 6.6 carregam de uma pasta de artefatos com variável de ambiente (`GALAXIES_ARTEFATOS`) | 2.5, 7.1 × 6.1, 6.5, 6.6 | a 6.x (pasta mais variável de ambiente), com o bundle registrado como artefato do run de treino final e o run id no `model_version` (F23 da auditoria; #37 do ROTEIRO) | V | Fase 5 |
 
 ## Decisões do Claude (registradas em DECISOES)
 
