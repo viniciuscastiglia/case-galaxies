@@ -13,3 +13,6 @@ contexto: [hist_*, tendencia, dias_desde_ultimo, posts_30d, idade_canal_dias, se
 blocos:
   "significado do título": [titulo_pc*]
   "capa (SigLIP)": [thumb_pc*]
+# blocos_argumento: os blocos que a #36 aprovou como argumento (só eles falam na resposta, F7).
+#   "capa" cobre o bloco "capa (SigLIP)" e as colunas dos blocos extras da capa (sondas e aparência).
+blocos_argumento: [capa]
