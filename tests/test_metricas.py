@@ -19,6 +19,7 @@ from previa.metricas import (
     ic_ganho_pareado,
     ic_par_a_par,
     ic_par_a_par_peso_posts,
+    ic_por_canal,
     mae_log,
     mape,
     pairwise_accuracy,
@@ -332,3 +333,53 @@ def test_dif_mae_pareada_reamostra_canais():
     pb = np.r_[np.full(10, 0.1), np.full(10, 0.8)]
     lo, hi = ic_dif_mae_pareado(y, pa, pb, np.repeat(["a", "b"], 10), n_boot=500, seed=0)
     assert lo == pytest.approx(-0.9) and hi == pytest.approx(0.7) and lo < 0 < hi
+
+
+# --- painel de métricas (TAPI 6.1; aula 2.4): o IC de qualquer métrica, reamostrando canais ---
+
+
+def test_ic_por_canal_um_canal_so():
+    # com um canal só, toda reamostra é a base inteira: o IC é o próprio valor nas duas pontas
+    t = pd.DataFrame({"channel_id": "a", "y": [1.0, 2.0, 6.0]})
+    lo, hi = ic_por_canal(lambda g: float(g["y"].mean()), t, n_boot=50, seed=0)
+    assert lo == pytest.approx(3.0) and hi == pytest.approx(3.0)
+
+
+def test_ic_por_canal_reamostra_canais_e_nao_posts():
+    # a tem 1 post e b tem 3: sorteando canais, o nº de linhas da reamostra é 2 (aa), 4 (ab/ba) ou
+    # 6 (bb); sorteando posts seria sempre 4. Com 2000 reamostras, os extremos aparecem.
+    t = pd.DataFrame({"channel_id": ["a", "b", "b", "b"], "y": [0.0, 1.0, 1.0, 1.0]})
+    lo, hi = ic_por_canal(lambda g: float(len(g)), t, n_boot=2000, seed=0)
+    assert (lo, hi) == (2.0, 6.0)
+
+
+def test_ic_por_canal_ignora_nan_e_nao_quebra_se_tudo_for_nan():
+    t = pd.DataFrame({"channel_id": ["a", "a", "b", "b"], "y": [0.0, 1.0, 2.0, 3.0]})
+
+    def media_se_tem_b(g):  # a reamostra só com o canal a não tem a métrica: NaN fica de fora
+        return float(g["y"].mean()) if (g["channel_id"] == "b").any() else np.nan
+
+    lo, hi = ic_por_canal(media_se_tem_b, t, n_boot=200, seed=0)
+    assert lo == 1.5 and hi == 2.5  # ab dá 1,5 e bb dá 2,5; aa (NaN) não entra, não vira NaN
+    lo, hi = ic_por_canal(lambda g: np.nan, t, n_boot=20, seed=0)
+    assert np.isnan(lo) and np.isnan(hi)
+
+
+def test_ic_por_canal_usa_os_mesmos_canais_dos_outros_ics():
+    # a mesma matriz de sorteios do ic_bootstrap_canal: com a mesma seed, os mesmos canais
+    canal = np.repeat(["a", "b", "c", "d"], 6)
+    y, p = rng.normal(size=24), rng.normal(size=24)
+    t = pd.DataFrame({"channel_id": canal, "y": y, "p": p})
+    tab = por_canal(y, p, canal)
+    esperado, _ = ic_bootstrap_canal(tab, n_boot=300, seed=7)
+    lo, hi = ic_por_canal(
+        lambda g: spearman_intra_canal(g["y"], g["p"], g["channel_id"]), t, n_boot=300, seed=7
+    )
+    np.testing.assert_allclose([lo, hi], esperado, rtol=1e-9)
+
+
+def test_ic_por_canal_recusa_tabela_vazia_ou_canal_nan():
+    with pytest.raises(ValueError, match="vazia"):
+        ic_por_canal(len, pd.DataFrame({"channel_id": []}), n_boot=10)
+    with pytest.raises(ValueError, match="channel_id"):
+        ic_por_canal(len, pd.DataFrame({"channel_id": ["a", None]}), n_boot=10)

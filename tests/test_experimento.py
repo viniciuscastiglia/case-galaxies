@@ -16,8 +16,11 @@ from previa.experimento import (
     hash_base,
     ler_config,
     linhas_de_treino,
+    painel,
+    painel_das_previsoes,
     preparar,
     rodar,
+    tabela_de_previsoes,
     treinar_gbm,
 )
 from previa.features import FEATURES
@@ -332,3 +335,149 @@ def test_bloco_extra_sem_nenhuma_feature_levanta(cfg_av, cfg):
     cor = pd.DataFrame({"thumb_brilho": 0.5}, index=base["post_id"])
     with pytest.raises(ValueError, match="aparencia_thumb"):
         rodar(cfg, base, dur, cfg_av, n_boot=50, seed=0, extras={"aparencia_thumb": cor})
+
+
+# --- painel de métricas (TAPI 6.1; aulas 2.1, 2.3, 2.4) ---
+
+
+def _caso_a_mao():
+    """2 canais, 3 posts cada; o modelo erra 0,5 em todos e o baseline erra 1 em todos.
+
+    Faixas do canal X: p25 5,8, p75 6,2, p95 6,8 (y 5, 6, 7 -> abaixo, na média, viral); as
+    previsões 5,5, 6,5 e 7,5 caem em abaixo, acima e viral: F1 = (1 + 0 + 0 + 1) / 4 = 0,5.
+    O canal Y é o X somado de 3, as mesmas faixas deslocadas."""
+    y = np.array([5.0, 6.0, 7.0, 8.0, 9.0, 10.0])
+    return pd.DataFrame(
+        {
+            "channel_id": ["X"] * 3 + ["Y"] * 3,
+            "y": y,
+            "p": y + 0.5,
+            "p_base": y + 1.0,
+            "faixa_p25": [5.8] * 3 + [8.8] * 3,
+            "faixa_p75": [6.2] * 3 + [9.2] * 3,
+            "faixa_p95": [6.8] * 3 + [9.8] * 3,
+            "dobra": [0, 0, 0, 1, 1, 1],
+        }
+    )
+
+
+def test_painel_caso_a_mao():
+    a = _caso_a_mao()
+    r = painel(a, n_boot=200, seed=0)
+    assert r["mae_log"] == pytest.approx(0.5)
+    assert r["e_mae"] == pytest.approx(np.exp(0.5))  # erra por um fator de 1,65, para cima ou baixo
+    assert r["rmse_log"] == pytest.approx(0.5)
+    assert r["mape"] == pytest.approx(100 * np.mean(0.5 / a["y"]))
+    assert r["spearman_global"] == pytest.approx(1.0)
+    assert r["f1_faixas"] == pytest.approx(0.5)
+    assert r["skill_mae"] == pytest.approx(0.5)  # 1 - 0,5 / 1 (2.1, regra 3)
+    # o erro é o mesmo em todo post: qualquer reamostra de canais dá os mesmos valores
+    for k in ("mae_log", "rmse_log", "skill_mae", "f1_faixas"):
+        assert r[f"{k}_lo"] == pytest.approx(r[k]) and r[f"{k}_hi"] == pytest.approx(r[k])
+    assert r["e_mae_lo"] == pytest.approx(np.exp(r["mae_log_lo"]))  # e^IC: monótona
+    assert r["e_mae_hi"] == pytest.approx(np.exp(r["mae_log_hi"]))
+    # um fold por canal: cada um com 3 posts em ordem perfeita, o Spearman intra é 1
+    assert r["dobra0_mae_log"] == pytest.approx(0.5) and r["dobra1_mae_log"] == pytest.approx(0.5)
+    assert r["dobra0_spearman_intra"] == pytest.approx(1.0)
+    assert r["dobra1_spearman_intra"] == pytest.approx(1.0)
+    assert "dobra0_mae_log_lo" not in r  # por fold, só o valor
+    assert not any("cobertura" in k for k in r)  # sem intervalo ainda (M6)
+
+
+def test_painel_ic_cobre_o_valor_e_varia_com_os_canais():
+    # X erra 0,2 em todo post e Y erra 1,0: o MAE do conjunto é 0,6 e a reamostra de canais vai de
+    # 0,2 (XX) a 1,0 (YY); o IC tem que mostrar essa incerteza, e o ponto fica dentro
+    a = _caso_a_mao()
+    a["p"] = a["y"] + np.r_[np.full(3, 0.2), np.full(3, 1.0)]
+    r = painel(a, n_boot=500, seed=0)
+    assert r["mae_log"] == pytest.approx(0.6)
+    assert r["mae_log_lo"] == pytest.approx(0.2) and r["mae_log_hi"] == pytest.approx(1.0)
+
+
+def test_painel_recusa_nan():
+    for col in ("p", "y", "p_base"):
+        a = _caso_a_mao()
+        a.loc[2, col] = np.nan
+        with pytest.raises(ValueError, match=col):
+            painel(a, n_boot=20, seed=0)
+
+
+def test_painel_skill_zero_se_o_modelo_for_o_baseline_e_nan_sem_erro_no_baseline():
+    a = _caso_a_mao()
+    a["p_base"] = a["p"]
+    assert painel(a, n_boot=20, seed=0)["skill_mae"] == 0.0
+    a["p_base"], a["p"] = a["y"], a["y"] + 0.5  # baseline perfeito: MAE 0, a razão não existe
+    r = painel(a, n_boot=20, seed=0)
+    assert np.isnan(r["skill_mae"]) and np.isnan(r["skill_mae_lo"])
+
+
+def test_painel_f1_sem_historico_e_nan_com_aviso():
+    a = _caso_a_mao()
+    a[["faixa_p25", "faixa_p75", "faixa_p95"]] = np.nan  # nenhum canal com 10+ posts maduros
+    with pytest.warns(UserWarning, match="histórico"):
+        r = painel(a, n_boot=20, seed=0)
+    assert np.isnan(r["f1_faixas"]) and np.isnan(r["f1_faixas_lo"])
+    assert r["mae_log"] == pytest.approx(0.5)  # o resto do painel não depende das faixas
+
+
+def test_rodar_registra_o_painel(cfg_av, cfg):
+    base, dur = _base()
+    r = rodar(cfg, base, dur, cfg_av, n_boot=100, seed=0)
+    metricas = ["mae_log", "e_mae", "rmse_log", "mape", "spearman_global", "f1_faixas", "skill_mae"]
+    for avaliacao in ("walk_forward", "canal_novo"):
+        res = r[avaliacao]
+        for m in metricas:
+            for sufixo in ("", "_lo", "_hi"):
+                assert np.isfinite(res[f"painel_{m}{sufixo}"]), f"{avaliacao} painel_{m}{sufixo}"
+        for k in range(len(res["arvores"])):  # uma entrada por dobra
+            assert np.isfinite(res[f"painel_dobra{k}_mae_log"])
+            assert np.isfinite(res[f"painel_dobra{k}_spearman_intra"])
+        # o painel mede as mesmas linhas das chaves antigas, que continuam aí
+        assert {"manchete_modelo", "ganho", "ic_ganho_lo", "mae_log_modelo"} <= set(res)
+        assert res["painel_mae_log"] == pytest.approx(res["mae_log_modelo"])
+        skill = 1 - res["mae_log_modelo"] / res["mae_log_base"]
+        assert res["painel_skill_mae"] == pytest.approx(skill)
+        assert res["painel_mae_log_lo"] <= res["painel_mae_log"] <= res["painel_mae_log_hi"]
+        assert 0 <= res["painel_f1_faixas"] <= 1
+
+
+def test_painel_das_previsoes_igual_ao_do_rodar(cfg_av, cfg):
+    base, dur = _base()
+    r = rodar(cfg, base, dur, cfg_av, n_boot=100, seed=0)
+    d = preparar(base, dur, cfg_av, cfg.lacuna_dias, min_posts_alvo=cfg.min_posts_alvo)
+    tabela = painel_das_previsoes(d, tabela_de_previsoes(r), n_boot=100, seed=0)
+    assert set(tabela.columns) == {"walk_forward", "canal_novo"}
+    for avaliacao in tabela.columns:
+        do_rodar = {
+            k.removeprefix("painel_"): v for k, v in r[avaliacao].items() if k.startswith("painel_")
+        }
+        for k, v in do_rodar.items():
+            assert tabela.loc[k, avaliacao] == pytest.approx(v, rel=1e-9, nan_ok=True), k
+        # a tabela une as chaves das duas avaliações: o que o rodar não tem (dobra a mais) é NaN
+        assert tabela.loc[list(set(tabela.index) - set(do_rodar)), avaliacao].isna().all()
+
+
+def test_painel_do_run_le_as_previsoes_salvas_sem_treinar(cfg_av, cfg, monkeypatch):
+    # a CLI `painel RUN_ID` para os runs lacrados: aqui com o MLflow e a base trocados por fakes
+    import previa.experimento as exp
+
+    base, dur = _base()
+    r = rodar(cfg, base, dur, cfg_av, n_boot=100, seed=0)
+    d = preparar(base, dur, cfg_av, cfg.lacuna_dias, min_posts_alvo=cfg.min_posts_alvo)
+    esperado = painel_das_previsoes(d, tabela_de_previsoes(r), n_boot=100, seed=0)
+
+    class FakeRun:
+        class data:  # noqa: N801
+            tags = {"hash_base": hash_base(base)}
+
+    monkeypatch.setattr(exp.mlflow, "set_experiment", lambda nome: None)
+    monkeypatch.setattr(exp.mlflow, "get_run", lambda run_id: FakeRun)
+    monkeypatch.setattr(exp.mlflow, "load_table", lambda nome, run_ids: tabela_de_previsoes(r))
+    monkeypatch.setattr(exp, "carregar_base", lambda: base)
+    monkeypatch.setattr(exp, "ler_duracoes", lambda: dur)
+    monkeypatch.setattr(exp, "ler_avaliacao", lambda: cfg_av)
+    obtido = exp.painel_do_run("RUN", n_boot=100, seed=0, min_posts=3)
+    pd.testing.assert_frame_equal(obtido, esperado)
+    FakeRun.data.tags = {"hash_base": "outra"}  # run de outra base: falha alto, como o `comparar`
+    with pytest.raises(ValueError, match="base atual"):
+        exp.painel_do_run("RUN", n_boot=100, seed=0, min_posts=3)

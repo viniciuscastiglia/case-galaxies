@@ -142,6 +142,36 @@ def ic_bootstrap_canal(tab, n_boot=2000, seed=0):
     return np.percentile(sp, [2.5, 97.5]), np.percentile(pw, [2.5, 97.5])
 
 
+def ic_por_canal(fn, t, n_boot=2000, seed=0):
+    """IC 95% de qualquer métrica `fn(linhas) -> float`, reamostrando CANAIS (2.4, erro comum 4).
+
+    `t` tem a coluna `channel_id`. Cada reamostra sorteia canais com reposição, junta as linhas
+    de cada sorteado (as posições de cada canal são calculadas uma vez, sem recortar a tabela por
+    canal a cada sorteio) e aplica `fn` à tabela junta. Serve às métricas que não são somas por
+    canal (MAE, Spearman global, F1 das faixas, razão entre dois MAEs). Devolve [lo, hi], os
+    percentis 2,5 e 97,5 ignorando os NaN de `fn`; [nan, nan] se todas forem NaN. A matriz de
+    sorteios é a dos outros ICs deste módulo: com a mesma seed, os mesmos canais. Um canal
+    sorteado duas vezes entra duas vezes na tabela, com o mesmo `channel_id`: uma `fn` que agrupa
+    por canal as enxerga como um grupo só (nas métricas intra-canal o valor é o mesmo).
+    """
+    if len(t) == 0:
+        raise ValueError("ic_por_canal: tabela vazia")
+    if t["channel_id"].isna().any():  # falha nunca silenciosa: o canal NaN sumiria dos grupos
+        raise ValueError("ic_por_canal: channel_id com NaN")
+    codigos, _ = pd.factorize(t["channel_id"].to_numpy(), sort=True)
+    ordem = np.argsort(codigos, kind="stable")
+    posicoes = np.split(ordem, np.flatnonzero(np.diff(codigos[ordem])) + 1)  # um array por canal
+    rng = np.random.default_rng(seed)
+    k = rng.integers(0, len(posicoes), size=(n_boot, len(posicoes)))
+    valores = np.empty(n_boot)
+    for b in range(n_boot):
+        linhas = t.iloc[np.concatenate([posicoes[c] for c in k[b]])].reset_index(drop=True)
+        valores[b] = fn(linhas)
+    if np.isnan(valores).all():
+        return np.array([np.nan, np.nan])
+    return np.nanpercentile(valores, [2.5, 97.5])
+
+
 # --- auxiliares da leitura por canal (Claude) ---
 
 

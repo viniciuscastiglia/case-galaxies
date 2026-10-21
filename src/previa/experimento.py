@@ -17,12 +17,14 @@ das mesmas features (`hist_mediana` com `hist_n` >= 3), como na leitura da M2.
 
 Uso: uv run python -m previa.experimento configs/experimentos/opcao_a.yaml
      uv run python -m previa.experimento comparar RUN_A RUN_B   (ganho de B sobre A, pareado)
+     uv run python -m previa.experimento painel RUN_ID   (o painel de métricas de um run salvo)
 """
 
 import argparse
 import hashlib
 import subprocess
 import sys
+import warnings
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
 
@@ -39,11 +41,16 @@ from previa.coletor import DADOS
 from previa.dados import carregar_base
 from previa.features import montar_features, quantis_do_canal
 from previa.metricas import (
+    f1_faixas_canal,
     ic_dif_mae_pareado,
     ic_ganho_pareado,
+    ic_por_canal,
     mae_log,
+    mape,
     pairwise_janela,
     par_a_par_peso_posts,
+    rmse_log,
+    spearman_global,
     spearman_intra_canal,
 )
 from previa.splits import _utc, canal_novo_no_futuro, folds_de_desenvolvimento, ler_avaliacao
@@ -333,10 +340,72 @@ def ganho_entre(d, te, p_a, p_b, n_boot=2000, seed=0, dobras=None) -> dict:
     }
 
 
-def avaliar(d, te, p_modelo, n_boot=2000, seed=0, dobras=None) -> dict:
-    """A manchete da #6 para o modelo e o baseline, nas linhas em que o baseline existe."""
+def _skill_mae(t) -> float:
+    """1 - MAE do modelo / MAE do baseline (2.1, regra 3); NaN se o baseline não erra nada."""
+    mae_base = mae_log(t["y"], t["p_base"])
+    return 1 - mae_log(t["y"], t["p"]) / mae_base if mae_base > 0 else np.nan
+
+
+def painel(a: pd.DataFrame, n_boot=2000, seed=0) -> dict:
+    """O painel de métricas do TAPI 6.1 (aula 2.4), cada uma com o IC 95% de canais.
+
+    `a` tem `channel_id, y, p, p_base, faixa_p25, faixa_p75, faixa_p95, dobra`, uma linha por Short
+    avaliado (y, p e p_base em log1p, p absoluto). Devolve `mae_log`, `e_mae` (e^MAE, o fator
+    típico de erro, com o IC de e^IC do MAE), `rmse_log`, `mape` (sobre o log, como a 2.4: em
+    curtidas cruas ele não diz nada), `spearman_global`, `f1_faixas` (#7, só nas linhas com
+    histórico) e `skill_mae` (1 - MAE do modelo / MAE do baseline, 2.1 regra 3), cada uma com
+    `_lo` e `_hi`; e, por dobra k, `dobra{k}_mae_log` e `dobra{k}_spearman_intra` (só o valor: o
+    IC de uma dobra com poucos canais não diria nada). A cobertura espera o intervalo (M6). NaN em
+    y, p ou p_base levanta ValueError (princípio 7); o F1 sem nenhuma linha com histórico é NaN,
+    com aviso.
+    """
+    for col in ("y", "p", "p_base", "dobra"):
+        if a[col].isna().any():  # falha nunca silenciosa: NaN viraria erro zero ou métrica NaN
+            raise ValueError(f"painel: {col} com NaN (filtre as linhas antes)")
+    a = a[["channel_id", "y", "p", "p_base", "faixa_p25", "faixa_p75", "faixa_p95", "dobra"]]
+    metricas = {
+        "mae_log": lambda t: mae_log(t["y"], t["p"]),
+        "rmse_log": lambda t: rmse_log(t["y"], t["p"]),
+        "mape": lambda t: mape(t["y"], t["p"]),
+        "spearman_global": lambda t: spearman_global(t["y"], t["p"]),
+        "f1_faixas": lambda t: f1_faixas_canal(
+            t["y"], t["p"], t["faixa_p25"], t["faixa_p75"], t["faixa_p95"]
+        ),
+        "skill_mae": _skill_mae,
+    }
+    saida = {}
+    for nome, fn in metricas.items():
+        lo, hi = ic_por_canal(fn, a, n_boot, seed)  # a mesma seed: os mesmos canais em todas
+        saida |= {nome: fn(a), f"{nome}_lo": float(lo), f"{nome}_hi": float(hi)}
+    if np.isnan(saida["f1_faixas"]):
+        warnings.warn(
+            "painel: nenhuma linha com histórico (10+ posts maduros): F1 das faixas indefinido",
+            stacklevel=2,
+        )
+    for sufixo in ("", "_lo", "_hi"):
+        saida[f"e_mae{sufixo}"] = float(np.exp(saida[f"mae_log{sufixo}"]))
+    for k, g in a.groupby("dobra", sort=True):
+        saida[f"dobra{int(k)}_mae_log"] = mae_log(g["y"], g["p"])
+        saida[f"dobra{int(k)}_spearman_intra"] = spearman_intra_canal(
+            g["y"], g["p"], g["channel_id"]
+        )
+    return saida
+
+
+def _linhas_avaliadas(d, te, p_modelo, dobras=None) -> pd.DataFrame:
+    """As linhas de `te` com baseline (#5), com a previsão, a dobra e a régua das faixas (#7)."""
     ok = te[d.loc[te, "p_base"].notna().to_numpy()]
-    a = d.loc[ok, ["channel_id", "published_at", "y", "p_base"]].assign(p=p_modelo.reindex(ok))
+    colunas = ["channel_id", "published_at", "y", "p_base", "faixa_p25", "faixa_p75", "faixa_p95"]
+    dobra = 0 if dobras is None else dobras.reindex(ok)
+    return d.loc[ok, colunas].assign(p=p_modelo.reindex(ok), dobra=dobra)
+
+
+def avaliar(d, te, p_modelo, n_boot=2000, seed=0, dobras=None) -> dict:
+    """A manchete da #6 para o modelo e o baseline, nas linhas em que o baseline existe.
+
+    As chaves `painel_*` acrescentam o painel de métricas (TAPI 6.1; `painel`) nas mesmas linhas.
+    """
+    a = _linhas_avaliadas(d, te, p_modelo, dobras)
     tab_m, tab_b = _tabela_por_dobra(a, "p", dobras), _tabela_por_dobra(a, "p_base", dobras)
     n = a.groupby("channel_id").size()
     mm, mb = par_a_par_peso_posts(tab_m, n), par_a_par_peso_posts(tab_b, n)
@@ -355,6 +424,7 @@ def avaliar(d, te, p_modelo, n_boot=2000, seed=0, dobras=None) -> dict:
         "mae_log_base": mae_log(a["y"], a["p_base"]),
         "spearman_intra_modelo": spearman_intra_canal(a["y"], a["p"], a["channel_id"]),
         "spearman_intra_base": spearman_intra_canal(a["y"], a["p_base"], a["channel_id"]),
+        **{f"painel_{k}": v for k, v in painel(a, n_boot, seed).items()},
     }
 
 
@@ -456,6 +526,41 @@ def ganhos(d, prev_a, prev_b, n_boot=2000, seed=0) -> pd.DataFrame:
     return pd.DataFrame(saida)
 
 
+def painel_das_previsoes(d, prev, n_boot=2000, seed=0) -> pd.DataFrame:
+    """O painel de cada avaliação de um run, refeito das previsões salvas (sem treinar).
+
+    `prev` é a `tabela_de_previsoes` do run (`post_id, p, dobra, avaliacao`) e `d` a base
+    preparada (`preparar`). Uma coluna por avaliação, uma linha por chave do `painel`, sem o
+    prefixo `painel_`; com os mesmos `n_boot` e `seed`, bate com o que o `rodar` registrou.
+    """
+    linha_de = pd.Series(d.index, index=d["post_id"])
+    saida = {}
+    for avaliacao in sorted(set(prev["avaliacao"])):
+        t = prev[prev["avaliacao"] == avaliacao]
+        idx = linha_de.loc[t["post_id"]].to_numpy()
+        p = pd.Series(t["p"].to_numpy(), index=idx)
+        dobras = pd.Series(t["dobra"].to_numpy(), index=idx)
+        a = _linhas_avaliadas(d, p.index.sort_values(), p, dobras)
+        saida[avaliacao] = painel(a, n_boot, seed)
+    return pd.DataFrame(saida)
+
+
+def painel_do_run(run_id: str, n_boot=2000, seed=0, min_posts=3) -> pd.DataFrame:
+    """O painel de um run salvo no MLflow, nas previsões dele sobre a base de desenvolvimento.
+
+    Não treina e não abre o teste (`carregar_base()` sem `final`). Como o `comparar`, exige que o
+    run tenha usado a base atual (o hash da base).
+    """
+    mlflow.set_experiment(EXPERIMENTO)  # o load_table procura no experimento ativo
+    base = carregar_base()
+    do_run = mlflow.get_run(run_id).data.tags.get("hash_base")
+    if do_run != hash_base(base):
+        raise ValueError(f"o run não usou a base atual ({hash_base(base)}): {do_run}; rode de novo")
+    prev = mlflow.load_table("previsoes.json", run_ids=[run_id])
+    d = preparar(base, ler_duracoes(), ler_avaliacao(), min_posts=min_posts)
+    return painel_das_previsoes(d, prev, n_boot, seed)
+
+
 def registrar(cfg: Config, caminho, resultado, base, tags=None) -> str:
     """Um run no MLflow: tags de rastreio, params, a config inteira e as métricas."""
     mlflow.set_experiment(EXPERIMENTO)
@@ -506,6 +611,12 @@ def main(argv=None) -> int:
         r = comparar(argv[1], argv[2], cfg_b["n_boot"], cfg_b["seed"], cfg_b["min_posts"])
         print(r.round(4).to_string())
         print(f"\ncomando: uv run python -m previa.experimento comparar {argv[1]} {argv[2]}")
+        return 0
+    if argv[:1] == ["painel"]:  # uv run python -m previa.experimento painel RUN_ID
+        cfg_b = ler_config_baselines()
+        r = painel_do_run(argv[1], cfg_b["n_boot"], cfg_b["seed"], cfg_b["min_posts"])
+        print(r.round(4).to_string())
+        print(f"\ncomando: uv run python -m previa.experimento painel {argv[1]}")
         return 0
     parser = argparse.ArgumentParser(prog="python -m previa.experimento")
     parser.add_argument("config")
