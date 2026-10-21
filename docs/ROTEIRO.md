@@ -17,8 +17,10 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
 - **Em voo quando a sessão parou (arquivos NÃO commitados; revisar antes de commitar):**
   1. o servidor MCP e os testes da A7 (`src/previa/servidor_mcp.py`, `configs/mcp.yaml`, `tests/test_servidor_mcp.py`
      e a seção "Usar pelo MCP" do README; brief em `.superpowers/sdd/2026-10-21-tool/brief-mcp.md`);
-  2. os documentos com os números (README 5 a 8, `MODEL_CARD.md`, `AUTOAVALIACAO.md`, `DATA_CARD.md`; relatório em
-     `.superpowers/sdd/2026-10-21-tool/report-docs.md` se existir);
+  2. os documentos com os números: o subagente TERMINOU (README 5 a 8, `MODEL_CARD.md`, `AUTOAVALIACAO.md`,
+     `DATA_CARD.md`; relatório em `.superpowers/sdd/2026-10-21-tool/report-docs.md`); faltam PREENCHER sem fonte
+     (mae_log e Spearman do teste estão no run `6b1f7e77` do MLflow); 7.075 avaliados × 7.265 do split = canônicos ×
+     todas as linhas, conferir a frase;
   3. o retreino da v2 depois da correção do pickle: conferir `data/logs/modelo_v2b.log` e
      `artefatos/model_version.json` (o run id deve ser novo, não `de922be7`); se falhou, rodar de um worktree limpo
      em `a98075b`: `PYTHONPATH=<wt>/src PREVIA_DADOS=<raiz>/data GALAXIES_ARTEFATOS=<raiz>/artefatos
