@@ -351,7 +351,8 @@ def etapa_audio(video_id: str, caminho: str, modelo: str = "small") -> dict:
             **energia,
             "aud_rms_fora_fala": fora,
             "aud_musica_provavel": bool(energia["aud_pulso"] > 0.5 or fora > 0.03),
-            "txt_transcricao": "".join(w.word for w in palavras).strip(),  # vai para o texto
+            # guardada, mas fora do modelo (#35): só existe na amostra (experimento.FORA_DO_MODELO)
+            "txt_transcricao": "".join(w.word for w in palavras).strip(),
             "_whisper": modelo,
         }
     finally:

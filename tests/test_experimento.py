@@ -753,3 +753,34 @@ def test_tabela_de_treino_recusa(cfg_av, cfg):
 
     with pytest.raises(ValueError, match="nao_existe"):
         validar_tabela_de_treino(d, [*cfg.features, "nao_existe"])
+
+
+def _bloco_audio(pasta, **extra):
+    (pasta / "cache").mkdir(parents=True, exist_ok=True)
+    pd.DataFrame(
+        {
+            "video_id": ["a" * 11, "b" * 11],
+            "aud_idioma": ["pt", "en"],
+            "aud_n_palavras": [12, 0],
+            "aud_fala_no_gancho": [True, False],
+            "txt_transcricao": ["3 erros que estragam a sua base", ""],
+            "_whisper": ["small", "small"],
+            **extra,
+        }
+    ).to_parquet(pasta / "cache" / "audio_v1.parquet", index=False)
+
+
+def test_ler_extra_descarta_o_texto_conhecido_e_recusa_texto_novo(tmp_path, monkeypatch):
+    """#35 (F27): a transcrição e o idioma saem pela lista FORA_DO_MODELO; texto novo levanta."""
+    import previa.experimento as experimento
+
+    monkeypatch.setattr(experimento, "DADOS", tmp_path)
+    _bloco_audio(tmp_path)
+    t = experimento.ler_extra("audio")
+    assert list(t.columns) == ["aud_n_palavras", "aud_fala_no_gancho"]
+    assert t.loc["b" * 11, "aud_fala_no_gancho"] == 0.0
+    assert t.index.name == "post_id"
+
+    _bloco_audio(tmp_path, aud_emocao=["alegre", "neutra"])
+    with pytest.raises(ValueError, match=r"aud_emocao"):
+        experimento.ler_extra("audio")

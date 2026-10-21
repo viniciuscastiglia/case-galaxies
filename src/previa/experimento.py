@@ -132,8 +132,20 @@ def codigo_setor(setor: pd.Series) -> pd.Series:
     return codigo
 
 
+# Colunas de texto dos blocos extras que ficam fora do modelo, cada uma com o porquê (#35, F27)
+FORA_DO_MODELO = {
+    "aud_idioma": "código do idioma (pt, en...); só a amostra, ~4% em inglês: limitação (#35)",
+    "txt_transcricao": "a fala do Whisper; só a amostra, efeito não mensurável: limitação (#35)",
+    "_whisper": "versão do modelo do Whisper (rastreio, não feature)",
+}
+
+
 def ler_extra(nome: str) -> pd.DataFrame:
-    """Um bloco de features por post_id, só com colunas numéricas (bool vira 0/1; 4.8, erro 4)."""
+    """Um bloco de features por post_id, só com colunas numéricas (bool vira 0/1; 4.8, erro 4).
+
+    As colunas de texto saem de propósito, pela lista `FORA_DO_MODELO`; uma coluna de texto
+    nova, fora da lista, levanta erro em vez de sumir.
+    """
     import json
 
     if nome == "sondas_thumb":
@@ -157,7 +169,10 @@ def ler_extra(nome: str) -> pd.DataFrame:
             t = t.add_prefix("meta_")
     else:
         raise ValueError(f"bloco extra desconhecido: {nome}")
-    t = t.select_dtypes(include=["number", "bool"]).astype(float)
+    texto = [c for c in t.columns if c not in t.select_dtypes(include=["number", "bool"]).columns]
+    if novas := sorted(set(texto) - set(FORA_DO_MODELO)):  # princípio 7: nada some em silêncio
+        raise ValueError(f"bloco {nome}: colunas não numéricas sem destino: {novas}")
+    t = t.drop(columns=texto).astype(float)
     t.index.name = "post_id"
     return t
 
