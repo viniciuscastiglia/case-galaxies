@@ -152,6 +152,8 @@ def ler_extra(nome: str) -> pd.DataFrame:
         t = pd.read_parquet(DADOS / "sondas_thumb_v1.parquet").set_index("video_id")
     elif nome == "aparencia_thumb":  # cor e brilho da capa (4.3), a parte OpenCV do bloco (#12)
         t = pd.read_parquet(DADOS / "aparencia_thumb_v1.parquet").set_index("video_id")
+    elif nome == "det_thumb":  # rosto e texto na capa, detectores clássicos (H10, #31; 4.6)
+        t = pd.read_parquet(DADOS / "det_thumb_v1.parquet").set_index("video_id")
     elif nome == "vlm":  # a rubrica (#13); só os campos com kappa > 0,6 entram na config
         linhas = [json.loads(x) for x in (DADOS / "vlm" / "rubrica_v1.jsonl").open()]
         t = pd.DataFrame(linhas).drop_duplicates("post_id", keep="last").set_index("post_id")

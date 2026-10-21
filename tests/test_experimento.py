@@ -784,3 +784,42 @@ def test_ler_extra_descarta_o_texto_conhecido_e_recusa_texto_novo(tmp_path, monk
     _bloco_audio(tmp_path, aud_emocao=["alegre", "neutra"])
     with pytest.raises(ValueError, match=r"aud_emocao"):
         experimento.ler_extra("audio")
+
+
+def test_ler_extra_det_thumb(tmp_path, monkeypatch):
+    """H10: as seis colunas dos detectores, em float, com o índice post_id."""
+    import previa.experimento as experimento
+
+    monkeypatch.setattr(experimento, "DADOS", tmp_path)
+    pd.DataFrame(
+        {
+            "video_id": ["a" * 11, "b" * 11],
+            "det_rosto_thumb": [True, False],
+            "det_n_rostos_thumb": [1, 0],
+            "det_area_rosto_thumb": [0.1, 0.0],
+            "det_texto_thumb": [False, True],
+            "det_n_caixas_texto_thumb": [0, 3],
+            "det_area_texto_thumb": [0.0, 0.2],
+        }
+    ).to_parquet(tmp_path / "det_thumb_v1.parquet", index=False)
+    t = experimento.ler_extra("det_thumb")
+    assert t.index.name == "post_id" and len(t.columns) == 6
+    assert (t.dtypes == "float64").all()
+    assert t.loc["a" * 11, "det_rosto_thumb"] == 1.0
+
+
+def test_config_h10_muda_so_os_detectores():
+    import yaml
+
+    from previa.caminhos import CONFIGS
+
+    h7 = yaml.safe_load((CONFIGS / "experimentos" / "h7_thumb.yaml").read_text())
+    h10 = yaml.safe_load((CONFIGS / "experimentos" / "h10_detectores.yaml").read_text())
+    livres = ("nome", "hipotese", "descricao", "features", "extras")
+    assert {k: v for k, v in h7.items() if k not in livres} == {
+        k: v for k, v in h10.items() if k not in livres
+    }
+    assert h10["hipotese"] == "H10"
+    assert h10["features"][: len(h7["features"])] == h7["features"]
+    assert h10["features"][len(h7["features"]) :] == ["det_*"]
+    assert h10["extras"] == [*h7["extras"], "det_thumb"]

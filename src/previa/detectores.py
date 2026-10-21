@@ -12,9 +12,14 @@ Todos os parâmetros moram em `configs/multimodal.yaml`, seção `detectores`.
 """
 
 import hashlib
+import json
+import os
+import sys
+from pathlib import Path
 
 import httpx
 import numpy as np
+import pandas as pd
 
 from previa.amostra import ler_config
 from previa.caminhos import DADOS
@@ -122,3 +127,161 @@ def texto_na_capa(
         cv2.fillPoly(mascara, [np.round(pontos).astype(np.int32)], 255)
         n_linhas += 1
     return {"n_linhas": n_linhas, "area_texto": float((mascara > 0).mean())}
+
+
+def features_da_capa(rgb: np.ndarray, yunet, detector_texto, cfg_texto: dict) -> dict:
+    """As 6 colunas `det_*` de uma capa já recortada 9:16 em RGB. A tool chama esta mesma função
+    na capa do criativo (paridade treino/uso)."""
+    rosto = rostos_na_capa(rgb, yunet)
+    texto = texto_na_capa(
+        rgb,
+        detector_texto,
+        tuple(cfg_texto["entrada"]),
+        cfg_texto["score_min"],
+        cfg_texto["area_min"],
+    )
+    return {
+        "det_rosto_thumb": bool(rosto["n_rostos"] > 0),
+        "det_n_rostos_thumb": int(rosto["n_rostos"]),
+        "det_area_rosto_thumb": float(rosto["area_maior_rosto"]),
+        "det_texto_thumb": bool(texto["n_linhas"] > 0),
+        "det_n_caixas_texto_thumb": int(texto["n_linhas"]),
+        "det_area_texto_thumb": float(texto["area_texto"]),
+    }
+
+
+def carregar_deteccoes(pasta: Path) -> pd.DataFrame:
+    """Todos os lotes salvos: uma linha por vídeo (índice video_id)."""
+    lotes = sorted(Path(pasta).glob("lote_*.parquet"))
+    if not lotes:
+        return pd.DataFrame()
+    return pd.concat([pd.read_parquet(p) for p in lotes]).set_index("video_id")
+
+
+def detectar_capas(
+    ids,
+    pasta_thumbs: Path,
+    destino: Path,
+    yunet,
+    detector_texto,
+    cfg_texto: dict,
+    lote: int,
+    log=print,
+) -> dict:
+    """Detecta rosto e texto nas capas de `ids` que ainda não estão em `destino`, em lotes.
+
+    Uma capa ausente conta em `sem_thumb`; uma corrompida vai para o `log` com o motivo, conta em
+    `erros` e o lote segue (o vídeo fica sem linha).
+    """
+    from PIL import Image
+
+    from previa.thumbs import recortar_9_16
+
+    pasta_thumbs = Path(pasta_thumbs)
+    destino = Path(destino)
+    destino.mkdir(parents=True, exist_ok=True)
+    feitos = set(carregar_deteccoes(destino).index)
+    faltam = [v for v in ids if v not in feitos and (pasta_thumbs / f"{v}.jpg").exists()]
+    resumo = {
+        "novos": len(faltam),
+        "pulados": sum(v in feitos for v in ids),
+        "sem_thumb": sum(v not in feitos and not (pasta_thumbs / f"{v}.jpg").exists() for v in ids),
+        "erros": 0,
+    }
+    n_lote = len(list(destino.glob("lote_*.parquet")))
+    for i in range(0, len(faltam), lote):
+        bloco = faltam[i : i + lote]
+        linhas = []
+        for v in bloco:
+            try:
+                with Image.open(pasta_thumbs / f"{v}.jpg") as img:
+                    rgb = recortar_9_16(np.asarray(img.convert("RGB")))
+                linhas.append(
+                    {"video_id": v, **features_da_capa(rgb, yunet, detector_texto, cfg_texto)}
+                )
+            except Exception as e:  # capa corrompida: registra e segue (princípio 7)
+                resumo["erros"] += 1
+                log(f"capa {v} ignorada: {type(e).__name__}: {e}")
+        if linhas:
+            arquivo = destino / f"lote_{n_lote:05d}.parquet"
+            tmp = arquivo.with_suffix(".tmp")
+            pd.DataFrame(linhas).to_parquet(tmp, index=False)
+            os.replace(tmp, arquivo)  # atômico: nunca fica um lote pela metade
+            n_lote += 1
+        log(f"{i + len(bloco)}/{len(faltam)} capas processadas")
+    return resumo
+
+
+PARES = [("det_rosto_thumb", "tem_rosto"), ("det_texto_thumb", "texto_na_tela")]
+
+
+def concordancia(det: pd.DataFrame, rotulos: pd.DataFrame) -> pd.DataFrame:
+    """Detector clássico contra a rubrica do VLM, só nos vídeos que têm os dois (kappa de Cohen)."""
+    from sklearn.metrics import cohen_kappa_score
+
+    if "post_id" in rotulos.columns:
+        rotulos = rotulos.set_index("post_id")
+    comuns = det.index.intersection(rotulos.index)
+    linhas = []
+    for col_det, col_vlm in PARES:
+        a = det.loc[comuns, col_det].astype(bool)
+        b = rotulos.loc[comuns, col_vlm].astype(bool)
+        um_lado_so = a.nunique() < 2 or b.nunique() < 2
+        linhas.append(
+            {
+                "detector": col_det,
+                "vlm": col_vlm,
+                "n": len(comuns),
+                "concordancia": float((a == b).mean()) if len(comuns) else float("nan"),
+                "kappa": float("nan") if um_lado_so else float(cohen_kappa_score(a, b)),
+                "divergentes": int((a != b).sum()),
+            }
+        )
+    return pd.DataFrame(linhas)
+
+
+def _divergentes(det: pd.DataFrame, rotulos: pd.DataFrame) -> pd.DataFrame:
+    comuns = det.index.intersection(rotulos.index)
+    partes = []
+    for col_det, col_vlm in PARES:
+        a = det.loc[comuns, col_det].astype(bool)
+        b = rotulos.loc[comuns, col_vlm].astype(bool)
+        d = pd.DataFrame({"par": col_det, "detector": a, "vlm": b})[a != b]
+        partes.append(d)
+    return pd.concat(partes).rename_axis("video_id").reset_index()
+
+
+def main(argv=None) -> int:
+    acao = (argv or sys.argv[1:] or [""])[0]
+    if acao not in ("capas", "concordancia"):
+        print("uso: python -m previa.detectores capas|concordancia", file=sys.stderr)
+        return 2
+    cfg = ler_config_detectores()
+    pasta = DADOS / f"det_thumb_v{cfg['versao']}"
+    if acao == "capas":
+        from previa.thumbs import PASTA
+
+        ids = sorted(p.stem for p in PASTA.glob("*.jpg"))
+        resumo = detectar_capas(
+            ids,
+            PASTA,
+            pasta,
+            criar_yunet(cfg["yunet"]),
+            criar_detector_texto(cfg["texto"]),
+            cfg["texto"],
+            cfg["lote"],
+        )
+        print(resumo, flush=True)
+        det = carregar_deteccoes(pasta)
+        det.reset_index().to_parquet(DADOS / f"det_thumb_v{cfg['versao']}.parquet", index=False)
+        return 0
+    det = carregar_deteccoes(pasta)
+    linhas = [json.loads(x) for x in (DADOS / "vlm" / "rubrica_v1.jsonl").open()]
+    rot = pd.DataFrame(linhas).drop_duplicates("post_id", keep="last").set_index("post_id")
+    print(concordancia(det, rot).to_string(index=False))
+    _divergentes(det, rot).to_csv(DADOS / "det_thumb_divergentes.csv", index=False)
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
