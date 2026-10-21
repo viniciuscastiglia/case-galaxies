@@ -1,7 +1,7 @@
 # Avaliação da base v2 (decisão #33). Mesma forma da avaliacao.yaml; lido por previa.splits.ler_avaliacao.
 #
-# ATENÇÃO: as datas abaixo são uma PROPOSTA, a confirmar pelo Vinicius (as datas e o esquema de
-# validação são decisão dele). Nada aqui toca a v1: avaliacao.yaml segue apontando base_v1.parquet.
+# As datas abaixo foram confirmadas pelo Vinicius em 21/10 (docs/DECISOES.md, "Datas da v2"). Nada aqui
+# toca a v1: avaliacao.yaml segue apontando base_v1.parquet.
 #
 # Ordem: treino -> gap -> calibração (sem teste). ATENÇÃO: a v2 gasta DE PROPÓSITO os meses de teste
 # da v1 (abril a setembro/2026) como treino e calibração do CQR, para o modelo de uso. Por isso só
