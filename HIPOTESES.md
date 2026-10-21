@@ -181,6 +181,26 @@ Tratamento: + cortes, movimento e aparência dos frames (4.3) e fala e energia d
 Resultado:
 Decisão:
 
+## H10: rosto e texto na capa, por detectores (#31)
+
+Data: 2026-10-21 (escrita antes de rodar a extração e o experimento)
+Hipótese: o rosto e o texto medidos na capa ajudam pouquíssimo, na ordem e no número; talvez nada.
+Mecanismo: três motivos, que se somam. (1) A capa só age onde é vista: na prateleira de Shorts, na página do canal e
+  na busca; no feed, o vídeo começa sozinho e ninguém vê a capa, e a rolagem é a maioria das visualizações (o
+  mecanismo da H7). (2) O SigLIP já vê boa parte do mesmo: contra o VLM, a sonda do rosto tem AUC 0,787 e a do texto,
+  0,703 (F26); o detector troca a semelhança pela quantidade (quanto da capa o rosto ou o texto ocupa), mas a
+  informação é quase a mesma. (3) O alvo é relativo ao canal: se um canal usa sempre o mesmo modelo de capa, a coluna
+  fica constante dentro dele e não explica por que um Short rende mais que o normal do canal; o detector só pode
+  ajudar nos canais que variam a capa.
+Métrica e limiar: a régua da #27 no walk-forward de 2025, na base toda: o bloco fica se melhorar a manchete ou o
+  `mae_log`, com IC 95% pareado por canal sem o zero, sem piorar a outra. Pela #36, só vira argumento da explicação
+  se também aparecer na remoção (o completo sem os detectores), acima do controle de ruído.
+Controle: o completo da H7 (`configs/experimentos/h7_thumb.yaml`, run `f405ee37`)
+Tratamento: + as 6 colunas dos detectores nas 30.981 capas: rosto (tem, quantos, área do maior) com o YuNet e texto
+  (tem, quantas caixas, área coberta) com o detector PP-OCRv3 (`configs/experimentos/h10_detectores.yaml`)
+Resultado:
+Decisão:
+
 ## H11: perda de Huber no lugar da L2 (#32)
 
 Data: 2026-10-21 (escrita antes de rodar; a H10, dos detectores da capa, vem depois)
