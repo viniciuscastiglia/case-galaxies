@@ -495,12 +495,16 @@ def rodar(
     extras=None,
     so_avaliar=None,
     min_posts=3,
+    *,
+    folds_fn=folds,
 ) -> dict:
     """Treina e avalia nas duas avaliações; devolve as métricas e as árvores de cada modelo.
 
     `embeddings` (bloco -> DataFrame com índice post_id) alimenta os blocos de `cfg.pca`, com o
     PCA ajustado de novo no treino de cada fold. `extras` (bloco -> DataFrame com índice post_id)
     entra por join; `so_avaliar` (post_ids) restringe as linhas avaliadas, como na amostra (H8).
+    `folds_fn(d, cfg_av)` devolve {avaliação: [(treino, teste)]}; o padrão é o desenvolvimento
+    (`folds`), e o teste final passa `previa.final.folds_finais` (F16).
     Cada avaliação traz `importancia` (Series, ganho normalizado das features) e
     `importancia_maior_fatia` (float, a maior fatia; o alarme é `avisar_importancia_dominante`).
     """
@@ -524,7 +528,7 @@ def rodar(
             raise ValueError(f"bloco extra {nome}: nenhuma coluna dele está nas features da config")
     embeddings = embeddings or {}
     saida = {}
-    for nome, pares in folds(d, cfg_av).items():
+    for nome, pares in folds_fn(d, cfg_av).items():
         p, arvores, todos = pd.Series(np.nan, index=d.index), [], d.index[:0]
         modelos = []
         id_dobra = pd.Series(-1, index=d.index)

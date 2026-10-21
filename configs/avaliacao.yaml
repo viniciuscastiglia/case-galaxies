@@ -25,3 +25,10 @@ walk_forward:
 canal_novo:
   n_grupos: 4
   seed: 0
+
+# Teste final (F16; hub, troubleshooting "bom demais"): acima disto, procure vazamento antes de comemorar
+final:
+  ganho_minimo: 0.03       # #5: ganho da manchete sobre o baseline no cenário temporal
+  cobertura_min_extra: 0.99 # pré-voo: cobertura mínima de cada extra nos posts canônicos do teste
+  alarme_manchete: 0.80
+  alarme_spearman: 0.80
