@@ -6,25 +6,31 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
 
 ## Agora
 
-- **Fase (21/10, 21h00):** noite da entrega. No `main` e no GitHub: o lote 1 (F2, F3, F29, F42, #36, #37, H10) e o
-  lote 2 (F23, F16, M8, base v2, abertura, autoavaliação). No branch `feat/lote-noite-2`, revisados e ainda sem merge:
-  A1 (`schemas.py`), lote 3 (flag, âncora, capa), o modelo final (#39), o núcleo da M6 (`intervalo.py`) e as decisões
-  #39, #40 e as datas da v2. Ledgers: `.superpowers/sdd/2026-10-21-*/progress.md`.
-- **Decidido hoje à noite:** #36, #37, a troca do PaddleOCR, H10 (rodada, não fica), A1 (casos 1 a 8 + #34, F10, F34,
-  tipo), bloco 2 (#14 a #18, #23, F11), F14 (98%), **#39: o modelo final** (sem histórico e texto; capa, idade como
-  controle, Huber; conferido contra a H11, run `e684ac8c`, commit `8f3d83c`), **#40: o número é o do modelo testado**
-  (Huber), o intervalo é q10/q90 + CQR; datas da v2 confirmadas; a M6 resolvida à mão (6 perguntas).
-- **Feito depois das 20h40:** a M6 integrada (`intervalo.py`, `final.py`, `modelo.py`); **o teste final aberto
-  uma vez** (run `6b1f7e77`, 20h34): H1 cumprida nos dois cenários (+5,6 [+3,6; +7,1] temporal; +3,5 [+1,9; +4,9]
-  canal novo), cobertura 76,5%; **o modelo de uso na v2** (run `de922be7`, em `artefatos/`); o `prever_criativo`
-  (`previsao.py`, em correção: canal externo e índice dos comparáveis).
-- **Em andamento (subagentes):** a correção do `prever_criativo`; o servidor MCP (A2, com a invariante e a injeção da
-  A7); os documentos com os números do teste (README 5 a 8, model card, autoavaliação, data card).
-- **Próximo passo:** revisar e commitar o que voltar; rodar `python -m previa.indice` (os comparáveis) na base real;
-  o texto da A2 do Vinicius em `configs/mcp.yaml`; o grafo (A6) se der tempo; o Vinicius reescreve as seções 1, 7 e 8
-  do README; review final; merge e push; `/fechar-sessao` às 23h30.
-- **Pendente do Vinicius:** A2 (as duas descrições e as três mensagens de erro); o validador da A4; as 3 seções do README.
-- **Bloqueios:** o teste final espera a M6 integrada; a v2 espera o teste aberto (`exige_teste_aberto`).
+- **Checkpoint da troca de conta (21/10, ~21h10).** Leia também `docs/RETOMADA.md`.
+- **No `main` e no GitHub:** os lotes 1 e 2 (até `d28ce86`). **No branch `feat/lote-noite-2`, commitado e revisado,
+  sem merge:** A1 (`schemas.py`), flag, âncora, capa, o modelo final (#39), a M6 (`intervalo.py`, `final.py`,
+  `modelo.py`), o `prever_criativo` (`previsao.py`) e o índice dos comparáveis (`indice.py`), a correção do pickle
+  (`a98075b`), e os registros de #39, #40, datas da v2, o teste final e a v2.
+- **Resultados (no `DECISOES.md`):** teste final aberto UMA vez (run `6b1f7e77`; NÃO rodar de novo): H1 cumprida
+  (+5,6 [+3,6; +7,1] temporal; +3,5 [+1,9; +4,9] canal novo); cobertura 76,5% (beleza 71%, cai por mês); o flag separa
+  o erro. Modelo de uso: v2.
+- **Em voo quando a sessão parou (arquivos NÃO commitados; revisar antes de commitar):**
+  1. o servidor MCP e os testes da A7 (`src/previa/servidor_mcp.py`, `configs/mcp.yaml`, `tests/test_servidor_mcp.py`
+     e a seção "Usar pelo MCP" do README; brief em `.superpowers/sdd/2026-10-21-tool/brief-mcp.md`);
+  2. os documentos com os números (README 5 a 8, `MODEL_CARD.md`, `AUTOAVALIACAO.md`, `DATA_CARD.md`; relatório em
+     `.superpowers/sdd/2026-10-21-tool/report-docs.md` se existir);
+  3. o retreino da v2 depois da correção do pickle: conferir `data/logs/modelo_v2b.log` e
+     `artefatos/model_version.json` (o run id deve ser novo, não `de922be7`); se falhou, rodar de um worktree limpo
+     em `a98075b`: `PYTHONPATH=<wt>/src PREVIA_DADOS=<raiz>/data GALAXIES_ARTEFATOS=<raiz>/artefatos
+     MLFLOW_TRACKING_URI=sqlite:///<raiz>/mlflow.db .venv/bin/python -m previa.modelo treinar
+     configs/experimentos/final.yaml configs/avaliacao_v2.yaml`; depois remover o worktree `wt-v2b` do scratchpad.
+- **Próximo passo, nesta ordem:** (1) conferir os três itens acima, revisar e commitar; (2) `uv run python -m
+  previa.indice` (índice dos comparáveis, depois da v2 nova) e um teste de fumaça do `prever_criativo` com o pacote
+  real e um Short do golden; (3) colocar no `configs/mcp.yaml` o texto da A2 do Vinicius (as descrições de
+  `prever_criativo` e `comparar_criativos` e as 3 mensagens de erro); (4) o Vinicius reescreve as seções 1, 7 e 8 do
+  README; (5) a A6 (grafo) só se sobrar tempo, senão vira limitação; (6) suíte + ruff, review final, merge no `main` e
+  push com o ok dele; (7) `/fechar-sessao` (diário, memória); entrega até 23h59.
+- **Pendente do Vinicius:** A2 (texto); README 1, 7 e 8; o ok do merge.
 
 ## Como funciona
 
