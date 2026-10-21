@@ -5,7 +5,8 @@
 > desenvolvimento `09f6035c11c9`). Os números do período de teste (01/04 a 14/09/2026) são contagens de linhas,
 > sem ler curtidas: o teste abre uma vez, no fim. A v0.1 (08/10) está no histórico do git.
 >
-> **v2 (decisão #33):** `data/base_v2.parquet`, exportação de 21/10/2026, 06h25, hash `96fd13a28156`, congelada por
+> **v2 (decisão #33):** `data/base_v2.parquet`, exportação de 21/10/2026, 06h25, hash `96fd13a28156` (do arquivo inteiro; o hash da base cortada, a que o modelo de uso de fato
+> treina, vai na tag `hash_base` do run do modelo de uso), congelada por
 > `python -m previa.dados congelar`. É a base do modelo de uso, retreinado com a mesma receita depois do teste final:
 > ela gasta de propósito os meses do teste da v1 no treino e na calibração (`configs/avaliacao_v2.yaml`, datas a
 > confirmar pelo Vinicius), e o `carregar_base` a recusa antes da primeira abertura do teste. Os números dela não se

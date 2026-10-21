@@ -36,11 +36,12 @@ from previa.experimento import (
     aplicar_pca,
     codigo_setor,
     commit_atual,
-    data_de_corte,
+    expandir_features,
     hash_base,
     ler_config,
     ler_duracoes,
     ler_embeddings_do_bloco,
+    ler_extra,
     preparar,
     treinar_gbm,
 )
@@ -63,17 +64,29 @@ class Bundle:
     run_id: str | None = None  # o run do MLflow que registrou este pacote (#37, F23)
     base: str = ""  # o nome do arquivo da base congelada
     hash_base: str = ""  # a impressão digital da base de treino
+    extras: list[str] = field(default_factory=list)  # os blocos extras (F17): `ler_extra(nome)`
+    colunas_extras: dict = field(default_factory=dict)  # bloco extra -> suas colunas em `features`
 
 
-def treinar_bundle(cfg: Config, base, duracoes, cfg_av, embeddings=None) -> Bundle:
-    """O modelo final da config: todas as linhas do bloco de treino, sem a calibração e o teste."""
-    if cfg.extras:  # o caminho dos blocos extras na previsão ainda não existe
-        raise ValueError(f"extras ainda não suportados no bundle: {cfg.extras}")
-    d = preparar(base, duracoes, cfg_av, cfg.lacuna_dias, min_posts_alvo=cfg.min_posts_alvo)
-    validar_tabela_de_treino(d, cfg.features)  # o mesmo contrato do runner (F15; 1.8, 3.5)
-    fim = cfg_av["cal_inicio"] - pd.Timedelta(days=cfg_av["gap_dias"])
-    tr = d.index[d["linha"] & (d["published_at"] < fim)]
-    dobra, feats, pcas = d.loc[tr].copy(), list(cfg.features), {}
+def fim_do_treino(cfg_av: dict) -> pd.Timestamp:
+    """Onde o treino do modelo de uso termina: `cal_inicio` - `gap_dias`."""
+    return cfg_av["cal_inicio"] - pd.Timedelta(days=cfg_av["gap_dias"])
+
+
+def treinar_bundle(cfg: Config, base, duracoes, cfg_av, embeddings=None, extras=None) -> Bundle:
+    """O modelo final da config: todas as linhas do bloco de treino, sem a calibração e o teste.
+
+    `extras`: nome do bloco -> tabela por `post_id` (`ler_extra`), como no runner. Os curingas da
+    config (`vlm_*`, `sonda_*`, `det_*`) viram as colunas do bloco, e o pacote guarda a lista
+    expandida: a previsão monta a mesma ordem.
+    """
+    d = preparar(
+        base, duracoes, cfg_av, cfg.lacuna_dias, min_posts_alvo=cfg.min_posts_alvo, extras=extras
+    )
+    base_feats = expandir_features(cfg.features, d.columns)  # curinga sem coluna levanta
+    validar_tabela_de_treino(d, base_feats)  # o mesmo contrato do runner (F15; 1.8, 3.5)
+    tr = d.index[d["linha"] & (d["published_at"] < fim_do_treino(cfg_av))]
+    dobra, feats, pcas = d.loc[tr].copy(), list(base_feats), {}
     for bloco, n_comp in cfg.pca.items():
         cols, pca = aplicar_pca(
             embeddings[bloco], d.loc[tr, "post_id"], dobra["post_id"], n_comp, bloco, cfg.seed
@@ -88,6 +101,8 @@ def treinar_bundle(cfg: Config, base, duracoes, cfg_av, embeddings=None) -> Bund
     return Bundle(
         modelo, feats, pcas, versao, cfg.lacuna_dias, ultimo, n, asdict(cfg),
         base=str(cfg_av.get("base", "")), hash_base=hash_base(base),
+        extras=list(cfg.extras),
+        colunas_extras={n: [c for c in feats if c in b.columns] for n, b in (extras or {}).items()},
     )  # fmt: skip
 
 
@@ -131,7 +146,9 @@ def registrar_bundle(bundle: Bundle, cfg_av: dict, caminho_config, destino=ARTEF
                 "papel": "modelo_de_uso",
                 "git_commit": commit_atual(),
                 "hash_base": bundle.hash_base,
-                "data_corte": data_de_corte(cfg_av),
+                "data_corte": str(
+                    fim_do_treino(cfg_av).date()
+                ),  # o fim do treino, não o do walk-forward
                 "config": str(caminho_config),
             }
         )
@@ -168,7 +185,8 @@ def main(argv=None) -> int:
     cfg_av = ler_avaliacao(caminho_av)
     base = carregar_base(caminho_config=caminho_av)  # base, datas, nome e hash da mesma config
     embeddings = {b: ler_embeddings_do_bloco(b) for b in cfg.pca}
-    bundle = treinar_bundle(cfg, base, ler_duracoes(), cfg_av, embeddings)
+    extras = {e: ler_extra(e) for e in cfg.extras}
+    bundle = treinar_bundle(cfg, base, ler_duracoes(), cfg_av, embeddings, extras)
     registrar_bundle(bundle, cfg_av, caminho, destino=ARTEFATOS)
     print(model_version(bundle)["rotulo"])
     return 0
@@ -185,7 +203,10 @@ def features_de_um_short(bundle: Bundle, posts_canal: pd.DataFrame, novo: dict) 
 
     `posts_canal`: os posts do canal (channel_id, published_at UTC, y = log1p das curtidas, NaN se
     ocultas), de qualquer idade: a lacuna de maturação é aplicada aqui, como no treino.
-    `novo`: published_at (com fuso), caption, sector, duration_s e `embeddings` (bloco -> vetor).
+    `novo`: published_at (com fuso), caption, sector, duration_s, `embeddings` (bloco -> vetor) e
+    `extras` (coluna -> valor, dos blocos extras). Coluna de extra ausente levanta, a menos que
+    `novo["extras_ausentes"]` (bloco -> motivo) declare o bloco que faltou: aí vira NaN e o motivo
+    sai em `x.attrs["extracao_falhou"]`, para o flag de confiança (princípio 7).
     """
     canal = posts_canal["channel_id"].iloc[0] if len(posts_canal) else "canal_novo"
     quando = pd.Timestamp(novo["published_at"]).tz_convert("UTC")
@@ -205,9 +226,24 @@ def features_de_um_short(bundle: Bundle, posts_canal: pd.DataFrame, novo: dict) 
         )
         for k, v in enumerate(comps):
             f[f"{bloco}_pc{k:02d}"] = v
+    declarados = novo.get("extras_ausentes") or {}
+    valores = novo.get("extras") or {}
+    for bloco in bundle.extras:
+        for col in bundle.colunas_extras.get(bloco, []):
+            if col in valores:
+                f[col] = float(valores[col])
+            elif bloco in declarados:
+                f[col] = np.nan  # o bloco falhou e o chamador disse; o GBM trata como ausente
+            else:
+                raise ValueError(
+                    f"a coluna {col} do bloco extra {bloco} não veio em novo['extras']; se o bloco "
+                    "falhou, declare-o em novo['extras_ausentes'] (bloco -> motivo)"
+                )
     for k, v in bundle.config.get("fixar", {}).items():  # #21: controles fixados na previsão
         f[k] = v
-    return f[bundle.features]
+    x = f[bundle.features]
+    x.attrs["extracao_falhou"] = {b: str(m) for b, m in declarados.items() if b in bundle.extras}
+    return x
 
 
 def referencia(posts_canal: pd.DataFrame, quando) -> tuple[float, int]:

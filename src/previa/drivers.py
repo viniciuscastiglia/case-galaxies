@@ -13,6 +13,7 @@ soma = previsão) é conferida em `contribuicoes` (erro comum 7).
 """
 
 from fnmatch import fnmatch
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
@@ -25,7 +26,7 @@ from previa.contribuicoes import agrupar_blocos, contribuicoes
 def carregar_cfg(caminho=None) -> dict:
     """`configs/explicacao.yaml`: k, padrões do contexto e blocos legíveis."""
     caminho = caminho or CONFIGS / "explicacao.yaml"
-    return yaml.safe_load(open(caminho, encoding="utf-8"))
+    return yaml.safe_load(Path(caminho).read_text(encoding="utf-8"))
 
 
 def _expandir(padroes, colunas) -> list[str]:

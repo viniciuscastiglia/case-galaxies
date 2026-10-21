@@ -42,7 +42,7 @@ CHAVES_FINAL = ("ganho_minimo", "cobertura_min_extra", "alarme_manchete", "alarm
 
 
 def limites(cfg_av: dict) -> dict:
-    """Os três limites de `final:` em configs/avaliacao.yaml; sem a chave, erro (sem padrão)."""
+    """Os quatro limites de `final:` em configs/avaliacao.yaml; sem a chave, erro (sem padrão)."""
     f = cfg_av.get("final")
     faltam = [k for k in CHAVES_FINAL if not isinstance(f, dict) or k not in f]
     if faltam:
@@ -62,9 +62,10 @@ def conferir_cobertura(caminho_base, cfg_av: dict, obrigatorios: dict, extras: d
     """Antes de abrir: cobertura dos blocos nos posts canônicos do período de teste.
 
     Só os canônicos (`duplicate_group == post_id`) são avaliados. Lê `post_id`, `published_at` e
-    `duplicate_group` do arquivo, sem curtidas. Duração e embeddings (calculados para todo post)
-    exigem 100%; cada extra, `final.cobertura_min_extra` (NaN sem mídia é legítimo). A cobertura
-    de cada extra é sempre impressa. Falhou: `ValueError`, e o teste não é aberto.
+    `duplicate_group` do arquivo, sem curtidas. Duração e o embedding do título (calculados para
+    todo post) exigem 100%; o embedding `thumb` e cada extra, `final.cobertura_min_extra` (NaN sem
+    mídia é legítimo). A cobertura
+    desses blocos é sempre impressa. Falhou: `ValueError`, e o teste não é aberto.
     """
     minimo = limites(cfg_av)["cobertura_min_extra"]
     ids = pd.read_parquet(caminho_base, columns=["post_id", "published_at", "duplicate_group"])
@@ -72,13 +73,22 @@ def conferir_cobertura(caminho_base, cfg_av: dict, obrigatorios: dict, extras: d
     na_janela = (datas >= cfg_av["teste_inicio"]) & (datas < cfg_av["teste_fim"])
     canonicos = ids.loc[na_janela & (ids["duplicate_group"] == ids["post_id"]), "post_id"]
     n = len(canonicos)
-    faltam = {k: int((~canonicos.isin(b.index)).sum()) for k, b in obrigatorios.items()}
+    # o embedding da capa vale como um extra: as sondas vêm dele e a imagem pode faltar (99%)
+    parciais = {k: obrigatorios[k] for k in obrigatorios if k == "thumb"}
+    faltam = {
+        k: int((~canonicos.isin(b.index)).sum())
+        for k, b in obrigatorios.items()
+        if k not in parciais
+    }
     faltam = {k: v for k, v in faltam.items() if v}
     ruins = []
-    for nome, bloco in extras.items():
+    for nome, bloco, rotulo in [
+        *((k, b, "do embedding") for k, b in parciais.items()),
+        *((k, b, "do extra") for k, b in extras.items()),
+    ]:
         tem = int(canonicos.isin(bloco.dropna(how="all").index).sum())
         pct = tem / n if n else 0.0
-        print(f"cobertura do extra {nome}: {tem}/{n} ({pct:.1%}) nos posts do teste")
+        print(f"cobertura {rotulo} {nome}: {tem}/{n} ({pct:.1%}) nos posts do teste")
         if pct < minimo:
             ruins.append(f"{nome} {pct:.1%} < {minimo:.1%}")
     if faltam or ruins:

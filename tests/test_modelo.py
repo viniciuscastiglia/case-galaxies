@@ -201,11 +201,80 @@ def test_paridade_com_a_lista_de_producao_e_historico_completo(base, cfg_av, tmp
     pd.testing.assert_frame_equal(x_antes, x_tudo)
 
 
-def test_bundle_recusa_extras(base, cfg, cfg_av):
+def _extra(b):
+    """Um bloco extra de 2 colunas por post_id (como o `vlm`), determinístico."""
+    rng = np.random.default_rng(5)
+    return pd.DataFrame(
+        {"ex_a": rng.normal(size=len(b)), "ex_b": rng.normal(size=len(b))},
+        index=pd.Index(b["post_id"], name="post_id"),
+    )
+
+
+def test_bundle_treina_com_extras(base, cfg, cfg_av):
     b, dur, emb = _partes(base)
-    cfg.extras = ["vlm"]
-    with pytest.raises(ValueError, match="extras"):
-        treinar_bundle(cfg, b, dur, cfg_av, emb)
+    cfg.extras = ["meu"]
+    cfg.features = [*cfg.features, "ex_*"]
+    bundle = treinar_bundle(cfg, b, dur, cfg_av, emb, extras={"meu": _extra(b)})
+    assert {"ex_a", "ex_b"} <= set(bundle.features) and "ex_*" not in bundle.features
+    assert bundle.extras == ["meu"]
+    cfg.features = [*cfg.features[:-1], "zz_*"]  # um curinga sem coluna: não vira controle calado
+    with pytest.raises(ValueError, match="zz_"):
+        treinar_bundle(cfg, b, dur, cfg_av, emb, extras={"meu": _extra(b)})
+
+
+def _novo_com_extras(d, dur, emb, linha, extras):
+    return {
+        "published_at": linha["published_at"],
+        "caption": linha["caption"],
+        "sector": linha["sector"],
+        "duration_s": float(dur[linha["post_id"]]),
+        "embeddings": {"titulo": emb["titulo"].loc[linha["post_id"]].to_numpy()},
+        "extras": extras,
+    }
+
+
+def test_paridade_treino_uso_com_extras(base, cfg, cfg_av):
+    b, dur, emb = _partes(base)
+    cfg.extras = ["meu"]
+    cfg.features = [*cfg.features, "ex_*"]
+    ext = _extra(b)
+    bundle = treinar_bundle(cfg, b, dur, cfg_av, emb, extras={"meu": ext})
+    d = preparar(b, dur, cfg_av, cfg.lacuna_dias, extras={"meu": ext})
+    alvo = d.index[d["linha"] & (d["channel_id"] == "UC1")][-40]
+    linha = d.loc[alvo]
+    anteriores = d[(d["channel_id"] == "UC1") & (d["published_at"] < linha["published_at"])]
+    novo = _novo_com_extras(d, dur, emb, linha, ext.loc[linha["post_id"]].to_dict())
+    x = features_de_um_short(bundle, anteriores[["channel_id", "published_at", "y"]], novo)
+    assert list(x.columns) == bundle.features
+    np.testing.assert_allclose(
+        x[["ex_a", "ex_b"]].to_numpy(float)[0], d.loc[alvo, ["ex_a", "ex_b"]].to_numpy(float)
+    )
+
+
+def test_extra_ausente_levanta_a_menos_que_o_bloco_venha_declarado(base, cfg, cfg_av):
+    b, dur, emb = _partes(base)
+    cfg.extras = ["meu"]
+    cfg.features = [*cfg.features, "ex_*"]
+    ext = _extra(b)
+    bundle = treinar_bundle(cfg, b, dur, cfg_av, emb, extras={"meu": ext})
+    d = preparar(b, dur, cfg_av, cfg.lacuna_dias, extras={"meu": ext})
+    linha = d.loc[d.index[d["linha"] & (d["channel_id"] == "UC1")][-40]]
+    posts = d[(d["channel_id"] == "UC1") & (d["published_at"] < linha["published_at"])]
+    posts = posts[["channel_id", "published_at", "y"]]
+    sem_coluna = _novo_com_extras(d, dur, emb, linha, {"ex_a": 1.0})  # falta ex_b
+    with pytest.raises(ValueError, match="ex_b"):
+        features_de_um_short(bundle, posts, sem_coluna)
+    sem_bloco = _novo_com_extras(d, dur, emb, linha, {})
+    with pytest.raises(ValueError, match="meu"):
+        features_de_um_short(bundle, posts, sem_bloco)
+    sem_bloco["extras_ausentes"] = {"meu": "vídeo sem áudio"}  # declarado: NaN e o motivo
+    x = features_de_um_short(bundle, posts, sem_bloco)
+    assert x[["ex_a", "ex_b"]].isna().all(axis=None)
+    assert x.attrs["extracao_falhou"] == {"meu": "vídeo sem áudio"}
+    fora = _novo_com_extras(d, dur, emb, linha, {"ex_a": 1.0})
+    fora["extras_ausentes"] = {"outro": "x"}  # declarar outro bloco não perdoa a coluna que falta
+    with pytest.raises(ValueError, match="ex_b"):
+        features_de_um_short(bundle, posts, fora)
 
 
 def test_bundle_valida_a_tabela_de_treino(base, cfg, cfg_av, monkeypatch):
@@ -251,6 +320,8 @@ def test_registrar_bundle_poe_o_run_no_model_version(base, cfg, cfg_av, tmp_path
     tags = mlflow.get_run(run_id).data.tags
     assert tags["papel"] == "modelo_de_uso" and tags["hash_base"] == mv["hash_base"]
     assert {"git_commit", "data_corte", "config"} <= set(tags)
+    # o corte do modelo de uso é o fim do treino (cal_inicio - gap), não o início do walk-forward
+    assert tags["data_corte"] == "2026-01-02"
 
 
 @pytest.mark.usefixtures("mlflow_temporario")

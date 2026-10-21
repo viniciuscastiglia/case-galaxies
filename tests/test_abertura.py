@@ -148,7 +148,7 @@ def test_run_da_config_pega_o_mais_recente(mlflow_temporario):  # noqa: F811
     ids = []
     for config in ("configs/experimentos/a.yaml", "configs/experimentos/a.yaml", "outra.yaml"):
         with mlflow.start_run() as run:
-            mlflow.set_tag("config", config)
+            mlflow.set_tags({"config": config, "avaliacao": "desenvolvimento (2025)"})
         ids.append(run.info.run_id)
         time.sleep(0.02)
     # dois runs da mesma config: o mais antigo (ids[0]) perde; o último de outra config não conta
@@ -159,6 +159,13 @@ def test_run_da_config_pega_o_mais_recente(mlflow_temporario):  # noqa: F811
         mlflow.end_run(status="FAILED")
     assert falho.info.run_id != ids[1]
     assert run_da_config("configs/experimentos/a.yaml") == ids[1]
+    with (
+        mlflow.start_run()
+    ):  # o run do teste final (mesma config, mais novo): nunca é o de abertura
+        mlflow.set_tags({"config": "configs/experimentos/a.yaml", "avaliacao": "final (teste)"})
+    with mlflow.start_run():  # o do modelo de uso não tem a tag de avaliação
+        mlflow.set_tag("config", "configs/experimentos/a.yaml")
+    assert run_da_config("configs/experimentos/a.yaml") == ids[1]
     with pytest.raises(LookupError, match="nunca.yaml"):
         run_da_config("nunca.yaml")  # sem run: falha alto, não devolve nada
 
@@ -168,7 +175,7 @@ def test_abrir_usa_o_run_de_cada_config_e_o_veredito_da_hipotese(mlflow_temporar
     run_de = {}
     for config in ("c.yaml", "t.yaml"):
         with mlflow.start_run() as run:
-            mlflow.set_tag("config", config)
+            mlflow.set_tags({"config": config, "avaliacao": "desenvolvimento (2025)"})
         run_de[config] = run.info.run_id
         time.sleep(0.02)
     tabela = _ablacao()

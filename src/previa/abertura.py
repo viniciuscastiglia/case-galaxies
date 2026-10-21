@@ -42,12 +42,19 @@ METRICAS = [
 
 
 def run_da_config(caminho: str) -> str:
-    """O run FINISHED mais recente com a tag `config` igual ao caminho; não lê métrica nenhuma."""
+    """O run FINISHED de desenvolvimento mais recente com a tag `config` igual ao caminho.
+
+    Só `avaliacao = desenvolvimento (2025)`: o run do teste final e o do modelo de uso têm a mesma
+    config e não podem ser o da abertura. Não lê métrica nenhuma.
+    """
     mlflow.set_experiment(EXPERIMENTO)
     seguro = str(caminho).replace("'", "''")
     achados = mlflow.search_runs(
         experiment_names=[EXPERIMENTO],
-        filter_string=f"tags.config = '{seguro}' and attributes.status = 'FINISHED'",
+        filter_string=(
+            f"tags.config = '{seguro}' and attributes.status = 'FINISHED' "
+            "and tags.avaliacao = 'desenvolvimento (2025)'"
+        ),
         order_by=["attributes.start_time DESC"],
         max_results=1,
         output_format="list",

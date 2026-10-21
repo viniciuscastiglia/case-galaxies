@@ -331,3 +331,21 @@ def test_cobertura_do_extra_98_bloqueia_e_995_passa(mini, capsys):
     com_995 = _bloco(mini["ids"][:199])  # 199/200 = 99,5%
     conferir_cobertura(mini["caminho"], mini["cfg_av"], obrig, {"vlm": com_995})
     assert "199/200 (99.5%)" in capsys.readouterr().out
+
+
+def test_cobertura_do_thumb_vale_como_extra_e_o_titulo_continua_100(mini, capsys):
+    obrig = {"duracoes": mini["tudo"], "titulo": _bloco(mini["ids"])}
+    thumb_995 = _bloco(mini["ids"][:199])  # 99,5%: passa, como um extra
+    conferir_cobertura(mini["caminho"], mini["cfg_av"], {**obrig, "thumb": thumb_995}, {})
+    assert "cobertura do embedding thumb: 199/200 (99.5%)" in capsys.readouterr().out
+    thumb_98 = _bloco(mini["ids"][:196])
+    with pytest.raises(ValueError, match=r"NÃO foi aberto.*thumb 98.0%"):
+        conferir_cobertura(mini["caminho"], mini["cfg_av"], {**obrig, "thumb": thumb_98}, {})
+    titulo_995 = _bloco(mini["ids"][:199])  # o título é calculado para todo post: 100%
+    with pytest.raises(ValueError, match=r"NÃO foi aberto.*'titulo': 1"):
+        conferir_cobertura(
+            mini["caminho"],
+            mini["cfg_av"],
+            {"duracoes": mini["tudo"], "titulo": titulo_995},
+            {},
+        )
