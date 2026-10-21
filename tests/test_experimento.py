@@ -414,7 +414,7 @@ def test_painel_recusa_nan():
     for col in ("p", "y", "p_base"):
         a = _caso_a_mao()
         a.loc[2, col] = np.nan
-        with pytest.raises(ValueError, match=col):
+        with pytest.raises(ValueError, match=rf"painel: {col} com NaN"):  # "p" casaria "painel"
             painel(a, n_boot=20, seed=0)
 
 
