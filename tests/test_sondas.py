@@ -4,7 +4,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from previa.sondas import validar_sondas
+from previa.sondas import ressalvas, validar_sondas
 
 
 def _ids(n):
@@ -27,9 +27,9 @@ def test_sonda_que_separa_tem_auc_1_e_passa():
         {"rosto": "tem_rosto"},
         auc_min=0.7,
     )
-    assert list(r.columns) == ["sonda", "rotulo", "n", "positivos", "auc", "passa"]
+    assert list(r.columns) == ["sonda", "rotulo", "setor", "n", "positivos", "auc", "passa"]
     linha = r.iloc[0]
-    assert (linha["sonda"], linha["rotulo"]) == ("rosto", "tem_rosto")
+    assert (linha["sonda"], linha["rotulo"], linha["setor"]) == ("rosto", "tem_rosto", "todos")
     assert (linha["n"], linha["positivos"]) == (40, 20)
     assert linha["auc"] == pytest.approx(1.0)
     assert bool(linha["passa"]) is True
@@ -127,3 +127,88 @@ def test_sem_post_id_em_comum_e_erro_explicito():
     rotulos = pd.DataFrame({"tem_rosto": [True, False]}, index=["c" * 11, "d" * 11])
     with pytest.raises(ValueError, match="em comum"):
         validar_sondas(sondas, rotulos, {"rosto": "tem_rosto"}, auc_min=0.7)
+
+
+# --- um par pode valer só num setor (a rubrica de `close_up_produto` muda com o setor) ---
+
+
+def _dois_setores():
+    """20 posts de beleza e 20 de automotivo, metade positiva em cada um, intercalados.
+
+    A sonda separa o rótulo na beleza (positivo = score alto) e erra no automotivo (o positivo tem
+    score baixo, como uma sonda "produto de beleza" diante de um farol): no conjunto, o AUC cai
+    para perto de 0,5 e esconde que ela funciona no setor certo (decisão da revisão final)."""
+    ids = _ids(40)
+    setores = pd.Series(["beleza"] * 20 + ["automotivo"] * 20, index=ids)
+    rotulo = pd.Series([i % 2 == 0 for i in range(40)], index=ids)
+    rng = np.random.default_rng(0)
+    certo = rotulo.astype(float)
+    score = certo.where(setores == "beleza", 1.0 - certo) + rng.normal(0, 0.05, 40)
+    return ids, setores, rotulo, score
+
+
+def test_par_com_setor_mede_so_nos_posts_do_setor():
+    ids, setores, rotulo, score = _dois_setores()
+    sondas = pd.DataFrame({"sonda_produto_beleza_thumb": score, "sonda_roda_thumb": score})
+    rotulos = pd.DataFrame({"close_up_produto": rotulo})
+    juntos = validar_sondas(
+        sondas, rotulos, {"produto_beleza": "close_up_produto"}, auc_min=0.7, setores=setores
+    )
+    assert juntos.loc[0, "setor"] == "todos" and juntos.loc[0, "n"] == 40
+    assert 0.3 < juntos.loc[0, "auc"] < 0.7  # os dois setores misturados: ~0,5
+    assert bool(juntos.loc[0, "passa"]) is False
+
+    pares = {
+        "produto_beleza": {"rotulo": "close_up_produto", "setor": "beleza"},
+        "roda": {"rotulo": "close_up_produto", "setor": "automotivo"},
+    }
+    r = validar_sondas(sondas, rotulos, pares, auc_min=0.7, setores=setores)
+    assert r["sonda"].tolist() == ["produto_beleza", "roda"]
+    assert r["setor"].tolist() == ["beleza", "automotivo"]
+    assert r["n"].tolist() == [20, 20]
+    assert r["positivos"].tolist() == [10, 10]
+    # na beleza a sonda separa (AUC 1); no automotivo o mesmo score é o avesso (AUC 0)
+    assert r["auc"].tolist() == pytest.approx([1.0, 0.0])
+    assert r["passa"].tolist() == [True, False]
+
+
+def test_par_sem_setor_continua_valendo_nos_dois_e_o_rotulo_em_texto_tambem():
+    ids, setores, rotulo, score = _dois_setores()
+    sondas = pd.DataFrame({"sonda_rosto_thumb": score, "sonda_roda_thumb": score})
+    rotulos = pd.DataFrame({"tem_rosto": rotulo, "close_up_produto": rotulo})
+    pares = {"rosto": "tem_rosto", "roda": {"rotulo": "close_up_produto", "setor": "automotivo"}}
+    r = validar_sondas(sondas, rotulos, pares, auc_min=0.7, setores=setores)
+    assert r["setor"].tolist() == ["todos", "automotivo"]
+    assert r["n"].tolist() == [40, 20]
+    # sem `setores`, os pares sem filtro valem como antes
+    sem = validar_sondas(sondas, rotulos, {"rosto": "tem_rosto"}, auc_min=0.7)
+    assert sem.loc[0, "auc"] == pytest.approx(r.loc[0, "auc"])
+
+
+def test_setor_sem_tabela_de_setores_ou_sem_posts_e_erro_explicito():
+    ids, setores, rotulo, score = _dois_setores()
+    sondas = pd.DataFrame({"sonda_roda_thumb": score})
+    rotulos = pd.DataFrame({"close_up_produto": rotulo})
+    pares = {"roda": {"rotulo": "close_up_produto", "setor": "automotivo"}}
+    with pytest.raises(ValueError, match="setores"):
+        validar_sondas(sondas, rotulos, pares, auc_min=0.7)
+    so_beleza = setores.where(setores == "beleza", "beleza")  # nenhum post de automotivo
+    with pytest.raises(ValueError, match="automotivo"):
+        validar_sondas(sondas, rotulos, pares, auc_min=0.7, setores=so_beleza)
+    erro = {"roda": {"rotulo": "close_up_produto", "sector": "automotivo"}}  # chave errada
+    with pytest.raises(ValueError, match="sector"):
+        validar_sondas(sondas, rotulos, erro, auc_min=0.7, setores=setores)
+
+
+def test_ressalvas_da_saida_em_uma_linha_cada():
+    ids = _ids(6)
+    sondas = pd.DataFrame({"sonda_falando_thumb": np.arange(4.0)}, index=ids[:4])
+    rotulos = pd.DataFrame({"tem_rosto": [True] * 5}, index=ids[1:])
+    linhas = ressalvas(sondas, rotulos, {"falando": "tem_rosto"})
+    assert linhas == [
+        "AUC é piso (rótulo do vídeo, sonda da capa)",
+        "falando é medida contra tem_rosto (proxy)",
+        "5 rótulos, 4 capas, 3 em comum",
+    ]
+    # sem o par "falando", a segunda ressalva não se aplica
+    assert len(ressalvas(sondas, rotulos, {"rosto": "tem_rosto"})) == 2
