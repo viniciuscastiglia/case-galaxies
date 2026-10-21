@@ -16,28 +16,53 @@ Uso: uv run python -m previa.final configs/experimentos/CONFIG.yaml --abrir-o-te
 """
 
 import argparse
+import json
 import sys
+import warnings
+from datetime import UTC, datetime
 from pathlib import Path
 
+import mlflow
+import numpy as np
 import pandas as pd
 
 from previa.baselines import ler_config as ler_config_baselines
+from previa.caminhos import CONFIGS
 from previa.coletor import DADOS
 from previa.dados import carregar_base
 from previa.experimento import (
     avisar_importancia_dominante,
     commit_atual,
+    expandir_features,
+    fixar_na_previsao,
     hash_base,
     ler_config,
     ler_duracoes,
     ler_embeddings_do_bloco,
     ler_extra,
+    linhas_de_treino,
+    matriz_da_dobra,
     registrar,
     rodar,
+    tabela_da_config,
 )
+from previa.flag import avaliar_flag, confidence_flag, limiares_da_calibracao
+from previa.flag import carregar_cfg as ler_cfg_flag
+from previa.intervalo import (
+    cobertura,
+    conter_o_numero,
+    escores_cqr,
+    faixa_de_posts,
+    intervalo,
+    prever_quantis,
+    q_chapeu,
+    treinar_quantis,
+)
+from previa.intervalo import ler_config as ler_cfg_intervalo
 from previa.splits import canal_novo_no_futuro, ler_avaliacao, split_treino_cal_teste
 
 REGISTRO = DADOS / "logs" / "teste_aberto.log"
+LOG_FINAL = DADOS / "logs" / "teste_final.log"
 CHAVES_FINAL = ("ganho_minimo", "cobertura_min_extra", "alarme_manchete", "alarme_spearman")
 
 
@@ -120,7 +145,7 @@ def avaliar_final(
 ) -> dict:
     """`rodar` com os folds do teste final: o mesmo treino e a mesma métrica do desenvolvimento.
 
-    TODO(M6): a cobertura do intervalo no teste entra aqui, depois da calibração.
+    A cobertura do intervalo no teste vem de `avaliar_intervalo`, na mesma abertura.
     """
     return rodar(
         cfg,
@@ -135,6 +160,204 @@ def avaliar_final(
         min_posts,
         folds_fn=folds_finais,
     )
+
+
+def calibracao_valida(d, cal, treino, cfg_av) -> pd.Index:
+    """As linhas de calibração: `linha`, em [cal_inicio, teste_inicio), com `p_base` (n_ref >= 3).
+
+    São as mesmas linhas que `avaliar` corrige (5.3, erros 2 e 3). Nenhuma pode estar no treino:
+    o q̂ vem de posts maduros que o modelo não viu. Falhou: `ValueError`.
+    """
+    datas = d.loc[cal, "published_at"]
+    ok = (
+        d.loc[cal, "linha"]
+        & (datas >= cfg_av["cal_inicio"])
+        & (datas < cfg_av["teste_inicio"])
+        & d.loc[cal, "p_base"].notna()
+    )
+    cal = cal[ok.to_numpy()]
+    vazou = cal.intersection(treino)
+    if len(vazou):
+        raise ValueError(
+            f"{len(vazou)} linhas de calibração estão no treino (5.3, erro comum 3): "
+            "o q̂ ficaria otimista"
+        )
+    return cal
+
+
+def _pinball(y, q, alfa) -> float:
+    e = np.asarray(y) - np.asarray(q)
+    return float(np.mean(np.maximum(alfa * e, (alfa - 1) * e)))
+
+
+def _tabela_cobertura(y, lo, hi, d_te, cfg_q) -> pd.DataFrame:
+    """Total, por setor, por faixa de posts anteriores (n_ref) e por mês de publicação (F41)."""
+    grupos = {
+        "setor": d_te["sector"],
+        "faixa_posts": faixa_de_posts(d_te["n_ref"], cfg_q),
+        "mes": d_te["published_at"].dt.strftime("%Y-%m"),
+    }
+    partes = []
+    total = cobertura(y, lo, hi, None).reset_index(names="grupo").assign(dimensao="total")
+    partes.append(total)
+    for dim, g in grupos.items():
+        t = cobertura(y, lo, hi, g.reset_index(drop=True))
+        t = t.drop(index="total").reset_index(names="grupo").assign(dimensao=dim)
+        partes.append(t)
+    saida = pd.concat(partes, ignore_index=True)
+    saida["n"] = saida["n"].astype(int)
+    return saida[["dimensao", "grupo", "n", "cobertura", "erro_padrao", "largura"]]
+
+
+def avaliar_intervalo(cfg, base, duracoes, cfg_av, cfg_q, cfg_flag, previsoes, **kw) -> dict:
+    """A M6 no teste: quantis, q̂ da calibração, cobertura do CQR e o flag (F16, F41; 5.2 a 5.4).
+
+    Só o cenário temporal, com a MESMA matriz de features do modelo pontual. `previsoes` é a
+    série do pontual (log1p, índice post_id), o número da tool (#40): o intervalo é alargado, se
+    preciso, para contê-lo. O q̂ vem só da calibração; o teste nunca entra nele. `kw`: embeddings,
+    extras, min_posts (como em `avaliar_final`).
+    """
+    embeddings, extras, min_posts = kw.get("embeddings"), kw.get("extras"), kw.get("min_posts", 3)
+    seed = kw.get("seed", 0)
+    d = tabela_da_config(cfg, base, duracoes, cfg_av, extras, min_posts)
+    base_feats = expandir_features(cfg.features, d.columns)
+    ((treino, teste),) = folds_finais(d, cfg_av)["temporal"]
+    datas = d["published_at"]
+    cal = d.index[
+        (d["linha"] & (datas >= cfg_av["cal_inicio"]) & (datas < cfg_av["teste_inicio"])).to_numpy()
+    ]
+    cal = calibracao_valida(d, cal, treino, cfg_av)
+    teste = teste[d.loc[teste, "p_base"].notna().to_numpy()]  # as linhas que `avaliar` corrige
+    embeddings = embeddings or {}
+    dobra_p, colunas_p = matriz_da_dobra(
+        d, treino, treino.union(teste), cfg, base_feats, embeddings, seed
+    )
+    dobra, feats = matriz_da_dobra(
+        d, treino, treino.union(cal).union(teste), cfg, base_feats, embeddings, seed
+    )
+    if feats != colunas_p:
+        raise ValueError(f"colunas dos quantis diferem do pontual: {feats} contra {colunas_p}")
+    modelos = treinar_quantis(dobra, treino, cfg, feats, cfg_q)
+    alfas = sorted(modelos)
+
+    def prever(idx):
+        x = fixar_na_previsao(dobra.loc[idx, feats], cfg)
+        return prever_quantis(modelos, x, dobra.loc[idx, "ref"], cfg)
+
+    q_cal, cruz_cal = prever(cal)
+    q_te, cruz_te = prever(teste)
+    qhat = q_chapeu(escores_cqr(q_cal[:, 0], q_cal[:, 2], dobra.loc[cal, "y"]), cfg_q.alpha_cqr)
+    if not np.isfinite(qhat):
+        raise ValueError(
+            f"q̂ infinito: a calibração tem {len(cal)} linhas, poucas para alpha_cqr="
+            f"{cfg_q.alpha_cqr} (k > n; 5.3). O intervalo não foi calculado."
+        )
+    y = dobra.loc[teste, "y"].to_numpy()
+    numero = previsoes.reindex(dobra.loc[teste, "post_id"]).to_numpy()
+    lo_c, hi_c = intervalo(q_te[:, 0], q_te[:, 2], qhat)
+    lo_c, hi_c = conter_o_numero(lo_c, hi_c, numero)
+    d_te = dobra.loc[teste]
+    tab_bruto = _tabela_cobertura(y, q_te[:, 0], q_te[:, 2], d_te, cfg_q)
+    tab_cqr = _tabela_cobertura(y, lo_c, hi_c, d_te, cfg_q)
+    tot = lambda t: t[t["dimensao"] == "total"].iloc[0]  # noqa: E731
+    m = {
+        "intervalo_qhat": float(qhat),
+        "intervalo_n_cal": len(cal),
+        "intervalo_n_teste": len(teste),
+        "intervalo_cruzamentos_cal": cruz_cal,
+        "intervalo_cruzamentos_teste": cruz_te,
+        "intervalo_bruto_cobertura": float(tot(tab_bruto)["cobertura"]),
+        "intervalo_bruto_largura": float(tot(tab_bruto)["largura"]),
+        "intervalo_cqr_cobertura": float(tot(tab_cqr)["cobertura"]),
+        "intervalo_cqr_largura": float(tot(tab_cqr)["largura"]),
+    }
+    for j, a in enumerate(alfas):
+        nome = f"q{round(a * 100)}"
+        m[f"intervalo_abaixo_{nome}"] = float(np.mean(y < q_te[:, j]))
+        m[f"intervalo_pinball_{nome}"] = _pinball(y, q_te[:, j], a)
+    for _, r in tab_cqr[tab_cqr["dimensao"] == "setor"].iterrows():
+        m[f"intervalo_cqr_cobertura_{r['grupo']}"] = float(r["cobertura"])
+    # o flag (5.4): limiares da calibração, sem kNN e sem extração (dist_knn=None, falhou=[])
+    largura_cal = pd.Series(q_cal[:, 2] - q_cal[:, 0] + 2 * qhat)
+    ultimo_treino = d.loc[linhas_de_treino(d, treino, cfg), "published_at"].max()
+    limiares = limiares_da_calibracao(largura_cal, None, ultimo_treino, cfg_flag)
+    motivos = []
+    for (_, r), lo, hi in zip(d_te.iterrows(), lo_c, hi_c, strict=True):
+        f = confidence_flag(
+            float(hi - lo), int(r["n_ref"]), [], None, r["published_at"].to_pydatetime(), limiares
+        )
+        motivos.append([x.codigo for x in f.motivos])
+    tab_flag = avaliar_flag(y, numero, motivos)
+    for _, r in tab_flag.iterrows():
+        sufixo = "" if r["grupo"] == "sinalizados" else f"_{r['grupo']}"
+        m[f"flag_taxa{sufixo}"] = float(r["taxa"])
+        if r["n"]:  # um grupo vazio não tem MAE: não é falha
+            m[f"flag_mae_{r['grupo']}"] = float(r["mae"])
+    return {
+        "metricas": {k: float(v) for k, v in m.items() if np.isfinite(v)},
+        "nao_finitas": [k for k, v in m.items() if not np.isfinite(v)],
+        "tabelas": {"cobertura_bruto": tab_bruto, "cobertura_cqr": tab_cqr, "flag": tab_flag},
+        "limiares": limiares,
+        "colunas": feats,
+        "colunas_pontual": colunas_p,
+    }
+
+
+def registrar_intervalo(run_id: str, iv: dict) -> None:
+    """Acrescenta ao MESMO run do teste as métricas `intervalo_*` e `flag_*` e as tabelas."""
+    nao_finitas = iv.get("nao_finitas", [])
+    if nao_finitas:
+        warnings.warn(
+            f"métrica não finita fora do registro do intervalo: {', '.join(nao_finitas)}",
+            stacklevel=2,
+        )
+    with mlflow.start_run(run_id=run_id):
+        if nao_finitas:
+            mlflow.set_tag("metricas_nao_finitas", ",".join(nao_finitas))
+        mlflow.log_metrics(iv["metricas"])
+        mlflow.log_dict(
+            {k: t.to_dict(orient="records") for k, t in iv["tabelas"].items()},
+            "intervalo_tabelas.json",
+        )
+        mlflow.log_dict(iv["limiares"], "intervalo_limiares.json")
+
+
+def _imprimir_intervalo(iv: dict) -> None:
+    m = iv["metricas"]
+    print(
+        f"\nintervalo (CQR, q̂ {m['intervalo_qhat']:.3f} em log, {m['intervalo_n_cal']} da "
+        f"calibração): cobertura {m['intervalo_cqr_cobertura']:.1%} (alvo 80%) · crua "
+        f"{m['intervalo_bruto_cobertura']:.1%} · largura {m['intervalo_cqr_largura']:.2f} em log · "
+        f"{m['intervalo_n_teste']} posts · cruzamentos {m['intervalo_cruzamentos_teste']}"
+    )
+    print(iv["tabelas"]["cobertura_cqr"].to_string(index=False, float_format="%.3f"))
+    print("\nflag (taxa e MAE por motivo; 5.4):")
+    print(iv["tabelas"]["flag"].to_string(index=False, float_format="%.3f"))
+
+
+def _guardar_falha(erro: BaseException, resultado: dict | None, log=None) -> None:
+    """Uma linha em `teste_final.log`: quando, a exceção e, se já existem, as métricas do pontual.
+
+    Os números sobrevivem a uma falha do MLflow ou do disco depois da abertura (o teste não
+    reabre). O próprio log falhar não pode mascarar a exceção original.
+    """
+    log = Path(LOG_FINAL if log is None else log)
+    metricas = None
+    if resultado is not None:
+        metricas = {
+            a: {k: float(v) for k, v in r.items() if isinstance(v, int | float | np.number)}
+            for a, r in resultado.items()
+        }
+    agora = datetime.now(UTC).isoformat(timespec="seconds")
+    linha = f"{agora} {type(erro).__name__}: {erro}"
+    if metricas is not None:
+        linha += " | " + json.dumps(metricas, ensure_ascii=False)
+    try:
+        log.parent.mkdir(parents=True, exist_ok=True)
+        with log.open("a", encoding="utf-8") as f:
+            f.write(linha.replace("\n", " ") + "\n")
+    except OSError as e:  # sem onde gravar: ao menos o terminal
+        print(f"ERRO ao gravar {log}: {e}\n{linha}", file=sys.stderr)
 
 
 def ja_aberto(registro=REGISTRO) -> list[str]:
@@ -230,34 +453,64 @@ def main(argv=None) -> int:
         extras,
     )
     base = carregar_base(final=True, registro=REGISTRO)  # uma vez: escreve o registro
-    n = len(ja_aberto(REGISTRO))
-    resultado = avaliar_final(
-        cfg,
-        base,
-        duracoes,
-        cfg_av,
-        cfg_b["n_boot"],
-        cfg_b["seed"],
-        embeddings,
-        extras,
-        cfg_b["min_posts"],
-    )
-    # registra ANTES de mostrar: os números ficam gravados antes de alguém vê-los
-    run_id = registrar(
-        cfg,
-        args.config,
-        resultado,
-        base,
-        tags={
-            "avaliacao": "final (teste)",
-            "abertura": str(n),
-            "data_corte": str(cfg_av["teste_inicio"].date()),
-            "teste_fim": str(cfg_av["teste_fim"].date()),
-        },
-        cfg_av=cfg_av,
-    )
+    resultado = None
+    try:
+        n = len(ja_aberto(REGISTRO))
+        resultado = avaliar_final(
+            cfg,
+            base,
+            duracoes,
+            cfg_av,
+            cfg_b["n_boot"],
+            cfg_b["seed"],
+            embeddings,
+            extras,
+            cfg_b["min_posts"],
+        )
+        # registra ANTES de mostrar: os números ficam gravados antes de alguém vê-los
+        run_id = registrar(
+            cfg,
+            args.config,
+            resultado,
+            base,
+            tags={
+                "avaliacao": "final (teste)",
+                "abertura": str(n),
+                "data_corte": str(cfg_av["teste_inicio"].date()),
+                "teste_fim": str(cfg_av["teste_fim"].date()),
+            },
+            cfg_av=cfg_av,
+        )
+    except Exception as erro:
+        _guardar_falha(erro, resultado)
+        raise
+    # o intervalo e o flag (M6) vêm depois do pontual já gravado: se quebrarem, o teste aberto
+    # não perde o resultado do pontual, e a falha fica numa tag do run (princípio 7)
+    try:
+        iv = avaliar_intervalo(
+            cfg,
+            base,
+            duracoes,
+            cfg_av,
+            ler_cfg_intervalo(CONFIGS / "intervalo.yaml"),
+            ler_cfg_flag(),
+            resultado["temporal"]["previsoes"],
+            embeddings=embeddings,
+            extras=extras,
+            min_posts=cfg_b["min_posts"],
+            seed=cfg_b["seed"],
+        )
+    except Exception as erro:
+        try:
+            with mlflow.start_run(run_id=run_id):
+                mlflow.set_tag("intervalo_erro", f"{type(erro).__name__}: {erro}"[:5000])
+        except Exception as erro_tag:  # a tag falhar não pode mascarar o erro original
+            _guardar_falha(RuntimeError(f"{erro!r}; e a tag falhou: {erro_tag!r}"), resultado)
+        raise
+    registrar_intervalo(run_id, iv)
     avisar_importancia_dominante(resultado)
     _imprimir(resultado, cfg_av)
+    _imprimir_intervalo(iv)
     print(f"\nrun {run_id} · abertura {n} · commit {commit_atual()} · base {hash_base(base)}")
     print(f"comando: uv run python -m previa.final {args.config} --abrir-o-teste")
     return 0

@@ -5,23 +5,30 @@ cujas datas cabem nela. Nada aqui toca a base real, o registro real nem o mlflow
 """
 
 import functools
+import json
 
 import mlflow
+import numpy as np
 import pandas as pd
 import pytest
 from test_experimento import _base, mlflow_temporario  # noqa: F401
 
 import previa.final as final
+from previa.caminhos import CONFIGS
 from previa.dados import carregar_base
 from previa.experimento import EXPERIMENTO, ler_config, preparar
 from previa.final import (
     alarmes,
     avaliar_final,
+    avaliar_intervalo,
+    calibracao_valida,
     conferir_cobertura,
     criterio,
     folds_finais,
     ja_aberto,
 )
+from previa.flag import carregar_cfg as ler_cfg_flag
+from previa.intervalo import ler_config as ler_cfg_intervalo
 from previa.splits import ler_avaliacao
 
 AVALIACAO = """\
@@ -187,6 +194,7 @@ def ambiente(tmp_path, cfg_av, monkeypatch, mlflow_temporario):  # noqa: F811
     reg = tmp_path / "logs" / "teste_aberto.log"
     (tmp_path / "exp.yaml").write_text(CONFIG)
     monkeypatch.setattr(final, "REGISTRO", reg)
+    monkeypatch.setattr(final, "LOG_FINAL", tmp_path / "logs" / "teste_final.log")
     monkeypatch.setattr(final, "caminho_da_base", lambda cfg_av: caminho)
     monkeypatch.setattr(final, "ler_avaliacao", lambda: cfg_av)
     monkeypatch.setattr(final, "ler_duracoes", lambda: dur)
@@ -203,7 +211,13 @@ def ambiente(tmp_path, cfg_av, monkeypatch, mlflow_temporario):  # noqa: F811
             registro=reg,
         ),
     )
-    return {"reg": reg, "cfg": str(tmp_path / "exp.yaml"), "dur": dur, "dir": tmp_path}
+    return {
+        "log": tmp_path / "logs" / "teste_final.log",
+        "reg": reg,
+        "cfg": str(tmp_path / "exp.yaml"),
+        "dur": dur,
+        "dir": tmp_path,
+    }
 
 
 def _nao_le_dados(*a, **k):
@@ -349,3 +363,218 @@ def test_cobertura_do_thumb_vale_como_extra_e_o_titulo_continua_100(mini, capsys
             {"duracoes": mini["tudo"], "titulo": titulo_995},
             {},
         )
+
+
+# --- M6 no teste final: intervalo e flag na mesma abertura (F16, F41; 5.2, 5.3, 5.4)
+
+
+@pytest.fixture
+def intervalo_pronto(cfg_av):
+    """(cfg, base, dur, resultado do pontual, resultado do intervalo) na base sintética."""
+    base, dur = _base()
+    cfg = ler_config_texto(CONFIG)
+    res = avaliar_final(cfg, base, dur, cfg_av, n_boot=50, seed=0)
+    cfg_q, cfg_f = ler_cfg_intervalo(CONFIGS / "intervalo.yaml"), ler_cfg_flag()
+    iv = avaliar_intervalo(cfg, base, dur, cfg_av, cfg_q, cfg_f, res["temporal"]["previsoes"])
+    return cfg, base, dur, res, iv
+
+
+def test_intervalo_cobertura_por_setor_faixa_e_mes(intervalo_pronto):
+    *_, iv = intervalo_pronto
+    for nome in ("cobertura_bruto", "cobertura_cqr"):
+        t = iv["tabelas"][nome]
+        assert {"total", "setor", "faixa_posts", "mes"} <= set(t["dimensao"])
+        assert {"beleza", "automotivo"} <= set(t.loc[t["dimensao"] == "setor", "grupo"])
+        meses = t.loc[t["dimensao"] == "mes", "grupo"]
+        assert "2025-06" in set(meses) and "2025-11" in set(meses)  # F41: o teste inteiro
+        assert t["cobertura"].between(0, 1).all()
+    total = iv["tabelas"]["cobertura_cqr"].query("dimensao == 'total'").iloc[0]
+    assert total["n"] == iv["metricas"]["intervalo_n_teste"] > 0
+    # q̂ >= 0 alarga o cru; q̂ < 0 (o cru já cobria demais na calibração) o encolhe
+    m = iv["metricas"]
+    sinal = m["intervalo_qhat"] >= 0
+    assert (m["intervalo_cqr_largura"] >= m["intervalo_bruto_largura"]) == sinal
+
+
+def test_intervalo_usa_as_mesmas_colunas_do_pontual(intervalo_pronto, cfg_av):
+    cfg, base, dur, _, iv = intervalo_pronto
+    from previa.experimento import expandir_features, tabela_da_config
+
+    d = tabela_da_config(cfg, base, dur, cfg_av)
+    assert iv["colunas"] == expandir_features(cfg.features, d.columns)
+    assert iv["colunas_pontual"] == iv["colunas"]
+
+
+def test_qhat_so_depende_da_calibracao(intervalo_pronto, cfg_av):
+    cfg, base, dur, res, iv = intervalo_pronto
+    mexida = base.copy()
+    no_teste = mexida["published_at"] >= cfg_av["teste_inicio"]
+    mexida.loc[no_teste, "metric_target"] = mexida.loc[no_teste, "metric_target"] * 20 + 7
+    cfg_q, cfg_f = ler_cfg_intervalo(CONFIGS / "intervalo.yaml"), ler_cfg_flag()
+    de_novo = avaliar_intervalo(
+        cfg, mexida, dur, cfg_av, cfg_q, cfg_f, res["temporal"]["previsoes"]
+    )
+    assert de_novo["metricas"]["intervalo_qhat"] == iv["metricas"]["intervalo_qhat"]
+    assert de_novo["metricas"]["intervalo_n_cal"] == iv["metricas"]["intervalo_n_cal"] > 0
+    assert (
+        de_novo["metricas"]["intervalo_cqr_cobertura"] != iv["metricas"]["intervalo_cqr_cobertura"]
+    )  # o teste mexeu na cobertura, não no q̂
+
+
+def test_intervalo_traz_quantis_pinball_e_flag(intervalo_pronto):
+    *_, iv = intervalo_pronto
+    m = iv["metricas"]
+    for a in ("q10", "q50", "q90"):
+        assert 0 <= m[f"intervalo_abaixo_{a}"] <= 1
+        assert m[f"intervalo_pinball_{a}"] >= 0
+    assert m["intervalo_cruzamentos_teste"] >= 0 and m["intervalo_cruzamentos_cal"] >= 0
+    assert 0 <= m["flag_taxa"] <= 1
+    flag = iv["tabelas"]["flag"]
+    assert {"sinalizados", "nao_sinalizados"} <= set(flag["grupo"])
+    assert iv["limiares"]["largura_log"] > 0  # o limiar vem da calibração
+
+
+def test_cli_registra_o_intervalo_no_mesmo_run(ambiente, capsys):
+    with pytest.warns(UserWarning, match="avaliação final"):
+        assert final.main([ambiente["cfg"], "--abrir-o-teste"]) == 0
+    runs = mlflow.search_runs(experiment_names=[EXPERIMENTO])
+    assert len(runs) == 1  # o mesmo run do teste
+    r = runs.iloc[0]
+    for k in (
+        "intervalo_cqr_cobertura",
+        "intervalo_qhat",
+        "intervalo_bruto_cobertura",
+        "flag_taxa",
+    ):
+        assert not np.isnan(r[f"metrics.{k}"]), k
+    cliente = mlflow.MlflowClient()
+    arquivos = {a.path for a in cliente.list_artifacts(r["run_id"])}
+    assert {"intervalo_tabelas.json", "intervalo_limiares.json"} <= arquivos
+    saida = capsys.readouterr().out
+    assert "intervalo" in saida.lower() and "flag" in saida.lower()
+    assert (
+        json.loads(mlflow.artifacts.load_text(f"runs:/{r['run_id']}/intervalo_limiares.json"))[
+            "min_posts"
+        ]
+        == 10
+    )
+
+
+def test_cli_calcula_o_intervalo_antes_de_imprimir(ambiente, monkeypatch):
+    ordem = []
+    real = final.registrar
+    monkeypatch.setattr(
+        final, "registrar", lambda *a, **k: ordem.append("registrar") or real(*a, **k)
+    )
+    monkeypatch.setattr(final, "_imprimir", lambda *a, **k: ordem.append("imprimir") or [])
+    monkeypatch.setattr(final, "_imprimir_intervalo", lambda *a, **k: ordem.append("imp_iv"))
+    real_iv = final.avaliar_intervalo
+    monkeypatch.setattr(
+        final, "avaliar_intervalo", lambda *a, **k: ordem.append("calcular_iv") or real_iv(*a, **k)
+    )
+    with pytest.warns(UserWarning):
+        final.main([ambiente["cfg"], "--abrir-o-teste"])
+    assert ordem.index("registrar") < ordem.index("calcular_iv") < ordem.index("imprimir")
+    assert ordem.index("registrar") < ordem.index("imp_iv")
+
+
+def test_calibracao_so_linhas_validas_e_fora_do_treino(d, cfg_av):
+    ((treino, teste),) = folds_finais(d, cfg_av)["temporal"]
+    cal = d.index[
+        (d["published_at"] >= cfg_av["cal_inicio"]) & (d["published_at"] < cfg_av["teste_inicio"])
+    ]
+    ok = calibracao_valida(d, cal, treino, cfg_av)
+    assert len(ok) > 0 and d.loc[ok, "linha"].all() and d.loc[ok, "p_base"].notna().all()
+    assert not ok.intersection(treino).size and not ok.intersection(teste).size
+
+
+def test_calibracao_no_treino_dispara_a_asserção(d, cfg_av):
+    ((treino, _),) = folds_finais(d, cfg_av)["temporal"]
+    cal = d.index[
+        (d["published_at"] >= cfg_av["cal_inicio"]) & (d["published_at"] < cfg_av["teste_inicio"])
+    ]
+    vazado = treino.union(cal[:3])  # três linhas da calibração caem no treino
+    with pytest.raises(ValueError, match="calibração estão no treino"):
+        calibracao_valida(d, cal, vazado, cfg_av)
+
+
+def test_erro_no_intervalo_deixa_o_pontual_registrado_e_a_tag(ambiente, monkeypatch):
+    def quebra(*a, **k):
+        raise RuntimeError("quantis quebraram")
+
+    monkeypatch.setattr(final, "avaliar_intervalo", quebra)
+    with pytest.warns(UserWarning), pytest.raises(RuntimeError, match="quantis quebraram"):
+        final.main([ambiente["cfg"], "--abrir-o-teste"])
+    runs = mlflow.search_runs(experiment_names=[EXPERIMENTO])
+    assert len(runs) == 1
+    assert "quantis quebraram" in runs.iloc[0]["tags.intervalo_erro"]
+    assert not np.isnan(runs.iloc[0]["metrics.temporal_manchete_modelo"])  # o pontual ficou
+    assert len(ja_aberto(ambiente["reg"])) == 1
+
+
+def test_qhat_infinito_levanta_antes_de_registrar(cfg_av):
+    import dataclasses
+
+    base, dur = _base()
+    cfg = ler_config_texto(CONFIG)
+    res = avaliar_final(cfg, base, dur, cfg_av, n_boot=50, seed=0)
+    cfg_q = dataclasses.replace(ler_cfg_intervalo(CONFIGS / "intervalo.yaml"), alpha_cqr=1e-6)
+    with pytest.raises(ValueError, match="q̂"):
+        avaliar_intervalo(
+            cfg, base, dur, cfg_av, cfg_q, ler_cfg_flag(), res["temporal"]["previsoes"]
+        )
+
+
+def test_metrica_nao_finita_vira_tag_e_aviso(ambiente, monkeypatch):
+    real = final.avaliar_intervalo
+
+    def com_nan(*a, **k):
+        iv = real(*a, **k)
+        iv["metricas"]["intervalo_pinball_q50"] = float("nan")
+        iv["nao_finitas"] = ["intervalo_pinball_q50"]
+        iv["metricas"] = {k: v for k, v in iv["metricas"].items() if np.isfinite(v)}
+        return iv
+
+    monkeypatch.setattr(final, "avaliar_intervalo", com_nan)
+    with pytest.warns(UserWarning, match="não finita"):
+        final.main([ambiente["cfg"], "--abrir-o-teste"])
+    runs = mlflow.search_runs(experiment_names=[EXPERIMENTO])
+    assert runs.iloc[0]["tags.metricas_nao_finitas"] == "intervalo_pinball_q50"
+
+
+def test_falha_ao_registrar_guarda_as_metricas_no_log(ambiente, monkeypatch):
+    def quebra(*a, **k):
+        raise OSError("disco cheio")
+
+    monkeypatch.setattr(final, "registrar", quebra)
+    with pytest.warns(UserWarning), pytest.raises(OSError, match="disco cheio"):
+        final.main([ambiente["cfg"], "--abrir-o-teste"])
+    linhas = ambiente["log"].read_text(encoding="utf-8").splitlines()
+    assert len(linhas) == 1 and "OSError: disco cheio" in linhas[0]
+    dados = json.loads(linhas[0].split(" ", 1)[1].split(" | ", 1)[1])
+    assert "manchete_modelo" in dados["temporal"] and "canal_novo" in dados
+
+
+def test_falha_antes_do_pontual_loga_so_a_excecao(ambiente, monkeypatch):
+    def quebra(*a, **k):
+        raise ValueError("pontual quebrou")
+
+    monkeypatch.setattr(final, "avaliar_final", quebra)
+    with pytest.warns(UserWarning), pytest.raises(ValueError, match="pontual quebrou"):
+        final.main([ambiente["cfg"], "--abrir-o-teste"])
+    assert "ValueError: pontual quebrou" in ambiente["log"].read_text(encoding="utf-8")
+
+
+def test_falha_do_set_tag_nao_mascara_a_excecao_original(ambiente, monkeypatch):
+    def quebra(*a, **k):
+        raise RuntimeError("quantis quebraram")
+
+    def tag_quebra(*a, **k):
+        raise ConnectionError("mlflow fora")
+
+    monkeypatch.setattr(final, "avaliar_intervalo", quebra)
+    monkeypatch.setattr(mlflow, "set_tag", tag_quebra)
+    with pytest.warns(UserWarning), pytest.raises(RuntimeError, match="quantis quebraram"):
+        final.main([ambiente["cfg"], "--abrir-o-teste"])
+    log = ambiente["log"].read_text(encoding="utf-8")
+    assert "quantis quebraram" in log and "mlflow fora" in log  # os dois ficam registrados

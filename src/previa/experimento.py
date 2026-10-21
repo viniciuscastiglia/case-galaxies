@@ -484,6 +484,40 @@ def avisar_importancia_dominante(resultado: dict, limite=LIMITE_IMPORTANCIA) -> 
             )
 
 
+def tabela_da_config(cfg: Config, base, duracoes, cfg_av, extras=None, min_posts=3):
+    """`preparar` com os parâmetros da config, mais as colunas de ruído (2.6, erro comum 2)."""
+    d = preparar(
+        base,
+        duracoes,
+        cfg_av,
+        cfg.lacuna_dias,
+        min_posts=min_posts,
+        min_posts_alvo=cfg.min_posts_alvo,
+        extras=extras,
+    )
+    if cfg.ruido:  # o tamanho do acaso nesta avaliação (2.6, erro comum 2)
+        ruido = np.random.default_rng(cfg.seed).normal(size=(len(d), cfg.ruido))
+        for k in range(cfg.ruido):
+            d[f"ruido_{k + 1}"] = ruido[:, k]
+    return d
+
+
+def matriz_da_dobra(d, tr, ids, cfg: Config, base_feats, embeddings, seed=0):
+    """A matriz de features de uma dobra: as linhas `ids` de `d` e as colunas de PCA.
+
+    O PCA é ajustado só nas linhas `tr` (3.6 e 4.4) e aplicado a todas as `ids`; o `rodar` e o
+    teste final (que acrescenta a calibração às `ids`) usam a mesma função. Devolve (dobra, feats).
+    """
+    dobra, feats = d.loc[ids].copy(), list(base_feats)
+    for bloco, n_comp in cfg.pca.items():
+        cols, _ = aplicar_pca(
+            embeddings[bloco], d.loc[tr, "post_id"], dobra["post_id"], n_comp, bloco, seed
+        )
+        dobra[list(cols.columns)] = cols.to_numpy()
+        feats += list(cols.columns)
+    return dobra, feats
+
+
 def rodar(
     cfg: Config,
     base,
@@ -508,19 +542,7 @@ def rodar(
     Cada avaliação traz `importancia` (Series, ganho normalizado das features) e
     `importancia_maior_fatia` (float, a maior fatia; o alarme é `avisar_importancia_dominante`).
     """
-    d = preparar(
-        base,
-        duracoes,
-        cfg_av,
-        cfg.lacuna_dias,
-        min_posts=min_posts,
-        min_posts_alvo=cfg.min_posts_alvo,
-        extras=extras,
-    )
-    if cfg.ruido:  # o tamanho do acaso nesta avaliação (2.6, erro comum 2)
-        ruido = np.random.default_rng(cfg.seed).normal(size=(len(d), cfg.ruido))
-        for k in range(cfg.ruido):
-            d[f"ruido_{k + 1}"] = ruido[:, k]
+    d = tabela_da_config(cfg, base, duracoes, cfg_av, extras, min_posts)
     base_feats = expandir_features(cfg.features, d.columns)
     validar_tabela_de_treino(d, base_feats)  # o contrato, antes de qualquer fit (F15; 1.8, 3.5)
     for nome, bloco in (extras or {}).items():  # senão o tratamento vira o controle (4.8, erro 4)
@@ -535,13 +557,7 @@ def rodar(
         for k, (tr, te) in enumerate(pares):
             if so_avaliar is not None:
                 te = te[d.loc[te, "post_id"].isin(so_avaliar).to_numpy()]
-            dobra, feats = d.loc[tr.union(te)].copy(), list(base_feats)
-            for bloco, n_comp in cfg.pca.items():
-                cols, _ = aplicar_pca(
-                    embeddings[bloco], d.loc[tr, "post_id"], dobra["post_id"], n_comp, bloco, seed
-                )
-                dobra[list(cols.columns)] = cols.to_numpy()
-                feats += list(cols.columns)
+            dobra, feats = matriz_da_dobra(d, tr, tr.union(te), cfg, base_feats, embeddings, seed)
             modelo, n = treinar_gbm(dobra, tr, cfg, feats)
             arvores.append(n)
             modelos.append(modelo)
