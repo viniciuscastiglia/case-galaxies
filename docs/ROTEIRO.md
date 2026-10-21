@@ -290,6 +290,7 @@ O Claude traz cada uma na hora certa, com contexto e opções. A recomendação 
 | 36 | Leitura da ablação na abertura (F32): as três leituras da 2.6 lado a lado | 2.6 | 6 | mostrar escada, todos menos um e ruído juntos; a régua #27 continua sendo a regra | **decidida 21/10 (A): a #27 decide o modelo; só o bloco sólido nas três leituras vira argumento** |
 | 37 | Carregamento do modelo de uso (F23): a 2.5 e a 7.1 pedem o MLflow (`models:/...`); a 6.1 e a 6.6 usam pasta mais variável de ambiente | 2.5, 6.1, 6.6, 7.1 | 6 | seguir a 6.x e registrar o bundle como artefato do run de treino final, com o run id no `model_version`; vai para `conflitos.md` | **decidida 21/10 (A); conflitos #19** |
 | 38 | Corte 4 (21/10, 13h30): ~12,9 h de trabalho dele para ~8,5 h úteis até 23h59 | "Se atrasar" | 6 | B: A2 para o Claude (ele escreve descrições e erros); teach-backs para 22/10; autoavaliação e F14 do rascunho do Claude; M9 com pré-triagem do Claude; A4 e A7 do Claude com o caso à mão dele; README: ele reescreve 3 seções | **decidida 21/10 (B)** |
+| 39 | Modelo final, na abertura das H2 a H11 | 2.5, 2.6 | 6 | o que a #27 aprovou (sem histórico e texto; capa, H5, Huber), conferido contra a H11 antes do teste | **decidida 21/10 (A)** |
 
 **Pendências do Claude:**
 
