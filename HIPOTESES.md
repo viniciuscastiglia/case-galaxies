@@ -180,3 +180,19 @@ Controle: o melhor GBM da Opção A, na amostra de 1.400 Shorts
 Tratamento: + cortes, movimento e aparência dos frames (4.3) e fala e energia do áudio (4.5)
 Resultado:
 Decisão:
+
+## H11: perda de Huber no lugar da L2 (#32)
+
+Data: 2026-10-21 (escrita antes de rodar; a H10, dos detectores da capa, vem depois)
+Hipótese: trocar a L2 pela Huber (δ = 1 em log) diminui o erro no número (`mae_log`), mas não mexe tanto na ordem
+  (manchete), porque os Shorts parecidos continuam recebendo a mesma avaliação entre si.
+Mecanismo: quando há Shorts virais, a Huber os inclui na conta, mas com um limite. Na L2, o erro entra ao quadrado, e
+  um viral puxa o número de todos os Shorts parecidos (na folha da Lumina, com 9 Shorts em 0 e 1 em +3,0: 0,30 com L2
+  e 0,11 com Huber; o `mae_log` dos 10 cai de 0,54 para 0,39).
+Métrica e limiar: a régua da #27 no walk-forward de 2025 e no "canal novo no futuro", na base toda: a Huber fica se
+  melhorar o `mae_log`, com IC 95% pareado por canal sem o zero, sem piorar a manchete (o IC da manchete não fica
+  inteiro do lado ruim). Senão, a L2 fica, agora escolhida pela medição.
+Controle: o completo da H7 com L2 (`configs/experimentos/h7_thumb.yaml`, run `f405ee37`)
+Tratamento: a mesma config com `objective: huber` e `alpha: 1.0` (`configs/experimentos/h11_huber.yaml`)
+Resultado:
+Decisão:
