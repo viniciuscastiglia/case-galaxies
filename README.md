@@ -140,7 +140,7 @@ npx @modelcontextprotocol/inspector uv run --directory /caminho/absoluto/case-ga
 uv run python -m previa.servidor_mcp --http   # HTTP Streamable em http://127.0.0.1:8000/mcp
 uv run python -m previa.demo --mcp           # a demo (#18): de-para no golden e o A ou B pelo MCP
 uv run python -m previa.agente PEDIDO.json   # o grafo num pedido (--publicado: explicação pelo LLM)
-uv run python -m previa.avaliacao_agente      # F30: o agente com o Gemini real em 24 perguntas (precisa do .env)
+uv run python -m previa.avaliacao_agente      # o agente com o Gemini real em 24 perguntas (precisa do .env)
 ```
 
 - **Sem chave nenhuma:** os testes, os experimentos sobre a base congelada e a previsão com o histórico congelado
@@ -283,13 +283,13 @@ canais; manchete pesada pelo número de Shorts de cada canal. Sem alarme de "bom
   erro típico cai de um fator de ×2,72 para ×2,52 [2,21; 3,06] (ganho relativo de 7,5% [1,8%; 12,7%]); Spearman
   intra-canal de 0,18 contra 0,05 do baseline, e global de 0,75 [0,55; 0,86]. IC por bootstrap de canais; métricas
   `temporal_*` e `canal_novo_*` do run.
-- **Painel do teste (F1, IC por bootstrap de canais, run `6b1f7e77`):**
+- **Painel do teste (IC por bootstrap de canais, run `6b1f7e77`):**
 
   | Cenário | `mae_log` | e^MAE | RMSE em log | Spearman global | F1 nas faixas | ganho relativo no MAE |
   | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
   | Temporal | 0,925 [0,794; 1,117] | ×2,52 [2,21; 3,06] | 1,29 [1,08; 1,57] | 0,75 [0,55; 0,86] | 0,20 [0,18; 0,23] | 7,5% [1,8%; 12,7%] |
   | Canal novo | 0,942 [0,815; 1,127] | ×2,56 [2,26; 3,09] | 1,29 [1,10; 1,56] | 0,73 [0,52; 0,85] | 0,17 [0,15; 0,20] | 5,7% [2,9%; 8,2%] |
-- **Cobertura do intervalo de 80% no teste (F41):** **76,5%** no total (alvo 80%; crua 68,9% antes do CQR), abaixo da
+- **Cobertura do intervalo de 80% no teste:** **76,5%** no total (alvo 80%; crua 68,9% antes do CQR), abaixo da
   faixa de 80% ± 3 da M6, e a queda é o drift da aula 7.5:
 
   | Recorte | n | Cobertura (alvo 80%) | Erro-padrão | Largura em log |
@@ -315,7 +315,7 @@ canais; manchete pesada pelo número de Shorts de cada canal. Sem alarme de "bom
 - **Confiabilidade da rubrica do VLM:** teste-reteste em 50 Shorts, kappa de 0,72 (gancho) a 1,00 (rosto e close de
   produto); os 6 campos passam do limiar de 0,6. O kappa mede a estabilidade do VLM com ele mesmo, não o acerto.
 - **`confidence_flag` no teste (5.4):** dispara em **61,4%** dos Shorts (4.341 de 7.075), quase todos por
-  `data_fora_do_periodo` (54,1%, esperado com o modelo de janeiro, F21) e 18,2% por `intervalo_largo`. O flag separa o
+  `data_fora_do_periodo` (54,1%, esperado com o modelo de janeiro) e 18,2% por `intervalo_largo`. O flag separa o
   erro: MAE em log de **1,005** nos sinalizados contra **0,797** nos não sinalizados, e 1,265 no `intervalo_largo`.
 
   | Grupo | n | Taxa | MAE em log |
@@ -324,7 +324,7 @@ canais; manchete pesada pelo número de Shorts de cada canal. Sem alarme de "bom
   | Não sinalizados | 2.734 | 38,6% | 0,797 |
   | `data_fora_do_periodo` | 3.827 | 54,1% | 0,991 |
   | `intervalo_largo` | 1.290 | 18,2% | 1,265 |
-- **O agente com o LLM real (F30, aula 6.6, camada 5):** 24 perguntas ao `create_agent` com o Gemini
+- **O agente com o LLM real (aula 6.6, camada 5):** 24 perguntas ao `create_agent` com o Gemini
   (`gemini-3.5-flash-lite`), 15 com armadilha (canal fora da base, data sem fuso, pergunta sobre views, injeção na
   legenda e na pergunta), com as regras escritas antes de rodar (`previa.avaliacao_agente`). **Trajetória certa em 22
   de 24 (92%) e fidelidade dos números em 22 de 24 (92%)**; run `dc6cd141` do experimento `previa-agente`, com o
@@ -386,7 +386,7 @@ rótulo difere (seção 8). Por isso a comparação é de ordem de grandeza e de
   ~206 pares a até 14 dias para medir o ganho.
 - **O que é associação:** os fatores da explicação dizem o que o modelo aprendeu, não o que causa curtidas.
 - **Drift:** nada depois de ~19/09/2026; mudanças do algoritmo do YouTube depois disso ficam fora. A cobertura do
-  intervalo no teste caiu de 84,3% (abril) a 65,7% (setembro) e fechou em 76,5%, abaixo dos 80% (F41).
+  intervalo no teste caiu de 84,3% (abril) a 65,7% (setembro) e fechou em 76,5%, abaixo dos 80%.
 - **P(B > A) supõe erros independentes:** A e B dividem canal e modelo, então a probabilidade é uma aproximação
   conservadora (aula 6.3, Tool 5).
 - **A v2 não tem teste próprio:** o modelo de uso foi retreinado com dados até maio de 2026, gastando os meses do
@@ -395,21 +395,25 @@ rótulo difere (seção 8). Por isso a comparação é de ordem de grandeza e de
   6 explicações passaram no validador na 1ª tentativa. O validador confere números, fatores e termos, mas não a
   redação: na 1ª rodada passou "reduz a previsão em 23% a mais", e uma regra nova no prompt corrigiu isso na 2ª (de
   novo 6 de 6). Não foi avaliado em escala.
-- **O que a auditoria pedia e não foi feito** (`docs/AUDITORIA.md`, seção 3): o motivo `fora_da_distribuicao` do flag
-  não é calculado pela tool (a distância aos vizinhos não entra); a capa não tem cache por SHA-256 (é lida a cada
-  chamada); o índice dos comparáveis usa só a capa, sem o título; não há what-if (a Tool 5 só ordena); não há o
-  dogfooding com o `MultiServerMCPClient`, nem o teste no Claude Code e no Inspector (o MCP foi testado com o cliente
-  do FastMCP, em memória e por stdio); e a instalação não foi testada do zero numa máquina limpa (o CI roda os
-  testes num clone limpo a cada push); também ficaram de fora a repetição das comparações decisivas com outras
-  seeds (F5; tudo usa a seed 0), o limiar do detector de cortes calibrado com rótulos (F6; foi à mão, e o bloco de
-  vídeo não entrou no modelo), o juiz da explicação de outra família de LLM (F8), a sanidade com um canal fictício por
-  faixa de tamanho (F12), o relatório de experimento no template do hub (F28; as hipóteses e os resultados estão no
-  `HIPOTESES.md` e na seção 7) e o random forest como segundo baseline (F36). As seções 4 a 7 da auditoria não foram
-  cruzadas de novo com o código final.
+- **O que o material da liga sugere e o Prévia não tem:**
+  - o motivo "fora da distribuição" no flag (aula 5.4): a tool não mede a distância do criativo aos Shorts do treino;
+  - o what-if (aula 7.2): a comparação ordena criativos prontos, mas não sugere o que mudar neles;
+  - um juiz da explicação de outra família de LLM (aula 5.7): a explicação é conferida por regras (números, fatores
+    e termos proibidos), não por um segundo modelo;
+  - comparáveis pela capa e pelo título (aula 6.4): o índice usa só a capa;
+  - o random forest como segundo baseline (aula 3.2) e as comparações decisivas repetidas com outras seeds (aula
+    2.6): tudo usa a seed 0;
+  - a sanidade com um canal fictício por faixa de tamanho (aula 1.4) e o relatório de experimento no template do hub
+    (as hipóteses e os resultados estão no `HIPOTESES.md` e na seção 7);
+  - o cache da capa pelo conteúdo (aula 6.3): a mesma capa é processada a cada chamada.
+- **Testes de integração que faltam:** o MCP foi testado com o cliente do FastMCP (em memória e por stdio), não pelo
+  adaptador do LangGraph (`MultiServerMCPClient`, aula 6.5) nem num host como o Claude Code ou o Inspector; a
+  instalação não foi testada numa máquina limpa (o CI roda os testes num clone limpo a cada push).
 - **Fora do modelo:** a transcrição e o idioma da fala (#35), a clusterização dos descritores (a rubrica tem campos
-  fixos, F38), o detector de objetos (o produto em close ficou na rubrica, #31), a leitura do texto na capa (só a
+  fixos), o detector de objetos (o produto em close ficou na rubrica, #31), a leitura do texto na capa (só a
   detecção: o PaddleOCR não instala na Stack 2026) e o baseline de regressão sobre os inscritos (os inscritos são os
-  do dia da coleta e vazariam o tamanho futuro do canal, F4).
+  do dia da coleta e vazariam o tamanho futuro do canal); o limiar do detector de cortes
+  do vídeo foi calibrado à mão (aula 4.3; o bloco de vídeo não entrou no modelo).
 - **Memória do pré-treino do VLM:** o Gemini recebe a URL pública do Short (`file_data`), então existe um risco
   pequeno de ele "lembrar" do vídeo ou do contador de curtidas em vez de só descrever o que vê (aula 7.3,
   "Vazamento pelo pré-treino"). A rubrica não pede nem recebe curtidas, não foi medido, e ela ficou fora do modelo
