@@ -3,6 +3,21 @@
 Histórico das sessões. As entradas novas ficam no topo, com 3 a 5 linhas por sessão (`/fechar-sessao`). O plano
 vivo está em `docs/ROTEIRO.md` e as decisões em `docs/DECISOES.md`.
 
+## 22/10 · cruzamento da auditoria com a entrega e o refino, sem mexer no modelo
+
+- O Claude cruzou a auditoria (F1 a F43 e a seção 3) com o entregue (`docs/CRUZAMENTO.md`): 32 entregues, 4 parciais,
+  3 não feitos declarados e 4 sem declaração. O mais sério: a explicação citava sondas não validadas ("produto beleza"
+  nos 3 canais automotivos da demo). Um run exploratório, sem documentar, mostrou que tirá-las não muda o número.
+- O Vinicius tirou a apresentação do centro e fixou o escopo: refinar sem mexer no modelo; o Claude executa e decide o
+  que seria dele com "a revisar". O plano `2026-10-22-refino` (12 tasks, TDD) rodou inline, com um revisor no fim.
+- Números: golden reproduzível (`previa.demo --golden`): 24 de 30 e 41 de 58, os 30 números iguais antes e depois;
+  limiar do `fora_da_distribuicao` 0,357 (p99 de 3.825 posts da calibração); ~0,4 s por criativo pelo MCP; seeds 0 a 2:
+  a capa e a Huber passam nas três; random forest (`938cb82e`) 54,2%, superado pelo final. `main` em `5c726fc`, 718
+  testes, no GitHub.
+- Lições: a frase "intervalo mais largo no canal pequeno" era o +1 do log1p (o revisor pegou); o `HIPOTESES.md`
+  entregue tinha os resultados vazios, que o README dizia estarem lá.
+- Próxima sessão: o estudo do Vinicius, pelas linhas "a revisar" do `DECISOES.md`; dados brutos apagados em 30/10.
+
 ## 21/10 (noite, 19h50 a 00h) · teste final, modelo de uso, o agente inteiro e a entrega
 
 - O teste final abriu uma vez (run `6b1f7e77`): +5,6 pontos [+3,6; +7,1] no temporal e +3,5 [+1,9; +4,9] no canal

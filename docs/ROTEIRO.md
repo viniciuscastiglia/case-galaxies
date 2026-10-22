@@ -6,12 +6,12 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
 
 ## Agora
 
-- **Fase: pós-entrega.** Entregue em 21/10, até 23h59: o repositório público (`main` em `5d6175a`, 670 testes) e o
-  vídeo no YouTube. Apresentação em 23/10. Teste final aberto UMA vez (run `6b1f7e77`): NÃO rodar `previa.final`.
-- **Próximo passo: as limitações, a partir de um cruzamento novo feito pelo Vinicius** (TAPI, hub e aulas contra o
-  código). A seção 8 do README e as listas do Claude de 21/10 são provisórias, não são o ponto de partida.
-- **Depois:** teach-backs e o estudo das peças delegadas em 21/10 (A2, A4, A6, M9, F30 e as seções 7 e 8 do README);
-  apagar os dados brutos em 30/10. Sem bloqueios.
+- **Fase: pós-entrega, refino feito (22/10).** O cruzamento da auditoria com a entrega (`docs/CRUZAMENTO.md`) virou
+  o plano `2026-10-22-refino`, aplicado sem mexer no modelo: `main` em `5c726fc`, 718 testes, no GitHub. Teste final
+  aberto UMA vez (run `6b1f7e77`): NÃO rodar `previa.final`. A apresentação não guia mais o trabalho.
+- **Próximo passo: o estudo do Vinicius**, no ritmo dele: as linhas "a revisar pelo Vinicius" do `DECISOES.md` (22/10)
+  e as peças delegadas (A2, A4, A6, M9, F30), com teach-back; opcional, o `claude mcp add` ou o Inspector.
+- **Prazo duro: 30/10**, apagar os dados brutos pelo passo a passo do data card (já com todas as pastas). Sem bloqueios.
 
 ## Como funciona
 
@@ -75,9 +75,10 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
   - [x] a base congelada (versão e hash) (19/10: v1, hash `09f6035c11c9`)
   - [x] o esqueleto de experimentos (YAML + dataclass, MLflow com commit, hash e corte, teste de perturbação) (19/10)
   - [x] `auditar_datas` (1.7) (19/10)
-  - [ ] a tabela de baselines na base real, com a mediana madura e o fallback por degrau: a tabela e a manchete
+  - [x] a tabela de baselines na base real, com a mediana madura e o fallback por degrau: a tabela e a manchete
     existem (19/10); os baselines mais fortes da 2.1 entraram em 21/10 (k = 10, manchete 0,501, empate com a
-    mediana madura, 0,497); o fallback por degrau é a cadeia da #34, na A1
+    mediana madura, 0,497); o fallback por degrau é a cadeia da #34, na A1 (22/10: o random forest com defaults como
+    segundo baseline, no desenvolvimento)
   - [x] a lista dos 50 Shorts para conferir (19/10)
 - **Pronta quando:** existe a tabela de baselines na base real, com o split definitivo e o run id, e as hipóteses
   estão escritas antes de rodar.
@@ -284,14 +285,14 @@ O Claude traz cada uma na hora certa, com contexto e opções. A recomendação 
 - ~~recoleta das estatísticas antes do treino final~~ (feita: a base v2, 21/10);
 - apagar os dados brutos em 30/10, pelo passo a passo do data card v1 (inclui as pastas do módulo 4 e do golden set); o MLflow é decisão do Vinicius;
 - inscritos da API em `data/canais.csv`, fora do git desde 21/10 (a versão pública é `docs/curadoria_canais.csv`); apagar em 30/10;
-- adiados da revisão final do lote de 21/10 (nenhum bloqueia; o detalhe estava no ledger do plano
-  `2026-10-21-lote-auditoria`):
-  - antes da A1: `faixa_do_canal` com escalar devolve um array 0-d (a tool precisa de `.item()`);
-  - antes do teste final: `k_escolhido` depende da ordem de `ks` e pula NaN em silêncio; `painel_do_run` e
-    `previa.erros` não chamam `conferir_cortes`; o `avaliacao.json` do run é lido do arquivo, e não do `cfg_av`;
-  - polimento: o F1 do painel por `bincount` (~6 s a menos por avaliação); o `auditoria.py:43` com caminho
-    relativo; o check do pandera poderia exigir a lacuna (`<= published_at − lacuna`); a `linha` vazia passa no
-    contrato; o `LIMITE_IMPORTANCIA` no código, e não na config.
+- ~~adiados da revisão final do lote de 21/10~~ (feitos em 22/10, no refino, menos o F1 do painel por `bincount`,
+  que é só desempenho);
+- adiados da revisão final do refino de 22/10 (nenhum bloqueia): o cache da capa sem trava entre threads; o
+  `fora_da_distribuicao` não roda quando falta a duração (desenho da 5.4; o model card só cita "sem capa"); a
+  fidelidade de alguns testes (índice antigo por atribuição; o degrau no teste das curtidas ocultas); a H11 com o
+  arredondamento do README; `avaliacao_crua` sem uso em `experimento.py`;
+- depois de retreinar o modelo de uso, rodar `previa.indice` de novo (o limiar do `fora_da_distribuicao` é da
+  calibração do pacote; com outro pacote, a regra se desliga com aviso).
 
 **README (texto do Vinicius, na A8):** o porquê do alvo e "posts anteriores **e maduros**"; o critério de sucesso.
 

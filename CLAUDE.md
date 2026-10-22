@@ -15,13 +15,14 @@ O briefing oficial é o TAPI (`escopo_projeto.md`), que é o nome do documento, 
 
 ## Agora
 
-- **Entregue em 21/10** (repositório público e vídeo); apresentação em 23/10. Fase atual e próximo passo: o "Agora"
-  do `docs/ROTEIRO.md`. Agora é refinamento: as limitações saem de um cruzamento novo feito pelo Vinicius; a seção 8
-  do README é provisória.
+- **Entregue em 21/10** (repositório público e vídeo). Fase atual e próximo passo: o "Agora" do `docs/ROTEIRO.md`.
+  Em 22/10, o refino sem mexer no modelo (`docs/CRUZAMENTO.md`, plano `2026-10-22-refino`); a apresentação não guia
+  mais o trabalho. Nesta fase o Claude executa e decide o que seria do Vinicius com "a revisar" no `DECISOES.md`.
 - **O que existe:** base v1 (experimentos e teste) e v2 (modelo de uso, run `5373921a`, em `artefatos/`); o teste
   final abriu UMA vez (run `6b1f7e77`; nunca rodar `previa.final` de novo); `previsao.prever_criativo` em passos, o
   servidor MCP, o agente LangGraph (grafo de 5 nós e `create_agent`), o explicador com validador, a demo e o F30.
-- **Delegado em 21/10 para estudo dele:** A2, A4, A6, M9, F30 e as seções 7 e 8 do README; teach-backs pendentes.
+- **Delegado para estudo dele:** A2, A4, A6, M9, F30 e as seções 7 e 8 do README (21/10), mais as linhas "a revisar
+  pelo Vinicius" do `DECISOES.md` (22/10); teach-backs pendentes.
 
 ## Papéis
 
@@ -137,7 +138,7 @@ uv run python -m previa.curadoria buscar   # busca por termo (data/termos_busca.
 ./scripts/coletar.sh                       # coleta diária (carrega o .env; log em data/logs/coleta.log)
 uv run mlflow ui --port 5001               # a porta 5000 é do AirPlay
 uv run python -m previa.experimento configs/experimentos/opcao_a_texto.yaml   # um experimento (MLflow)
-uv run python -m previa.experimento comparar RUN_A RUN_B   # B sobre A nas duas réguas (#27), pareado por canal
+uv run python -m previa.experimento comparar RUN_A RUN_B   # B sobre A nas duas réguas (#27), pareado por canal; aceita o id curto
 uv run python -m previa.ablacao configs/ablacao.yaml   # escada, todos menos um e ruído (2.6, 4.8)
 uv run python -m previa.erros RUN_ID     # resíduos por corte e os 20 piores para a M9 (2.6)
 uv run python -m previa.baselines janela   # a manchete da #6 para os baselines
@@ -150,6 +151,7 @@ uv run python -m previa.modelo treinar configs/experimentos/final.yaml configs/a
 uv run python -m previa.indice             # índice dos comparáveis do modelo de uso (em artefatos/)
 uv run python -m previa.servidor_mcp       # servidor MCP (stdio; --http em 127.0.0.1:8000/mcp)
 uv run python -m previa.demo --mcp         # demo #18: de-para no golden e o A ou B pelo MCP
+uv run python -m previa.demo --golden      # golden com alarme (24/30, 41/58); --sanidade; --langchain (MCP pelo adaptador)
 uv run python -m previa.agente PEDIDO.json # o grafo num pedido (--publicado: explicação pelo Gemini)
 uv run python -m previa.avaliacao_agente   # F30: o agente com o Gemini real em 24 perguntas (precisa do .env)
 ```
@@ -191,9 +193,12 @@ Nunca mostre chaves em saída de terminal ou log. Erros da API do Google trazem 
 - **faster-whisper 1.2.1 + PyAV 19:** passe o áudio como array (o `decode_audio` quebra).
 - **Caminhos (F18):** `previa.caminhos` é absoluto; `PREVIA_DADOS` e `GALAXIES_ARTEFATOS` trocam dados e artefatos
   (vazio vira o padrão; relativo é erro). O `tests/conftest.py` aponta os dois e o MLflow para uma pasta temporária.
-- **Modo automático:** push, `git branch -f main` e mudar a visibilidade do repositório são bloqueados para o
-  Claude; o Vinicius roda com `!` no prompt.
-- **Uso da conta:** dois subagentes em paralelo gastaram ~15 pontos em 10 minutos (21/10). Avise antes de lançar.
+- **Modo automático:** push só com o pedido explícito do Vinicius (em 22/10, com o pedido, passou); `git branch -f
+  main` e mudar a visibilidade do repositório: o Vinicius roda com `!` no prompt.
+- **Uso da conta:** dois subagentes em paralelo gastaram ~15 pontos em 10 minutos (21/10); um revisor de branch
+  inteira levou ~290 mil tokens e 14 minutos (22/10). Avise antes de lançar.
+- **Índice dos comparáveis:** depois de retreinar o modelo de uso, rode `previa.indice`. O limiar do
+  `fora_da_distribuicao` é da calibração do pacote; com outro pacote, a regra se desliga com aviso.
 - **Gemini free tier no agente:** o F30 (24 perguntas, ~60 pedidos) bateu 429 numa delas.
 - **MLflow 3.16:** `set_tracking_uri` e `set_experiment` escrevem `MLFLOW_TRACKING_URI` e `MLFLOW_EXPERIMENT_ID` no
   ambiente do processo; num teste, use a fixture `mlflow_temporario`, nunca o `mlflow.db` real.
