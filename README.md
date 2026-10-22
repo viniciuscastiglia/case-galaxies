@@ -123,7 +123,11 @@ uv run python -m previa.ablacao configs/ablacao.yaml   # a ablação por blocos 
 uv run mlflow ui --port 5001                          # a porta 5000 é do AirPlay no macOS
 ```
 
-<!-- PREENCHER (A2): o comando do servidor e o do treino do modelo de uso -->
+```bash
+# o modelo de uso (v2) e o índice dos comparáveis, em GALAXIES_ARTEFATOS (padrão: artefatos/)
+uv run python -m previa.modelo treinar configs/experimentos/final.yaml configs/avaliacao_v2.yaml
+uv run python -m previa.indice
+```
 
 #### Usar pelo MCP
 
