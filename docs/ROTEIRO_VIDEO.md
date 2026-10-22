@@ -1,6 +1,6 @@
 # Roteiro do vídeo (5 a 7 minutos)
 
-Segue o "Roteiro de demonstração" do hub da liga (`templates`). Cada bloco tem a fala (para ler em voz alta, como
+**Como gravar, passo a passo:** `docs/TUTORIAL_GRAVACAO.md`. Segue o "Roteiro de demonstração" do hub da liga (`templates`). Cada bloco tem a fala (para ler em voz alta, como
 teleprompter), o que fica na tela e o comando. São ~800 palavras: lendo com calma, ~6 minutos.
 
 **Antes de gravar (5 min):**
@@ -59,7 +59,7 @@ teleprompter), o que fica na tela e o comando. São ~800 palavras: lendo com cal
 
 ## Bloco 5 · 3:00 · Ao vivo: o de-para (~90 s)
 
-**Tela:** o terminal. **Comando:** `uv run python -m previa.demo`
+**Tela:** o terminal. **Comando:** `uv run python -m previa.demo --mcp` (aperte Enter já gravando; leia o 1º parágrafo enquanto roda)
 
 > Agora ao vivo. Estes são seis canais que ficaram fora da base de propósito, e de cada um eu peguei o Short mais
 > recente, por uma regra escrita antes de rodar, para não escolher a dedo. Para cada um, o modelo não vê as curtidas:
@@ -77,7 +77,7 @@ teleprompter), o que fica na tela e o comando. São ~800 palavras: lendo com cal
 
 ## Bloco 6 · 4:30 · Pelo MCP (~45 s)
 
-**Tela:** o terminal. **Comando:** `uv run python -m previa.demo --mcp` (role até o fim da saída)
+**Tela:** o mesmo terminal do bloco 5, rolado até o fim da saída (não rode nada de novo)
 
 > O Prévia não é só um script. Ele é um servidor MCP, que qualquer agente pode chamar, como o da Galaxies ou o Claude.
 > Aqui, um cliente sobe o servidor, lista as duas tools, prever_criativo e comparar_criativos, e faz a mesma
