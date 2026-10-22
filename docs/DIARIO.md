@@ -3,6 +3,18 @@
 Histórico das sessões. As entradas novas ficam no topo, com 3 a 5 linhas por sessão (`/fechar-sessao`). O plano
 vivo está em `docs/ROTEIRO.md` e as decisões em `docs/DECISOES.md`.
 
+## 21/10 (noite, 19h50 a 00h) · teste final, modelo de uso, o agente inteiro e a entrega
+
+- O teste final abriu uma vez (run `6b1f7e77`): +5,6 pontos [+3,6; +7,1] no temporal e +3,5 [+1,9; +4,9] no canal
+  novo, critério cumprido; `mae_log` 0,925 contra 0,999; cobertura de 76,5% (cai de 84% em abril a 66% em setembro).
+  Modelo de uso: a v2, run `5373921a`. Golden com a v2: cobertura 24/30, par-a-par 41/58.
+- Feitos e no `main`: M6, flag, `prever_criativo` (em passos), MCP (A2, A7), A4 (6/6 com o Gemini real), A6 completa
+  (5 nós), F30 (22/24 e 22/24, run `dc6cd141`), a demo #18, a M9 por regra, README profissional, cards, tutorial do
+  vídeo. Repositório público pela opção B; vídeo gravado e enviado. 670 testes.
+- Lições: a A6 foi reduzida pelo Claude sem perguntar (refeita completa); dois agentes em paralelo gastaram 15
+  pontos de uso em 10 minutos; o cruzamento com a auditoria foi parcial até ele perguntar.
+- Próxima sessão: o Vinicius faz um cruzamento novo para identificar as limitações.
+
 ## 21/10 (tarde, 13h30 a 18h) · lote da auditoria no main e as decisões #32 a #35 e #38
 
 - O lote sem decisão da auditoria rodou em 9 tasks com subagentes, cada uma revisada, e passou numa revisão final

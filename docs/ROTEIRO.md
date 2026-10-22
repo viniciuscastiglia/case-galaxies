@@ -6,18 +6,12 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
 
 ## Agora
 
-- **Checkpoint (21/10, 21h45).** Tudo commitado e verde (666 testes, ruff limpo) no `feat/lote-noite-2`, até
-  `39f0444`: MCP e A7, A2 (texto do Claude), A4 (`explicador.py`), A6 (`agente.py`), a demo (`previa.demo`, regra
-  #18), a M9 (triagem por regra, `.superpowers/sdd/2026-10-21-agente/m9.md`), o roteiro do vídeo
-  (`docs/ROTEIRO_VIDEO.md`), README e cards sem `PREENCHER` nem comentários, a opção B do repo público
-  (`docs/curadoria_canais.csv`; `data/canais.csv` fora do git). Teste final aberto UMA vez (run `6b1f7e77`): NÃO rodar
-  `previa.final` de novo.
-- **Falta, do Vinicius (o modo automático bloqueia o Claude de publicar):** (1) `git branch -f main feat/lote-noite-2
-  && git push origin main feat/lote-noite-2`; (2) `gh repo edit viniciuscastiglia/case-galaxies --visibility public
-  --accept-visibility-change-consequences`; (3) gravar o vídeo pelo roteiro e subir no YouTube; (4) enviar à liga o
-  link do repo e o do vídeo até 23h59.
-- **Depois da entrega:** `/fechar-sessao`; o Vinicius estuda e reescreve A2, A4, A6, M9 e as seções 7 e 8 do README
-  (delegados em 21/10); teach-backs em 22/10.
+- **Fase: pós-entrega.** Entregue em 21/10, até 23h59: o repositório público (`main` em `5d6175a`, 670 testes) e o
+  vídeo no YouTube. Apresentação em 23/10. Teste final aberto UMA vez (run `6b1f7e77`): NÃO rodar `previa.final`.
+- **Próximo passo: as limitações, a partir de um cruzamento novo feito pelo Vinicius** (TAPI, hub e aulas contra o
+  código). A seção 8 do README e as listas do Claude de 21/10 são provisórias, não são o ponto de partida.
+- **Depois:** teach-backs e o estudo das peças delegadas em 21/10 (A2, A4, A6, M9, F30 e as seções 7 e 8 do README);
+  apagar os dados brutos em 30/10. Sem bloqueios.
 
 ## Como funciona
 
@@ -69,7 +63,7 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
 - **Vinicius escreve:**
   - [x] M1 (17/10, teach-back em `estudos/TEACHBACKS.md`)
   - [x] M2 (19/10; código do Claude a partir do caso à mão, #26)
-  - [ ] `HIPOTESES.md` (19/10: H1, H2 e H4; faltam H3, H5 a H9)
+  - [x] `HIPOTESES.md` (19/10: H1, H2 e H4; faltam H3, H5 a H9)
 - **Claude:**
   - [x] `splits.py` portado da 2.3, com testes, e `folds_de_desenvolvimento` (17/10)
   - [x] `metricas.py` portado da 2.4, com testes (18/10), e a manchete da #6 (19/10)
@@ -97,7 +91,7 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
   - [x] features de texto (#9) (18/10)
   - [x] LightGBM × CatBoost (#10) (18/10)
   - [x] lacuna (#11) (18/10)
-  - [ ] conferência dos 50 Shorts (#19)
+  - [x] conferência dos 50 Shorts (#19)
   - [x] idade do rótulo (#21) (18/10)
 - **Vinicius escreve:**
   - [x] M3 (19/10; código do Claude, #26; a parte do Vinicius é a H2 e a leitura)
@@ -107,7 +101,7 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
   - [x] o bloco `txt_` (manuais, cache de embeddings, PCA por fold no runner) (19/10)
   - [x] (19/10, com o treino da M4, #26) o runner em volta da M4: configuração, carga dos dados, montagem das features e registro no MLflow. O treino
     em si (early stopping, refit e comparação com o baseline) é a M4
-  - [ ] a recoleta das estatísticas antes do treino final
+  - [x] a recoleta das estatísticas antes do treino final
   - [x] o início do download das thumbnails, em background (19/10; ~8 h, termina à noite)
 - **Marco 1:** GBM × baseline em walk-forward e em "canal novo no futuro", com IC pareado por canal.
 
@@ -118,13 +112,13 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
   - rápida: [ ] 6.2, [ ] 6.3, [ ] Function calling (revisão)
 - **Vinicius decide:** [x] setores no contrato (#22) (18/10)
 - **Vinicius escreve:**
-  - [ ] A1
-  - [ ] A2
+  - [x] A1
+  - [x] A2 (21/10: texto do Claude, a pedido do Vinicius)
 - **Claude:**
-  - [ ] `prever_criativo` como esqueleto andante (carrega o modelo uma vez, devolve `model_version`)
+  - [x] `prever_criativo` como esqueleto andante (carrega o modelo uma vez, devolve `model_version`)
   - [x] as versões fixadas (`fastmcp==3.4.7`, `mcp==1.30.0`, langgraph, langchain) (19/10)
   - [x] a guarda do OpenMP (20/10: `previa.openmp.um_runtime`; no Mac M4, torch + LightGBM dão segfault em qualquer ordem de import sem `OMP_NUM_THREADS=1`)
-  - [ ] os stubs das tools
+  - [x] os stubs das tools
 - **Marco 2:** `prever_criativo` responde pelo MCP no Inspector e dentro do Claude Code (`claude mcp add`), com o
   número do GBM.
 
@@ -136,10 +130,10 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
 - **Vinicius decide:**
   - [x] recorte multimodal (#12) (18/10)
   - [x] rubrica do VLM (#13) (18/10)
-  - [ ] limiares do flag (#14)
+  - [x] limiares do flag (#14)
 - **Vinicius escreve:**
-  - [ ] M6
-  - [ ] M9: assistir e classificar os 20 piores erros (a lista está pronta e lacrada: `data/erros/piores_2d1bb463.csv`, 20/10)
+  - [x] M6
+  - [x] M9: assistir e classificar os 20 piores erros (a lista está pronta e lacrada: `data/erros/piores_2d1bb463.csv`, 20/10) (21/10: por regra, pelo Claude, sem assistir aos vídeos; `data/erros/m9_triagem_e684ac8c.csv`)
 - **Claude:**
   - [x] thumbnails da base toda (SigLIP 2, sondas, OpenCV, PCA no treino) (20/10: 30.981 capas com embedding, 10 sondas e cor e brilho da faixa 9:16)
   - [x] amostra com frames, cortes e transcrição (apagando a mídia depois de extrair) (21/10, 0h15: 1.399 de 1.400; H9 e ablação da amostra rodadas e lacradas)
@@ -147,7 +141,7 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
   - [x] bootstrap pareado por canal da M9 (corte #24; o Vinicius faz teach-back): o da ablação, nas duas réguas (20/10)
   - [x] fusão com prefixos (19/10, no runner)
   - [x] o runner da ablação (20/10: `previa.ablacao`, escada + todos menos um + ruído; base toda e amostra rodadas e lacradas)
-  - [ ] o `confidence_flag` com as regras decididas
+  - [x] o `confidence_flag` com as regras decididas
   - [x] a medição da maturação (19/10: crescimento mediano de 0% depois de 21 dias; `previa.maturacao`)
 - **Pronta quando:** existe a tabela de ablação com IC e a cobertura do intervalo de 80% está medida, total e por
   setor.
@@ -158,26 +152,26 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
   - a fundo: [ ] 5.6, [ ] 5.7, [ ] 6.6
   - rápida: [ ] 5.5, [ ] 6.4
 - **Vinicius decide:**
-  - [ ] LLM do explicador (#15)
-  - [ ] background do SHAP (#16)
-  - [ ] explicação pelo MCP (#17)
-  - [ ] criativos da demo (#18)
-  - [ ] payload do explicador (#23)
+  - [x] LLM do explicador (#15)
+  - [x] background do SHAP (#16)
+  - [x] explicação pelo MCP (#17)
+  - [x] criativos da demo (#18)
+  - [x] payload do explicador (#23)
 - **Vinicius escreve:**
-  - [ ] A4: o validador
-  - [ ] A7: a invariante
+  - [x] A4: o validador
+  - [x] A7: a invariante
 - **Claude:**
-  - [ ] A5 e A6 (corte #24; o Vinicius faz teach-back de cada uma): A5 pronta em 19/10 (`previa.comparaveis`)
-  - [ ] o prompt da A4 e o teste de injeção da A7 (corte #25; o Vinicius faz teach-back)
-  - [ ] M8, o `top_drivers` (corte #28; o Vinicius faz teach-back)
+  - [x] A5 e A6 (corte #24; o Vinicius faz teach-back de cada uma): A5 pronta em 19/10 (`previa.comparaveis`) (A6 completa em 21/10; teach-back pendente)
+  - [x] o prompt da A4 e o teste de injeção da A7 (corte #25; o Vinicius faz teach-back) (teach-back pendente)
+  - [x] M8, o `top_drivers` (corte #28; o Vinicius faz teach-back) (teach-back pendente)
   - [x] SHAP (`pred_contrib`, e o intervencional para o fundo da #16) (19/10)
-  - [ ] payload e template da explicação
-  - [ ] cliente do LLM e LLM falso
-  - [ ] corpos das tools 1 a 5
+  - [x] payload e template da explicação
+  - [x] cliente do LLM e LLM falso
+  - [x] corpos das tools 1 a 5
   - [x] índice de comparáveis (19/10)
-  - [ ] `Passos` do grafo
+  - [x] `Passos` do grafo
   - [x] golden set congelado (canais fora do treino) (19/10: 30 Shorts de 6 canais, `data/golden/`)
-  - [ ] testes de contrato e de regressão
+  - [x] testes de contrato e de regressão
   - [x] CI no GitHub Actions (pytest e ruff, sem dados e sem LLM) (19/10; o primeiro run, em 21/10, passou em
     ~2 min 20 s no Ubuntu: run `39647277817`, commit `1b25813`)
 - **Pronta quando:** o agente passa nos testes (invariante, injeção, golden set) e a explicação é validada.
@@ -186,14 +180,14 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
 
 - **Leitura:** [ ] 6.7 (rápida)
 - **Vinicius escreve:**
-  - [ ] A8: o README até 21/10; o ensaio cronometrado e o ensaio de perguntas em 22 e 23/10
-  - [ ] autoavaliação do hub (até 21/10)
+  - [x] A8: o README até 21/10; o ensaio cronometrado e o ensaio de perguntas em 22 e 23/10 (README feito em 21/10; ensaios pendentes)
+  - [x] autoavaliação do hub (até 21/10)
 - **Claude:**
   - [x] rascunho do README a partir do `DECISOES.md` (corte #25; o Vinicius reescreve) (20/10: marcas `V:` e `PREENCHER:`)
-  - [ ] tabelas do README
-  - [ ] data card e model card finais
-  - [ ] respostas da demo salvas em JSON (plano B)
-  - [ ] verificação final
+  - [x] tabelas do README
+  - [x] data card e model card finais
+  - [x] respostas da demo salvas em JSON (plano B)
+  - [x] verificação final
 
 ## Dia a dia (horas do Vinicius)
 
@@ -287,9 +281,9 @@ O Claude traz cada uma na hora certa, com contexto e opções. A recomendação 
 **Pendências do Claude:**
 
 - resumos de 3 linhas da 3.4, 3.5, 4.8, 5.6, 6.7 e das EDD (corte #28), cada um entregue com a peça que o usa;
-- recoleta das estatísticas antes do treino final (Fase 2);
+- ~~recoleta das estatísticas antes do treino final~~ (feita: a base v2, 21/10);
 - apagar os dados brutos em 30/10, pelo passo a passo do data card v1 (inclui as pastas do módulo 4 e do golden set); o MLflow é decisão do Vinicius;
-- inscritos da API versionados em `data/canais.csv` até 30/10;
+- inscritos da API em `data/canais.csv`, fora do git desde 21/10 (a versão pública é `docs/curadoria_canais.csv`); apagar em 30/10;
 - adiados da revisão final do lote de 21/10 (nenhum bloqueia; o detalhe estava no ledger do plano
   `2026-10-21-lote-auditoria`):
   - antes da A1: `faixa_do_canal` com escalar devolve um array 0-d (a tool precisa de `.item()`);

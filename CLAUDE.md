@@ -15,15 +15,13 @@ O briefing oficial é o TAPI (`escopo_projeto.md`), que é o nome do documento, 
 
 ## Agora
 
-- **Reta final de 14 a 21/10** (entrega até 23h59; 22 e 23/10 são de preparo da apresentação), em 6 fases. Fase,
-  próximo passo e bloqueios: o "Agora" do `docs/ROTEIRO.md`.
-- **Base pronta:** 70 canais (35 por setor) e ~31 mil Shorts rotulados; coleta diária (launchd, 5h15) até 30/10.
-- **Modelo (19/10):** GBM com alvo relativo ao canal, avaliado no walk-forward de 2025 e no "canal novo" pelo
-  runner (`previa.experimento`, MLflow); modelo de uso em `previa.modelo`. Ainda não há intervalo (M6) nem agente.
-- **Auditoria (21/10, #30):** `docs/AUDITORIA.md` lista as faltas (F1 a F43, por prioridade). A seção 3 diz o que
-  cada peça de hoje precisa cumprir; a seção 9 traz as decisões e a ordem do dia. O Vinicius só leu até o módulo 2: cada peça abre com o
-  conceito mínimo da aula no chat, antes do caso à mão (#29). Os itens sem decisão estão feitos e no `main` (21/10);
-  o corte #38 tirou dele a A2, a A4, a A7 e parte da M9 e do README.
+- **Entregue em 21/10** (repositório público e vídeo); apresentação em 23/10. Fase atual e próximo passo: o "Agora"
+  do `docs/ROTEIRO.md`. Agora é refinamento: as limitações saem de um cruzamento novo feito pelo Vinicius; a seção 8
+  do README é provisória.
+- **O que existe:** base v1 (experimentos e teste) e v2 (modelo de uso, run `5373921a`, em `artefatos/`); o teste
+  final abriu UMA vez (run `6b1f7e77`; nunca rodar `previa.final` de novo); `previsao.prever_criativo` em passos, o
+  servidor MCP, o agente LangGraph (grafo de 5 nós e `create_agent`), o explicador com validador, a demo e o F30.
+- **Delegado em 21/10 para estudo dele:** A2, A4, A6, M9, F30 e as seções 7 e 8 do README; teach-backs pendentes.
 
 ## Papéis
 
@@ -148,6 +146,12 @@ uv run python -m previa.sondas             # AUC das sondas da capa contra a rub
 uv run python -m previa.vlm rodar          # rubrica do VLM (precisa do .env; ~500 pedidos por dia)
 uv run python -m previa.thumbs             # thumbnails da base (retoma do cache)
 uv run python -m previa.midia amostra      # frames, cortes e áudio da amostra: SÓ do IP de casa
+uv run python -m previa.modelo treinar configs/experimentos/final.yaml configs/avaliacao_v2.yaml  # modelo de uso
+uv run python -m previa.indice             # índice dos comparáveis do modelo de uso (em artefatos/)
+uv run python -m previa.servidor_mcp       # servidor MCP (stdio; --http em 127.0.0.1:8000/mcp)
+uv run python -m previa.demo --mcp         # demo #18: de-para no golden e o A ou B pelo MCP
+uv run python -m previa.agente PEDIDO.json # o grafo num pedido (--publicado: explicação pelo Gemini)
+uv run python -m previa.avaliacao_agente   # F30: o agente com o Gemini real em 24 perguntas (precisa do .env)
 ```
 
 Nos experimentos, a base entra por `previa.dados.carregar_base()`, que lê a base congelada (`base` em
@@ -187,6 +191,10 @@ Nunca mostre chaves em saída de terminal ou log. Erros da API do Google trazem 
 - **faster-whisper 1.2.1 + PyAV 19:** passe o áudio como array (o `decode_audio` quebra).
 - **Caminhos (F18):** `previa.caminhos` é absoluto; `PREVIA_DADOS` e `GALAXIES_ARTEFATOS` trocam dados e artefatos
   (vazio vira o padrão; relativo é erro). O `tests/conftest.py` aponta os dois e o MLflow para uma pasta temporária.
+- **Modo automático:** push, `git branch -f main` e mudar a visibilidade do repositório são bloqueados para o
+  Claude; o Vinicius roda com `!` no prompt.
+- **Uso da conta:** dois subagentes em paralelo gastaram ~15 pontos em 10 minutos (21/10). Avise antes de lançar.
+- **Gemini free tier no agente:** o F30 (24 perguntas, ~60 pedidos) bateu 429 numa delas.
 - **MLflow 3.16:** `set_tracking_uri` e `set_experiment` escrevem `MLFLOW_TRACKING_URI` e `MLFLOW_EXPERIMENT_ID` no
   ambiente do processo; num teste, use a fixture `mlflow_temporario`, nunca o `mlflow.db` real.
 
