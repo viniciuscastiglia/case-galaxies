@@ -140,6 +140,7 @@ npx @modelcontextprotocol/inspector uv run --directory /caminho/absoluto/case-ga
 uv run python -m previa.servidor_mcp --http   # HTTP Streamable em http://127.0.0.1:8000/mcp
 uv run python -m previa.demo --mcp           # a demo (#18): de-para no golden e o A ou B pelo MCP
 uv run python -m previa.agente PEDIDO.json   # o grafo num pedido (--publicado: explicação pelo LLM)
+uv run python -m previa.avaliacao_agente      # F30: o agente com o Gemini real em 24 perguntas (precisa do .env)
 ```
 
 - **Sem chave nenhuma:** os testes, os experimentos sobre a base congelada e a previsão com o histórico congelado
@@ -323,6 +324,14 @@ canais; manchete pesada pelo número de Shorts de cada canal. Sem alarme de "bom
   | Não sinalizados | 2.734 | 38,6% | 0,797 |
   | `data_fora_do_periodo` | 3.827 | 54,1% | 0,991 |
   | `intervalo_largo` | 1.290 | 18,2% | 1,265 |
+- **O agente com o LLM real (F30, aula 6.6, camada 5):** 24 perguntas ao `create_agent` com o Gemini
+  (`gemini-3.5-flash-lite`), 15 com armadilha (canal fora da base, data sem fuso, pergunta sobre views, injeção na
+  legenda e na pergunta), com as regras escritas antes de rodar (`previa.avaliacao_agente`). **Trajetória certa em 22
+  de 24 (92%) e fidelidade dos números em 22 de 24 (92%)**; run `dc6cd141` do experimento `previa-agente`, com o
+  tracing do MLflow. Leitura das 3 perguntas marcadas: uma não foi respondida (a cota do Gemini, erro 429); duas são
+  falsos positivos das regras (o agente pediu o `channel_stats` com um exemplo que tinha "100"; recusou "um número
+  arbitrário como 50.000" e chamou a tool). A fidelidade só confere números: numa resposta, o agente atribuiu o
+  intervalo largo a uma "alta volatilidade histórica do canal", uma causa que não está nos dados.
 - **Onde o modelo erra (M9, aula 2.6):** os 20 piores erros do modelo final no walk-forward de 2025 (run `e684ac8c`)
   são todos subestimações, de 416× a 2.249×. Pela regra escrita antes de classificar (views ≥ 100× a mediana do
   canal e menos de 5 comentários por mil curtidas = sinal de anúncio): **12 com sinal de impulsionamento** (Renault,
@@ -387,8 +396,8 @@ rótulo difere (seção 8). Por isso a comparação é de ordem de grandeza e de
   não é calculado pela tool (a distância aos vizinhos não entra); a capa não tem cache por SHA-256 (é lida a cada
   chamada); o índice dos comparáveis usa só a capa, sem o título; não há what-if (a Tool 5 só ordena); não há o
   dogfooding com o `MultiServerMCPClient`, nem o teste no Claude Code e no Inspector (o MCP foi testado com o cliente
-  do FastMCP, em memória e por stdio); o agente não foi avaliado com um LLM real em 20 a 30 perguntas, nem com o
-  tracing do MLflow (F30); e a instalação não foi testada do zero numa máquina limpa.
+  do FastMCP, em memória e por stdio); e a instalação não foi testada do zero numa máquina limpa (o CI roda os
+  testes num clone limpo a cada push).
 - **Fora do modelo:** a transcrição e o idioma da fala (#35), a clusterização dos descritores (a rubrica tem campos
   fixos, F38), o detector de objetos (o produto em close ficou na rubrica, #31), a leitura do texto na capa (só a
   detecção: o PaddleOCR não instala na Stack 2026) e o baseline de regressão sobre os inscritos (os inscritos são os
