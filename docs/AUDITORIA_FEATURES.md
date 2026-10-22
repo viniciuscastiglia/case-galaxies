@@ -57,6 +57,20 @@ deixa esse resto pequeno quando as curtidas estabilizam, e a medição da matura
 | fala transcrita | áudio do vídeo | instante da publicação | nenhuma | |
 | nota do gancho | VLM sobre os frames do gancho | instante da publicação | alvo, se o prompt receber métricas | conferir que o prompt não recebe views nem curtidas |
 
+## Da capa (modelo final)
+
+Acrescentada em 22/10/2026 para cobrir as features do modelo final (`configs/experimentos/final.yaml`), que vieram
+depois desta tabela.
+
+| Feature | Fonte | Quando existe | Família de risco | Teste |
+| :--- | :--- | :--- | :--- | :--- |
+| embedding da capa (`thumb_pc*`, PCA de 16 do SigLIP 2) | a thumbnail atual pela URL do `i.ytimg.com`, recortada na faixa 9:16 | dia da coleta (o canal pode trocar a capa depois de publicar) | temporal (brando); pré-processamento (o PCA) | `test_pca_ajustado_so_no_treino`; paridade com a tool em `test_paridade_treino_uso_com_extras` |
+| sondas da capa (`sonda_*_thumb`, 10) | o mesmo embedding contra frases fixas (`configs/multimodal.yaml`) | dia da coleta | temporal (brando) | `test_paridade_com_o_caminho_do_treino` (a tool calcula igual ao treino) |
+| aparência da capa (`thumb_brilho`, `thumb_contraste`, `thumb_saturacao`, `thumb_colorfulness`) | a mesma thumbnail, pelo OpenCV | dia da coleta | temporal (brando) | `test_paridade_com_o_caminho_do_treino` |
+
+Na previsão, a capa é a que a marca envia, que existe antes de publicar: o risco mora só no treino, onde a capa pode
+ser uma versão trocada depois. O data card registra isso como viés ("Capa da data da coleta").
+
 ## Removidas ou de controle
 
 | Feature | Fonte | Quando existe | Família de risco | Teste |

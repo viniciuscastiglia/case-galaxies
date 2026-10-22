@@ -62,7 +62,8 @@ reservas revisadas (2 marcas e 1 criador por setor), com o histórico dos 6 cana
 
 - **Termos:** YouTube API Services Terms of Service e Developer Policies, na versão de 14/09/2026 lida na aula 1.8.
 - **Uso:** educacional e interno, sem produto e sem clientes reais consumindo as previsões.
-- **Sem redistribuição:** o repositório (privado) tem o código, as planilhas de curadoria e este data card. Base,
+- **Sem redistribuição:** o repositório (público desde 21/10/2026) tem o código, a curadoria dos canais sem os
+  números da API (`docs/curadoria_canais.csv`) e este data card. Base,
   parquets, thumbnails, vídeos, frames e áudio ficam fora do git (`.gitignore`).
 - **Retenção:** a coleta diária renova as estatísticas de todo vídeo cujo dado mais recente passou de 25 dias e apaga
   os que sumiram da API. Em seguida, uma auditoria confere se algum vídeo passou de 30 dias sem renovação; se passou,
@@ -84,7 +85,9 @@ Passo a passo do apagamento, em 30/10 (v1: inclui as pastas do módulo 4 e do go
 launchctl bootout gui/$(id -u) ~/Library/LaunchAgents/com.previa.coletor.plist
 rm ~/Library/LaunchAgents/com.previa.coletor.plist
 rm -f data/shorts.duckdb data/*.parquet data/cota*.json data/amostra_multimodal.csv data/conferencia_shorts*.csv
+rm -f data/canais.csv data/candidatos.csv data/buscas.csv data/sondas_auc_v1.csv
 rm -rf data/logs data/thumbs data/emb_thumb_v1 data/cache data/vlm data/golden data/videos data/ablacao media/ artefatos/
+rm -rf data/demo data/erros data/det_thumb_v1 data/modelos
 ```
 
 **MLflow até 30/10:** o `mlflow.db` e o `mlruns/` ficam fora do git. Eles guardam as métricas agregadas, que o README cita pelo run id, e as previsões por `post_id` (`previsoes.json`), que são dado derivado da API: em 30/10, os `previsoes.json` são apagados e as métricas ficam.
@@ -98,7 +101,7 @@ rm -rf data/logs data/thumbs data/emb_thumb_v1 data/cache data/vlm data/golden d
   diários dos Shorts com até 60 dias e renovação dos vencidos.
 - **Regra de Short:** até 60 s se publicado antes de 15/10/2024, até 180 s depois (quando o limite mudou para 3
   minutos), e não horizontal: largura menor ou igual à altura no player, com formato desconhecido contando como
-  Short. A conferência de 50 Shorts a olho (#19, F14, 21/10) deu **49 de 50 de acordo com a regra do coletor (98%)**. Por
+  Short. A conferência de 50 Shorts a olho (#19, 21/10) deu **49 de 50 de acordo com a regra do coletor (98%)**. Por
   estrato: vertical recusado na borda 10/10; Short até 60 s antes de 15/10/2024 9/10; Short depois, de 61 a 180 s
   15/15; Short depois, até 60 s 15/15. A regra sem `isShort` erra em 1 de 50 nas bordas (`data/conferencia_shorts.csv`,
   `python -m previa.conferencia resultado`; DECISOES de 21/10).
@@ -203,16 +206,16 @@ Escritos pelo Vinicius em 08/10 (exercício da aula 1.8).
 
 **Atualização da v1 (21/10):** os números dos itens 1 e 3 são de 08/10. Na base congelada v1, a beleza tem 50% de marcas e o automotivo, 83% de criadores; a base de desenvolvimento tem rótulos com mediana de 636 dias, 85% com mais de 300. A idade do rótulo entrou como controle, fixada em 30 dias na previsão (H5: `mae_log` −0,018 [−0,028; −0,007]).
 
-4. **Capa da data da coleta.** (complemento do Claude, a revisar) A thumbnail é a de outubro de 2026, e o canal
+4. **Capa da data da coleta.** A thumbnail é a de outubro de 2026, e o canal
    pode tê-la trocado depois da publicação. Na previsão, a capa de A e B é a que a marca escolher.
 
-5. **VLM recebe a URL pública.** (complemento do Claude, a revisar) A rubrica é extraída pelo Gemini a partir da URL
+5. **VLM recebe a URL pública.** A rubrica é extraída pelo Gemini a partir da URL
    pública do Short, então há um risco pequeno de o modelo "lembrar" do vídeo do pré-treino em vez de só descrevê-lo
    (aula 7.3). Não pedimos nem damos curtidas ao VLM; o risco não foi medido.
-6. **Sem varredura semanal completa do coletor.** (complemento do Claude, a revisar) A coleta diária é incremental e
+6. **Sem varredura semanal completa do coletor.** A coleta diária é incremental e
    para quando uma página inteira de IDs já é conhecida; a aula 1.5 pede uma varredura completa por semana, porque a ordem da API não é
    garantida. Não a fizemos, e um Short fora de ordem pode ter ficado de fora.
-7. **Recall dos comparáveis não medido.** (complemento do Claude, a revisar) Não medimos quantos criativos parecidos
+7. **Recall dos comparáveis não medido.** Não medimos quantos criativos parecidos
    a busca de comparáveis recupera (RAG 6, recall@K).
 
 ## Esquema
@@ -237,12 +240,12 @@ curtidas. O modo estrito trava coluna faltando ou sobrando. A validação roda a
 | Sem reconhecimento facial | ✅ só a presença de rosto (um campo da rubrica), sem identificar ninguém | — |
 | Data card com "o que NÃO representa" e vieses | ✅ | — |
 | Esquema validado com pandera a cada exportação | ✅ desde 08/10 | — |
-| Previsão apresentada como estimativa do modelo | ❌ a tool ainda não existe | No contrato da tool (A1) e no README, até 21/10 |
+| Previsão apresentada como estimativa do modelo | ✅ toda resposta diz "Isto é uma estimativa do modelo, não métrica do YouTube" (`previsao._explicacao`) | — |
 | Plano de exclusão dos dados brutos, com data | ✅ 30/10/2026; a coleta desliga sozinha | Seguir o passo a passo acima; decidir o MLflow |
 
 ## Contato e versão
 
-- **Responsável:** Vinicius Castiglia. **Repositório:** `case-galaxies` (privado).
+- **Responsável:** Vinicius Castiglia. **Repositório:** <https://github.com/viniciuscastiglia/case-galaxies>.
 - **v0.1 (08/10/2026):** primeira versão, exercício da aula 1.8.
 - **v1 (20/10/2026):** a base congelada dos experimentos (70 canais, 31.303 Shorts), a mídia do módulo 4, o golden
-  set, a maturação medida e o passo a passo do apagamento com as pastas novas. Rascunho do Claude, a revisar.
+  set, a maturação medida e o passo a passo do apagamento com as pastas novas.

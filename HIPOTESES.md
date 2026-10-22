@@ -2,7 +2,8 @@
 
 Escritas **antes** de rodar (aula 2.5: o "jardim dos caminhos que se bifurcam"). Cada hipótese diz o que se espera,
 por quê, e como se decide. Depois de rodar, entram o resultado (com o run id do MLflow) e a decisão; o que estava
-escrito antes não muda.
+escrito antes não muda. Os resultados das H2 a H11 saem da abertura de 21/10 (`previa.abertura`), com os runs de
+controle e de tratamento; os Δ são do tratamento sobre o controle, em pontos na manchete e em log no `mae_log`.
 
 Regras de todas:
 
@@ -48,8 +49,8 @@ Métrica e limiar: a régua dos blocos (#27), nos folds de walk-forward de 2025:
 Controle: o GBM sem as features de histórico (a âncora do alvo relativo, a mediana madura do canal,
   continua: a H2 mede o histórico além dela)
 Tratamento: o GBM com as 9 features de histórico da 3.5 (`hist_*`, `tendencia`, `dias_desde_ultimo`, `posts_30d`)
-Resultado:
-Decisão:
+Resultado (abertura de 21/10, `uv run python -m previa.abertura`; controle → tratamento, walk-forward): `29c8914e` → `7b230752`: manchete −0,3 [−1,6; +0,6]; `mae_log` −0,011 [−0,032; +0,008].
+Decisão: não fica (nenhuma das duas réguas com IC sem o zero, #27); o modelo final não tem o histórico (#39).
 
 ## H3: lacuna do histórico (#11)
 
@@ -67,8 +68,8 @@ Controle: lacuna de 30 dias (princípio 2; `opcao_a_texto.yaml`)
 Tratamento: lacuna de 7 dias, a única candidata (`h3_lacuna_7.yaml`). A de 0 dias (`h3_lacuna_0.yaml`) entra na
   tabela só para mostrar o otimismo do backtest, nunca como candidata: o backtest volta o relógio, mas não as
   curtidas (a foto é de outubro de 2026), e um post com 0 a 3 dias ainda cresce +69% (decisão de 20/10)
-Resultado:
-Decisão:
+Resultado (abertura de 21/10, `uv run python -m previa.abertura`; controle → tratamento, walk-forward): lacuna de 7 dias, `7b230752` → `b6f87e18`: manchete −1,7 [−2,6; −0,6]; `mae_log` −0,018 [−0,032; −0,008]. A de 0 dias, só ilustração (`739112f6`): manchete +0,4 [−1,2; +1,8]; `mae_log` −0,062 [−0,082; −0,045], o ganho que o alvo imaturo dá de graça.
+Decisão: não fica (o `mae_log` melhora, mas a manchete piora com o IC inteiro do lado ruim); fica a lacuna de 30 dias.
 
 ## H4: texto (#9)
 
@@ -84,8 +85,8 @@ Métrica e limiar: a régua dos blocos (#27), nos folds de walk-forward de 2025,
 Controle: o GBM sem texto
 Tratamento: (a) as features manuais do título e da descrição (CTA, pergunta, hashtags, números, termos do setor);
   (b) as manuais + embeddings multilíngues com PCA de 16 ajustado só no treino
-Resultado:
-Decisão:
+Resultado (abertura de 21/10, `uv run python -m previa.abertura`; controle → tratamento, walk-forward): (a) manuais, `192a4f36` → `caba0e64`: manchete +0,1 [−0,6; +0,9]; `mae_log` +0,003 [−0,005; +0,011]. (b) embeddings, `192a4f36` → `7b230752`: manchete +0,3 [−0,4; +1,0]; `mae_log` +0,004 [−0,006; +0,015] (sobre a, `caba0e64` → `7b230752`: +0,2 [−0,6; +0,9]; +0,001 [−0,010; +0,013]).
+Decisão: não fica, nem (a) nem (b); o modelo final não tem o texto (#39).
 
 ## H5: idade do rótulo (#21)
 
@@ -104,8 +105,8 @@ Tratamento: `target_age_days` no treino, fixada em 30 na previsão (`h5_idade_co
   plataforma), não a maturação, que a curva já mediu (0% de crescimento a partir de ~21 dias). O 30 cai no galho
   da idade mais nova do treino (a árvore não extrapola): na previsão, vale "a época mais recente". A opção (b) da
   #21 (só rótulos de até 90 dias) sai: o rótulo mais novo do desenvolvimento tem 188 dias (decisão de 20/10)
-Resultado:
-Decisão:
+Resultado (abertura de 21/10, `uv run python -m previa.abertura`; controle → tratamento, walk-forward): `7b230752` → `889dbae6`: manchete +0,3 [−0,4; +1,2]; `mae_log` −0,018 [−0,028; −0,007].
+Decisão: fica (o `mae_log` melhora com IC sem o zero, sem piorar a manchete); a idade entra no treino e fica fixada em 30 na previsão.
 
 ## H6: teto por canal nas linhas de treino (#8)
 
@@ -125,8 +126,8 @@ Métrica e limiar: nos dois cenários do run, com papéis diferentes (decisão d
   no walk-forward de 2025, não pode piorar (o IC não fica inteiro do lado ruim) em nenhuma das duas.
 Controle: sem teto (a manchete, #8)
 Tratamento: até 400 Shorts por canal nas linhas de treino (o histórico continua com todos os posts)
-Resultado:
-Decisão:
+Resultado (abertura de 21/10, `uv run python -m previa.abertura`; controle → tratamento): `7b230752` → `09275208`. Canal novo: manchete −0,1 [−0,9; +0,8]; `mae_log` −0,005 [−0,017; +0,005]. Walk-forward (só a guarda de não piorar): manchete −0,1 [−0,9; +0,8]; `mae_log` +0,006 [−0,007; +0,021].
+Decisão: não fica (no canal novo, nenhuma régua com IC sem o zero); o treino segue sem teto.
 
 ## H7: thumbnail (#12)
 
@@ -141,8 +142,8 @@ Métrica e limiar: a régua da #27 no walk-forward de 2025, na base toda: o bloc
   ou o `mae_log`, com IC 95% pareado por canal sem o zero, sem piorar a outra.
 Controle: o melhor GBM da Opção A
 Tratamento: + bloco da thumbnail (SigLIP 2 com PCA ajustado no treino, sondas e cor/brilho do OpenCV), base toda
-Resultado:
-Decisão:
+Resultado (abertura de 21/10, `uv run python -m previa.abertura`; controle → tratamento, walk-forward): `7b230752` → `f405ee37`: manchete +2,3 [+1,2; +3,3]; `mae_log` −0,012 [−0,023; −0,003].
+Decisão: fica nas duas réguas e é sólida nas três leituras da ablação (escada, remoção e acima do ruído, #36): é o único bloco de conteúdo que a explicação usa como argumento.
 
 ## H8: rubrica do VLM (#13)
 
@@ -159,8 +160,8 @@ Métrica e limiar: a régua da #27 no walk-forward de 2025, na amostra: o bloco 
   `mae_log` (decisão de 20/10)
 Controle: o melhor GBM da Opção A, na amostra de 1.400 Shorts
 Tratamento: + os campos da rubrica com kappa > 0,6 no teste-reteste
-Resultado:
-Decisão:
+Resultado (abertura de 21/10, `uv run python -m previa.abertura`; controle → tratamento, walk-forward, na amostra; régua pelo `mae_log`, com a manchete como guarda): `e97356c6` → `59961a2f`: manchete −5,5 [−14,9; +3,4]; `mae_log` −0,005 [−0,021; +0,010].
+Decisão: não fica; inconclusivo por tamanho (cerca de 200 pares na amostra).
 
 ## H9: sinais do vídeo e do áudio (#12)
 
@@ -178,8 +179,8 @@ Métrica e limiar: a régua da #27 no walk-forward de 2025, na amostra: o bloco 
   `mae_log` (decisão de 20/10)
 Controle: o melhor GBM da Opção A, na amostra de 1.400 Shorts
 Tratamento: + cortes, movimento e aparência dos frames (4.3) e fala e energia do áudio (4.5)
-Resultado:
-Decisão:
+Resultado (abertura de 21/10, `uv run python -m previa.abertura`; controle → tratamento, walk-forward, na amostra; régua pelo `mae_log`): `e97356c6` → `601b2217`: manchete −3,9 [−12,7; +4,8]; `mae_log` +0,000 [−0,014; +0,015].
+Decisão: não fica; inconclusivo por tamanho.
 
 ## H10: rosto e texto na capa, por detectores (#31)
 
@@ -198,8 +199,8 @@ Métrica e limiar: a régua da #27 no walk-forward de 2025, na base toda: o bloc
 Controle: o completo da H7 (`configs/experimentos/h7_thumb.yaml`, run `f405ee37`)
 Tratamento: + as 6 colunas dos detectores nas 30.981 capas: rosto (tem, quantos, área do maior) com o YuNet e texto
   (tem, quantas caixas, área coberta) com o detector PP-OCRv3 (`configs/experimentos/h10_detectores.yaml`)
-Resultado:
-Decisão:
+Resultado (abertura de 21/10, `uv run python -m previa.abertura`; controle → tratamento, walk-forward): `f405ee37` → `dc4f5984`: manchete −0,5 [−1,1; +0,3]; `mae_log` −0,002 [−0,013; +0,006].
+Decisão: não fica.
 
 ## H11: perda de Huber no lugar da L2 (#32)
 
@@ -214,5 +215,35 @@ Métrica e limiar: a régua da #27 no walk-forward de 2025 e no "canal novo no f
   inteiro do lado ruim). Senão, a L2 fica, agora escolhida pela medição.
 Controle: o completo da H7 com L2 (`configs/experimentos/h7_thumb.yaml`, run `f405ee37`)
 Tratamento: a mesma config com `objective: huber` e `alpha: 1.0` (`configs/experimentos/h11_huber.yaml`)
-Resultado:
-Decisão:
+Resultado (abertura de 21/10, `uv run python -m previa.abertura`; controle → tratamento): `f405ee37` → `bfba1020`. Walk-forward: manchete +2,0 [+1,2; +3,0]; `mae_log` −0,043 [−0,062; −0,026]. Canal novo: manchete +0,4 [−0,4; +1,3]; `mae_log` −0,077 [−0,112; −0,047].
+Decisão: fica nos dois cenários; o modelo final usa a Huber (#39, #40).
+
+## Robustez (22/10, depois do teste; só o desenvolvimento)
+
+Não é hipótese nova nem troca o modelo: confere se as duas escolhas que decidiram o modelo final se sustentam em
+outras seeds (aula 2.6, erro comum 5) e se o boosting vence um random forest com os defaults (aula 3.2). Tudo no
+walk-forward de 2025 e no "canal novo no futuro", dentro do treino; as configs estão em
+`configs/experimentos/robustez/`, e cada comparação sai de `uv run python -m previa.experimento comparar A B`.
+
+**Seeds.** O modelo final contra a mesma config sem a capa, e contra a mesma config com a L2, nas seeds 0, 1 e 2 (a
+seed 0 do final é o run `e684ac8c`). Δ do modelo final sobre a variante:
+
+| Escolha | Seed | Walk-forward: manchete | Walk-forward: `mae_log` | Canal novo: manchete | Canal novo: `mae_log` |
+| :--- | :--- | ---: | ---: | ---: | ---: |
+| Capa | 0 (`61fd784a` → `e684ac8c`) | +3,2 [+1,6; +4,9] | −0,024 [−0,045; −0,003] | +4,0 [+2,4; +5,6] | −0,014 [−0,030; +0,006] |
+| Capa | 1 (`91fd1af7` → `7dc467e4`) | +3,2 [+1,6; +4,7] | −0,023 [−0,039; −0,007] | +3,5 [+1,9; +4,9] | −0,011 [−0,027; +0,009] |
+| Capa | 2 (`bb37bb0e` → `2d7e2650`) | +3,4 [+1,7; +5,0] | −0,025 [−0,044; −0,006] | +3,2 [+1,3; +5,4] | −0,002 [−0,014; +0,014] |
+| Huber | 0 (`85b36d3d` → `e684ac8c`) | +1,6 [+0,7; +2,2] | −0,026 [−0,043; −0,011] | +0,8 [−0,3; +1,7] | −0,056 [−0,083; −0,034] |
+| Huber | 1 (`2aa1f708` → `7dc467e4`) | +1,4 [+0,8; +1,9] | −0,030 [−0,050; −0,015] | +0,8 [−0,2; +1,5] | −0,066 [−0,104; −0,035] |
+| Huber | 2 (`e0374960` → `2d7e2650`) | +1,3 [+0,5; +2,0] | −0,030 [−0,048; −0,014] | +0,8 [0,0; +1,9] | −0,060 [−0,087; −0,035] |
+
+As duas escolhas passam a régua da #27 nas três seeds. A capa melhora a ordem nos dois cenários e o número no
+walk-forward; a Huber melhora o número nos dois cenários e a ordem no walk-forward. O ganho da capa aqui (+3,2 a +3,4)
+é maior que o da H7 (+2,3) porque o controle é outro: o modelo final sem a capa, e não a Opção A.
+
+**Random forest (aula 3.2).** As mesmas linhas e features do modelo final num random forest com os defaults do
+scikit-learn (run `938cb82e`): manchete de 54,2% no walk-forward e 53,5% no canal novo, contra 49,7% da mediana
+madura. O modelo final sobre ele: walk-forward, manchete +1,2 [+0,2; +2,2] e `mae_log` −0,064 [−0,100; −0,039];
+canal novo, manchete −0,2 [−1,2; +0,7] e `mae_log` −0,065 [−0,119; −0,028]. O boosting erra bem menos o número nos dois
+cenários e ordena melhor no futuro; nos canais nunca vistos, a ordem empata. A maior parte do ganho de ordem vem das
+features (o random forest já fica bem acima da mediana), não do algoritmo.
