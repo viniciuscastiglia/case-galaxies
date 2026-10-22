@@ -1,0 +1,11 @@
+# O grafo fixo e o agente (aula 6.2; A6). Os textos que o LLM lê (instruções, descrições das tools
+# e mensagens de erro) vêm de configs/mcp.yaml: o agente e o servidor MCP falam a mesma língua.
+
+grafo:
+  nome: previsao_previa
+
+agente:
+  nome: assistente_previa
+  # ToolCallLimitMiddleware (AUDITORIA, seção 3, "As cinco tools"): no máximo 6 chamadas de tool
+  # por pergunta; um LLM em laço para aqui em vez de gastar a cota.
+  limite_de_chamadas: 6
