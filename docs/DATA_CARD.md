@@ -100,7 +100,10 @@ opção é apagar só os `previsoes.json` e manter as métricas. -->
   diários dos Shorts com até 60 dias e renovação dos vencidos.
 - **Regra de Short:** até 60 s se publicado antes de 15/10/2024, até 180 s depois (quando o limite mudou para 3
   minutos), e não horizontal: largura menor ou igual à altura no player, com formato desconhecido contando como
-  Short. A conferência de 50 Shorts a olho (#19) está em aberto. <!-- PREENCHER: a concordância da #19 -->
+  Short. A conferência de 50 Shorts a olho (#19, F14, 21/10) deu **49 de 50 de acordo com a regra do coletor (98%)**. Por
+  estrato: vertical recusado na borda 10/10; Short até 60 s antes de 15/10/2024 9/10; Short depois, de 61 a 180 s
+  15/15; Short depois, até 60 s 15/15. A regra sem `isShort` erra em 1 de 50 nas bordas (`data/conferencia_shorts.csv`,
+  `python -m previa.conferencia resultado`; DECISOES de 21/10).
 - **Teto por canal:** a exportação leva todos os Shorts rotulados. O teto de 400 vale só para as linhas de treino,
   como parâmetro do experimento (H6): o histórico do canal precisa de todos os posts (paridade treino/uso).
 - **Duplicatas (#1, 14/10, entre canais desde 17/10):** a coluna `duplicate_group` leva o ID da primeira cópia

@@ -125,9 +125,17 @@ uv run mlflow ui --port 5001                          # a porta 5000 é do AirPl
 
 <!-- PREENCHER (A2): o comando do servidor e o do treino do modelo de uso -->
 
+#### Usar pelo MCP
+
+O servidor expõe `prever_criativo` e `comparar_criativos` (o número é sempre o do modelo; não há LLM nele), os
+resources `model://card` e `schema://prediction-*` e o prompt `decidir_entre_criativos`. Os textos que o LLM do host
+lê estão em `configs/mcp.yaml`. O pacote vem de `GALAXIES_ARTEFATOS` (caminho absoluto).
+
 ```bash
-uv run python -m previa.servidor_mcp                  # servidor MCP (stdio)
-claude mcp add previa -- uv run --directory /caminho/absoluto/case-galaxies python -m previa.servidor_mcp
+claude mcp add previa -e GALAXIES_ARTEFATOS=/caminho/absoluto/artefatos -- \
+  uv run --directory /caminho/absoluto/case-galaxies python -m previa.servidor_mcp
+npx @modelcontextprotocol/inspector uv run --directory /caminho/absoluto/case-galaxies python -m previa.servidor_mcp
+uv run python -m previa.servidor_mcp --http   # HTTP Streamable em http://127.0.0.1:8000/mcp
 ```
 
 - **Sem chave nenhuma:** os testes, os experimentos sobre a base congelada e a previsão com o histórico congelado
@@ -142,7 +150,10 @@ claude mcp add previa -- uv run --directory /caminho/absoluto/case-galaxies pyth
   treino (paciência de 100, até 5.000 árvores) e refit com o número de árvores escolhido. Partida da aula 3.4:
   `learning_rate` 0,05, 15 folhas, `min_data_in_leaf` 20, `feature_fraction` 0,9, `bagging_fraction` 0,8 com
   `bagging_freq` 1, `lambda_l2` 1, seed 0, determinístico. Configs em `configs/experimentos/`.
-- **Intervalo de 80%:** <!-- PREENCHER (M6): quantis 0,1/0,5/0,9 + CQR calibrado em fev–mar/2026 -->
+- **Intervalo de 80%:** quantis 0,1 e 0,9 com ajuste conformal (CQR à mão, calibração por data em fev e mar/2026, 1.843
+  posts maduros), q̂ = 0,229 em log. O `predicted_metric` é o do modelo final com Huber, o mesmo que o teste mede (#40);
+  o q50 é o centro do intervalo, não o número, e o intervalo é alargado só se preciso para conter o número
+  (`conter_o_numero`, que só aumenta a cobertura). Cobertura medida no teste: seção 7.
 - **Features por bloco** (prefixo por bloco, aula 4.8):
 
   | Bloco | Features | Onde existe |
@@ -155,13 +166,20 @@ claude mcp add previa -- uv run --directory /caminho/absoluto/case-galaxies pyth
   | Rubrica do VLM | gancho (0:00 a 0:03), energia e ritmo, rosto, produto em close, antes/depois, texto na tela (`vlm_*`) | amostra de 1.400 |
   | Vídeo e áudio | cortes, movimento e aparência dos frames, fala e energia do áudio | amostra de 1.400 |
 
-  <!-- PREENCHER: quais blocos ficaram, pela H2 a H9 -->
+  **Blocos que ficaram (decisão #39, régua da #27, run `6b1f7e77`):** calendário e canal, metadados (duração e setor), a
+  **capa** (H7) e a idade do rótulo como controle (H5, fixada em 30 dias na previsão). Ficaram de fora o histórico do
+  canal (H2), o texto do título (H4b), o teto por canal (H6), a rubrica do VLM (H8), o vídeo e áudio (H9) e os
+  detectores de rosto e texto (H10), porque nenhum passou a régua (seção 7). A perda é a Huber (δ = 1 em log; H11).
+  O modelo final tem 37 features: 7 de calendário, canal e metadados (incluindo a idade fixada), 10 sondas da capa, 4
+  de aparência (brilho, contraste, saturação, colorfulness) e o PCA de 16 do SigLIP 2 (`configs/experimentos/final.yaml`).
 - **Extração multimodal:** texto com `paraphrase-multilingual-MiniLM-L12-v2` (384 dimensões, CPU); capa com
   `google/siglip2-base-patch16-224` (CPU, ~20 por segundo, na faixa central 9:16 da thumbnail); rubrica com
   `gemini-3.5-flash-lite` (google-genai 2.25.0, por URL, 1 fps, temperatura 0, saída validada com Pydantic; ~95
   tokens por segundo de vídeo, no free tier); cortes com PySceneDetect 0.7.1; fala com faster-whisper `small`.
   Os PCAs são ajustados só no treino de cada fold.
-- **Versão em produção:** <!-- PREENCHER: `gbm-<nome>-<data>-<hash>` e o run id do MLflow -->
+- **Versão em produção:** `gbm-final-20261021-e3b7614`, run MLflow `5373921a` (o pacote é artefato do run, #37). É a
+  receita do modelo final retreinada na base v2 (treino até 31/05/2026; CQR em 3.825 posts de 01/07 a 14/09/2026; base
+  cortada `52fd60e2ae9b`). O número do teste (seção 7) é o da v1, do run `6b1f7e77`; a v2 não tem teste próprio.
 
 ## 6. Metodologia
 
@@ -174,7 +192,7 @@ claude mcp add previa -- uv run --directory /caminho/absoluto/case-galaxies pyth
   | Treino | 01/07/2021 a 01/01/2026 | 20.579 | ajuste; walk-forward de 2025 para as escolhas |
   | Gap | jan/2026 | 1.025 | maturidade do alvo e contágio na fronteira |
   | Calibração | 01/02 a 31/03/2026 | 1.882 | o intervalo (CQR) |
-  | Teste | 01/04 a 14/09/2026 | 7.265 | uma vez, no fim (`carregar_base(final=True)`, registrado em `data/logs/teste_aberto.log`) |
+  | Teste | 01/04 a 14/09/2026 | 7.265 (7.075 sem as cópias de `duplicate_group`: os avaliados) | uma vez, no fim (`carregar_base(final=True)`, registrado em `data/logs/teste_aberto.log`) |
 
   Antes de jul/2021 (336 Shorts) o formato ainda não existia no Brasil: esses posts ficam só no histórico.
 - **Validação:** as escolhas de modelo saem do walk-forward de 2025, dentro do treino (4 folds, 8.831 Shorts, 65
@@ -209,35 +227,102 @@ Cada decisão, com a aula que a sustenta: [`docs/DECISOES.md`](docs/DECISOES.md)
 
 ## 7. Resultados
 
-<!-- PREENCHER: a tabela de ablação (aula 4.8), nos folds de walk-forward de 2025; a linha da H1 no teste -->
+<!-- V: Vinicius reescreve esta seção com as suas palavras (A8, #38). Os números abaixo são do Claude, com run id, e valem
+enquanto o texto dele não os substituir; não apague o que ele escrever. -->
 
-| Modelo | Manchete (par-a-par, 14 dias) | Ganho [IC 95%] | MAE em log | Spearman intra-canal | Cobertura 80% |
-| :--- | ---: | ---: | ---: | ---: | ---: |
-| Baseline: mediana madura do canal | 49,7% | — | | | — |
-| GBM Opção A (histórico, calendário, duração) | | | | | |
-| + texto | | | | | |
-| + capa | | | | | |
-| + rubrica do VLM (amostra) | | | | | |
-| + vídeo e áudio (amostra) | | | | | |
+**Ablação por blocos** (aula 4.8; walk-forward de 2025, IC por bootstrap de canais pareado; um bloco fica se melhorar a
+manchete ou o `mae_log` com IC sem o zero, sem piorar a outra, #27):
 
-- **Canal novo no futuro:** <!-- PREENCHER -->
-- **Teste temporal (H1, abertura única):** <!-- PREENCHER, com o run id -->
+| Passo (walk-forward de 2025) | Δ manchete [IC 95%] | Δ `mae_log` [IC 95%] | Decisão (#27) | Runs |
+| :--- | ---: | ---: | :--- | :--- |
+| Baseline: mediana madura | 49,7% (IC 49,2 a 50,1) | | | |
+| + histórico do canal (H2) | −0,3 [−1,6; +0,6] | −0,011 [−0,032; +0,008] | não fica | `29c8914e` → `7b230752` |
+| + calendário (base da Opção A) | +0,3 [−0,4; +1,2] | −0,002 [−0,007; +0,003] | sem hipótese | `b42880df` → `3911b69f` |
+| + metadados | +1,1 [+0,1; +1,9] | +0,011 [−0,004; +0,032] | sem hipótese | `3911b69f` → `b1189cd0` |
+| + texto do título (H4b) | +0,3 [−0,4; +1,0] | +0,004 [−0,006; +0,015] | não fica | `b1189cd0` → `3d787d42` |
+| + capa (H7) | +2,3 [+1,2; +3,3] | −0,012 [−0,023; −0,003] | **fica** (sólido nas três leituras, #36) | `3d787d42` → `2d1bb463` |
+| + detectores de rosto e texto (H10) | −0,5 [−1,1; +0,3] | −0,002 [−0,013; +0,006] | não fica | `f405ee37` → `dc4f5984` |
+| idade do rótulo como controle (H5) | +0,3 [−0,4; +1,2] | −0,018 [−0,028; −0,007] | **fica** (pelo `mae_log`) | `7b230752` → `889dbae6` |
+| teto de 400 por canal (H6) | −0,2 [−0,9; +0,8] | +0,006 [−0,007; +0,021] | não fica | `7b230752` → `09275208` |
+| perda de Huber, δ = 1 (H11) | +2,0 [+1,2; +3,0] | −0,043 [−0,062; −0,026] | **fica** (também no canal novo: +0,4 [−0,4; +1,3], `mae_log` −0,077 [−0,112; −0,047]) | `f405ee37` → `bfba1020` |
+| rubrica do VLM, na amostra (H8) | −5,5 [−14,9; +3,4] | −0,005 [−0,021; +0,010] | não fica (inconclusiva por tamanho: 201 pares) | `e97356c6` → `59961a2f` |
+| vídeo e áudio, na amostra (H9) | −3,9 [−12,7; +4,8] | +0,000 [−0,014; +0,015] | não fica (idem) | `e97356c6` → `601b2217` |
+
+Fonte: `data/logs/abertura.md` (abertura da #27 e da #36, decisão #39 de `docs/DECISOES.md`). Δ em pontos percentuais da
+manchete; Δ `mae_log` em log (negativo é melhor). A H7 aparece como `7b230752` → `f405ee37` na tabela das hipóteses, com o mesmo ganho. A H3 (lacuna de 7 dias) não fica na régua: manchete −1,7 [−2,6; −0,6],
+`mae_log` −0,018 [−0,032; −0,008] (`7b230752` → `b6f87e18`).
+
+Só um bloco de conteúdo é sólido nas três leituras (escada, remoção e acima do ruído, #36): a **capa**. No canal novo,
+a capa soma +1,7 [+0,6; +2,8] na manchete (`mae_log` +0,023 [−0,012; +0,063], sem sinal). A rubrica do VLM e o vídeo e áudio ficam inconclusivos por
+tamanho: a amostra tem 201 pares a até 14 dias, e o efeito de +3 pontos não é mensurável com ela (decisão de 20/10).
+A conferência do modelo final contra a H11 (`e684ac8c` contra `bfba1020`) não piorou nenhuma régua nos dois cenários;
+no walk-forward, o `mae_log` ficou +0,019 [−0,006; +0,051], pior no ponto, com o IC encostando no zero (decisão #39).
+
+**Teste final (H1, abertura única, 7.075 Shorts de 70 canais):**
+
+| Cenário | Baseline | Modelo final | Ganho [IC 95%] | Critério da #5 |
+| :--- | ---: | ---: | ---: | :--- |
+| Temporal (treino até jan/2026, teste de 01/04 a 14/09/2026) | 49,7% | 55,3% | +5,6 [+3,6; +7,1] | cumprido (ganho >= +3, IC sem o zero) |
+| Canal novo no futuro | 49,7% | 53,2% | +3,5 [+1,9; +4,9] | cumprido (IC sem o zero) |
+
+Run `6b1f7e77fc39469ab61a143a73891279` (abertura 1, commit `3f47754`, base `778cd25c74bb`, 21/10 20h34;
+`uv run python -m previa.final configs/experimentos/final.yaml --abrir-o-teste`, não repetir). 7.075 Shorts de 70
+canais; manchete pesada pelo número de Shorts de cada canal. Sem alarme de "bom demais" (0,553 < 0,80).
+
+- **Canal novo no futuro:** na abertura do teste, 53,2% contra 49,7% (+3,5 [+1,9; +4,9], run `6b1f7e77`); no
+  desenvolvimento, a Huber (H11) melhorou o `mae_log` em −0,077 [−0,112; −0,047] (`f405ee37` → `bfba1020`). No número
+  do teste: `mae_log` de 0,942 contra 0,999 do baseline (ganho relativo de 5,7% [2,9%; 8,2%]); Spearman intra-canal de
+  0,13 contra 0,05 e global de 0,73 [0,52; 0,85].
+- **Teste temporal (H1, abertura única):** 55,3% contra 49,7% do baseline, ganho +5,6 pontos [IC +3,6; +7,1]; critério
+  da #5 cumprido (run `6b1f7e77`, tabela acima). No número: `mae_log` de 0,925 contra 0,999 do baseline, ou seja, o
+  erro típico cai de um fator de ×2,72 para ×2,52 [2,21; 3,06] (ganho relativo de 7,5% [1,8%; 12,7%]); Spearman
+  intra-canal de 0,18 contra 0,05 do baseline, e global de 0,75 [0,55; 0,86]. IC por bootstrap de canais; métricas
+  `temporal_*` e `canal_novo_*` do run.
+- **Cobertura do intervalo de 80% no teste (F41):** **76,5%** no total (alvo 80%; crua 68,9% antes do CQR), abaixo da
+  faixa de 80% ± 3 da M6, e a queda é o drift da aula 7.5:
+
+  | Recorte | n | Cobertura (alvo 80%) | Erro-padrão | Largura em log |
+  | :--- | ---: | ---: | ---: | ---: |
+  | Total | 7.075 | 76,5% (crua 68,9%) | 0,005 | 2,665 |
+  | Automotivo | 3.930 | 80,6% | 0,006 | 2,525 |
+  | Beleza | 3.145 | 71,4% | 0,007 | 2,840 |
+  | Canais com 10 a 50 posts | 190 | 63,2% | 0,029 | 2,555 |
+  | Canais com mais de 50 posts | 6.885 | 76,9% | 0,005 | 2,668 |
+  | 2026-04 | 962 | 84,3% | 0,013 | 2,668 |
+  | 2026-05 | 1.053 | 80,6% | 0,012 | 2,625 |
+  | 2026-06 | 1.233 | 77,5% | 0,011 | 2,626 |
+  | 2026-07 | 1.581 | 74,3% | 0,010 | 2,698 |
+  | 2026-08 | 1.556 | 75,3% | 0,010 | 2,649 |
+  | 2026-09 | 690 | 65,7% | 0,015 | 2,753 |
+
+  Automotivo cobre 80,6% e beleza 71,4%; canais pequenos (10 a 50 posts) 63,2%; a cobertura cai de 84,3% em abril a
+  65,7% em setembro. A resposta é o retreino (a v2) e, depois, o monitor da seção 9.
 - **Golden set "de-para":** 30 Shorts de 6 canais de fora da base (2 marcas e 1 criador por setor, sorteados), com
   curtidas medianas de 10 a 59 por canal. <!-- PREENCHER: cobertura e par-a-par -->
 - **Confiabilidade da rubrica do VLM:** teste-reteste em 50 Shorts, kappa de 0,72 (gancho) a 1,00 (rosto e close de
   produto); os 6 campos passam do limiar de 0,6. O kappa mede a estabilidade do VLM com ele mesmo, não o acerto.
-- **Onde o modelo erra:** <!-- PREENCHER (M9): os 20 piores erros, classificados -->
+- **`confidence_flag` no teste (5.4):** dispara em **61,4%** dos Shorts (4.341 de 7.075), quase todos por
+  `data_fora_do_periodo` (54,1%, esperado com o modelo de janeiro, F21) e 18,2% por `intervalo_largo`. O flag separa o
+  erro: MAE em log de **1,005** nos sinalizados contra **0,797** nos não sinalizados, e 1,265 no `intervalo_largo`.
+
+  | Grupo | n | Taxa | MAE em log |
+  | :--- | ---: | ---: | ---: |
+  | Sinalizados | 4.341 | 61,4% | 1,005 |
+  | Não sinalizados | 2.734 | 38,6% | 0,797 |
+  | `data_fora_do_periodo` | 3.827 | 54,1% | 0,991 |
+  | `intervalo_largo` | 1.290 | 18,2% | 1,265 |
+- **Onde o modelo erra:** <!-- PREENCHER (M9): os 20 piores erros, classificados; é do Vinicius (#38) -->
 
 ### Comparação com a literatura
 
-Os números da literatura são os do hub da liga (`leituras`, `troubleshooting` e `roadmap`); a coluna do Prévia só é
-preenchida depois da abertura do teste e das ablações.
+Os números da literatura são os do hub da liga (`leituras`, `troubleshooting` e `roadmap`); a coluna do Prévia usa o teste
+(run `6b1f7e77`) e a ablação acima.
 
 | O que a literatura reporta | Fonte | Prévia |
 | :--- | :--- | :--- |
-| Spearman de 0,55 a 0,85 antes da publicação (o intra-canal costuma ser menor que o global) | hub, `troubleshooting` ("Minhas métricas estão boas demais") | PREENCHER: Spearman global e intra-canal no teste (H1) |
-| Spearman de 0,71 e par-a-par de 76,3% em 11 mil YouTube Shorts educativos, com rubrica do VLM, K-Means e XGBoost (Gupta et al., arXiv:2512.21402) | hub, `leituras` | PREENCHER: par-a-par no teste (H1) |
-| Conteúdo visual soma de +0,02 a +0,04 de Spearman com a camada multimodal | hub, `roadmap` (aula 4.8) | PREENCHER: ganho do visual e da rubrica, com IC (ablação) |
+| Spearman de 0,55 a 0,85 antes da publicação (o intra-canal costuma ser menor que o global) | hub, `troubleshooting` ("Minhas métricas estão boas demais") | global de 0,75 [0,55; 0,86] no teste temporal e 0,73 no canal novo (dentro da faixa); intra-canal de 0,18 e 0,13 (run `6b1f7e77`) |
+| Spearman de 0,71 e par-a-par de 76,3% em 11 mil YouTube Shorts educativos, com rubrica do VLM, K-Means e XGBoost (Gupta et al., arXiv:2512.21402) | hub, `leituras` | par-a-par intra-canal de 55,3% no teste temporal (+5,6 sobre o baseline) e 53,2% no canal novo (run `6b1f7e77`); abaixo dos 76,3%, esperado: outro alvo, outro split, outros setores |
+| Conteúdo visual soma de +0,02 a +0,04 de Spearman com a camada multimodal | hub, `roadmap` (aula 4.8) | capa: +2,3 pontos de manchete [+1,2; +3,3] no walk-forward de 2025, `mae_log` −0,012 [−0,023; −0,003]; rubrica do VLM: não mensurável com a amostra (−5,5 [−14,9; +3,4], 201 pares) |
 
 <!-- V: reescrever com as suas palavras (aula 6.7: "na mesma direção do que a literatura reporta"). Dizer em que ponto
 estamos dentro da faixa, acima ou abaixo, e o que isso sugere (acima de 0,85 seria alarme de vazamento). -->
@@ -250,9 +335,12 @@ rótulo difere (seção 8). Por isso a comparação é de ordem de grandeza e de
 
 ## 8. Limitações
 
+<!-- V: Vinicius reescreve esta seção com as suas palavras (A8, #38). Os números novos (cobertura por mês, flag) são do
+Claude, do teste `6b1f7e77`; não apague o que ele escrever. -->
+
 - **Canais novos e pequenos:** com menos de 10 posts maduros o alvo relativo não existe e a previsão sai com
   baixa confiança; com menos de 3, ela é recusada. O golden set é de canais pequenos de propósito, para mostrar esse
-  caso. <!-- PREENCHER: com que frequência o `confidence_flag` dispara no teste -->
+  caso. No teste, o `confidence_flag` disparou em 61,4% dos Shorts (seção 7).
 - **Idade do rótulo:** na base de desenvolvimento, 85% dos rótulos foram medidos com mais de 300 dias (mediana de
   636: a primeira coleta pegou o histórico inteiro), e no teste eles têm de 1 a 6 meses; o modelo aprende curtidas
   "de vida inteira" e é avaliado nas de poucos meses (H5).
@@ -264,7 +352,8 @@ rótulo difere (seção 8). Por isso a comparação é de ordem de grandeza e de
 - **Multimodal numa amostra:** a rubrica do VLM e os sinais do vídeo existem em 1.400 Shorts; em 2025, isso dá só
   ~206 pares a até 14 dias para medir o ganho.
 - **O que é associação:** os fatores da explicação dizem o que o modelo aprendeu, não o que causa curtidas.
-- **Drift:** nada depois de ~19/09/2026; mudanças do algoritmo do YouTube depois disso ficam fora.
+- **Drift:** nada depois de ~19/09/2026; mudanças do algoritmo do YouTube depois disso ficam fora. A cobertura do
+  intervalo no teste caiu de 84,3% (abril) a 65,7% (setembro) e fechou em 76,5%, abaixo dos 80% (F41).
 - <!-- PREENCHER: P(A > B) supõe erros independentes (Tool 5) -->
 - **Memória do pré-treino do VLM:** o Gemini recebe a URL pública do Short (`file_data`), então existe um risco
   pequeno de ele "lembrar" do vídeo ou do contador de curtidas em vez de só descrever o que vê (aula 7.3,
