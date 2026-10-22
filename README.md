@@ -3,14 +3,6 @@
 Prevê, antes da publicação, as curtidas de um YouTube Short de beleza ou automotivo de um canal brasileiro, com
 intervalo, ranking entre criativos e explicação, exposto como função Python e servidor MCP para a Galaxies.
 
-<!--
-RASCUNHO DO CLAUDE (20/10, corte #25, aula 6.7), a partir do docs/DECISOES.md, do HIPOTESES.md e do
-docs/DATA_CARD.md. O Vinicius reescreve na A8. Marcas:
-  <!- V: ... ->          texto que é do Vinicius (o porquê do alvo, o critério de sucesso, as leituras)
-  <!- PREENCHER: ... ->  número que sai de um run lacrado, do teste (abertura única) ou de uma peça a fazer
-A seção 1 é o texto do Vinicius de 05/10, sem mudança. As seções seguem o briefing (TAPI, entregáveis) e o
-template da 6.7.
--->
 
 ## 1. O problema (aula 1.1)
 
@@ -22,13 +14,14 @@ template da 6.7.
 3. **Momento:** antes da publicação do vídeo. Nesse momento já se sabe o canal onde o vídeo será postado, o histórico
    desse canal até a data (somente posts anteriores ao vídeo), o vídeo, a legenda, o horário planejado e o setor.
 4. **Alvo:** o log da razão entre as curtidas do post e a mediana dos posts anteriores do canal, medido quando o vídeo
-   tiver pelo menos 30 dias de postado. <!-- TODO(Vinicius): o porquê do alvo, depois da aula 1.6 -->
+   tiver pelo menos 30 dias de postado. Relativo ao canal porque a marca escolhe o criativo, não o tamanho do
+   canal: o tamanho explica a maior parte das curtidas (Spearman global de 0,75 no teste, contra 0,18 dentro do
+   canal) e já é conhecido antes de publicar (aula 1.6).
 5. **Sucesso:** para avaliar a ordenação, acurácia par a par e Spearman; para o erro, MAE em log (quanto o número
    previsto erra em média). O modelo deve bater o baseline "todo vídeo do canal vai ter a mediana do canal". A
    validação segue a ordem temporal: o modelo é treinado no passado e validado e testado em ordem cronológica.
 
-**Critério de sucesso (decisão #5, 19/10).** <!-- V: juntar ao item 5 com as suas palavras -->
-Rascunho: o Prévia funciona se, na manchete (o par-a-par entre Shorts do mesmo canal publicados a até 14 dias um do
+**Critério de sucesso (decisão #5, 19/10).** O Prévia funciona se, na manchete (o par-a-par entre Shorts do mesmo canal publicados a até 14 dias um do
 outro, com cada canal pesando pelo seu número de Shorts), o ganho do GBM sobre a mediana madura do canal for de pelo
 menos +3 pontos, com IC 95% do bootstrap pareado por canal sem o zero, no teste temporal (aberto uma vez), e se o
 ganho também tiver IC sem o zero no "canal novo no futuro". Os ~60% citados pela Galaxies são referência, não meta.
@@ -45,8 +38,7 @@ produz o número: ele orquestra, extrai atributos do vídeo e redige a explicaç
 
 ## 2. Base
 
-Data card completo: [`docs/DATA_CARD.md`](docs/DATA_CARD.md). <!-- PREENCHER: o data card ainda é a v0.1 de
-08/10; a versão final traz os números abaixo -->
+Data card completo: [`docs/DATA_CARD.md`](docs/DATA_CARD.md) (v1, com a v2 do modelo de uso).
 
 - **Origem:** YouTube Data API v3, com chave própria (`channels.list`, `playlistItems.list`, `videos.list`;
   `channelSections.list` e `search.list` só para descobrir canais). Coleta incremental pela playlist de uploads,
@@ -71,27 +63,33 @@ Data card completo: [`docs/DATA_CARD.md`](docs/DATA_CARD.md). <!-- PREENCHER: o 
 
 ## 3. Arquitetura
 
-<!-- PREENCHER: conferir os nomes com a A1 (contrato), a A2 (servidor MCP) e a A6 (grafo) quando existirem -->
-
 ```mermaid
 flowchart LR
     C["Agente Nexus (Galaxies)<br/>ou Claude Code"] -->|MCP, stdio| S["servidor_mcp<br/>prever_criativo · comparar_criativos"]
-    S --> A["api.prever_criativo<br/>(função pura, Pydantic na entrada e na saída)"]
-    A --> G["grafo LangGraph"]
-    G --> T1["Tool 1 · extrair_atributos<br/>VLM, SigLIP 2, OpenCV (cache)"]
-    G --> T2["Tool 2 · historico_e_comparaveis<br/>só o passado maduro"]
-    G --> T3["Tool 3 · prever<br/>LightGBM + CQR: o número"]
-    G --> T4["Tool 4 · explicar<br/>SHAP, top_drivers, texto validado"]
-    G --> T5["Tool 5 · ordenar_criativos<br/>ranking e P(A > B)"]
+    L["agente.py: create_agent<br/>(LLM com as mesmas 2 tools)"] --> GR["agente.py: grafo fixo<br/>extrair → prever → explicar → responder"]
+    S --> F["previsao.prever_criativo<br/>(função pura, Pydantic na entrada e na saída)"]
+    GR --> F
+    GR --> E["explicador.py<br/>LLM só narra · validador · template"]
+    F --> K["âncora do canal (só o passado maduro)<br/>capa: SigLIP 2, sondas, aparência"]
+    F --> M["LightGBM (Huber) + CQR: o número e o intervalo"]
+    F --> X["flag · top_drivers (TreeSHAP) · comparáveis · template"]
 ```
 
-- **O centro é uma função Python** (`prever_criativo`): recebe o criativo, o canal, o setor e o horário planejado
-  e devolve a previsão, o intervalo de 80%, o `confidence_flag`, os fatores e a versão do modelo. O MCP e o grafo
-  são adaptadores em volta dela; um teste prova que o número do agente, do MCP e da função é o mesmo.
-- **Onde o LLM entra:** na extração de atributos do vídeo (a rubrica do VLM, Tool 1) e na redação da explicação
-  (Tool 4), que um validador confere contra os números do modelo antes de sair. **Onde não entra:** no número.
-- **Conteúdo do criativo é dado, nunca instrução:** legenda, texto na tela e fala podem conter prompt injection, e
-  um teste mostra que uma legenda com instruções não muda o número.
+- **O centro é uma função Python** (`previsao.prever_criativo`): recebe o criativo, o canal (`channel_id` ou
+  `channel_stats`), o setor e o horário planejado com fuso, e devolve a previsão, o intervalo de 80%, o
+  `confidence_flag`, os fatores, os comparáveis, a explicação e a versão do modelo. O caminho dentro dela é fixo:
+  âncora do canal, capa, features (as mesmas funções do treino), número e intervalo, flag, fatores. O
+  `comparar_criativos` ordena os criativos do mesmo canal e dá P(B > A) de cada par.
+- **Dois adaptadores em volta dela:** o servidor MCP (`servidor_mcp.py`, sem LLM: a explicação é o template, #17) e o
+  agente LangGraph (`agente.py`): um grafo fixo (extrair → prever → explicar → responder, estado em JSON com a
+  `trilha`) e um `create_agent` que só escolhe qual das duas tools chamar e com que pedido. Testes provam que o
+  número do MCP, do grafo e do agente é o da função, que é o do modelo.
+- **Onde o LLM entra:** na narração da explicação, no grafo e só para Shorts já publicados (#15): o `explicador.py`
+  manda ao LLM um payload fechado (número, intervalo, motivos do flag, fatores, comparáveis; nunca a legenda), e um
+  validador confere cada número, cada fator, o intervalo e os termos proibidos; uma nova tentativa, e depois o
+  template. A rubrica do VLM foi medida (H8) e não entrou no modelo final. **Onde não entra:** no número.
+- **Conteúdo do criativo é dado, nunca instrução:** a legenda só vira feature calculada, e um teste mostra que uma
+  legenda com instruções não muda o número nem aparece na resposta.
 
 ## 4. Instalação e execução
 
@@ -140,6 +138,8 @@ claude mcp add previa -e GALAXIES_ARTEFATOS=/caminho/absoluto/artefatos -- \
   uv run --directory /caminho/absoluto/case-galaxies python -m previa.servidor_mcp
 npx @modelcontextprotocol/inspector uv run --directory /caminho/absoluto/case-galaxies python -m previa.servidor_mcp
 uv run python -m previa.servidor_mcp --http   # HTTP Streamable em http://127.0.0.1:8000/mcp
+uv run python -m previa.demo --mcp           # a demo (#18): de-para no golden e o A ou B pelo MCP
+uv run python -m previa.agente PEDIDO.json   # o grafo num pedido (--publicado: explicação pelo LLM)
 ```
 
 - **Sem chave nenhuma:** os testes, os experimentos sobre a base congelada e a previsão com o histórico congelado
@@ -188,7 +188,9 @@ uv run python -m previa.servidor_mcp --http   # HTTP Streamable em http://127.0.
 ## 6. Metodologia
 
 - **Alvo relativo ao canal:** `y_rel = log1p(curtidas) − mediana madura do canal`, definido com 10+ posts maduros
-  (#20); a previsão em curtidas é a saída do modelo mais essa mediana. <!-- V: o porquê, com o exemplo do Acelerados -->
+  (#20); a previsão em curtidas é a saída do modelo mais essa mediana. Sem isso, o modelo
+  aprenderia o tamanho do canal: um Short mediano de um canal grande tem mais curtidas que o melhor Short de um canal
+  pequeno, e a pergunta da marca é dentro do próprio canal.
 - **Split temporal (#2, #3):**
 
   | Bloco | Datas de publicação | Shorts | Uso |
@@ -217,22 +219,20 @@ uv run python -m previa.servidor_mcp --http   # HTTP Streamable em http://127.0.
   - inscritos do dia da coleta, views, curtidas e comentários do próprio vídeo nunca viram feature;
   - `auditar_datas` (aula 1.7) confere, para cada feature, que o valor existe antes da publicação;
   - a mesma função calcula cada feature no treino e na previsão, com teste de paridade e de perturbação do futuro.
-- **Hipóteses antes de rodar:** [`HIPOTESES.md`](HIPOTESES.md), H1 a H9, cada uma com mecanismo, métrica, limiar e
+- **Hipóteses antes de rodar:** [`HIPOTESES.md`](HIPOTESES.md), H1 a H11, cada uma com mecanismo, métrica, limiar e
   controle. Os runs ficam lacrados até a hipótese estar escrita. Um bloco de features fica se melhorar a manchete
   ou o `mae_log` com IC pareado sem o zero, sem piorar a outra régua (#27).
-- **Testes:** <!-- PREENCHER: nº de testes no fim --> testes no CI (GitHub Actions, sem dados e sem LLM):
-  contratos (Pydantic na tool, pandera na tabela de treino), trava do teste, splits, paridade treino/uso. Do agente:
-  <!-- PREENCHER (A1, A4, A7): contrato, invariante "número do agente = número do modelo", golden set, injeção na
-  legenda, fidelidade da explicação -->
+- **Testes:** 666 testes (`uv run pytest`; CI no GitHub Actions), sem dados reais e sem LLM real:
+  contratos (Pydantic na tool, pandera na tabela de treino), trava do teste, splits, paridade treino/uso. Do
+  agente: o contrato (A1, os 8 pedidos do caso à mão), a invariante "número do MCP = do grafo = do agente = da
+  função = do modelo" (A7), a injeção na legenda, a fidelidade da explicação (A4: número inventado, fator fora
+  dos `top_drivers`, falta do intervalo e termo proibido são reprovados) e a regra de seleção da demo.
 - **Registro:** MLflow local (`previa-curtidas`), com commit, hash da base, config, métricas e as previsões fora da
   amostra de cada run; `previa.experimento comparar RUN_A RUN_B` dá o ganho de B sobre A nas duas réguas.
 
 Cada decisão, com a aula que a sustenta: [`docs/DECISOES.md`](docs/DECISOES.md).
 
 ## 7. Resultados
-
-<!-- V: Vinicius reescreve esta seção com as suas palavras (A8, #38). Os números abaixo são do Claude, com run id, e valem
-enquanto o texto dele não os substituir; não apague o que ele escrever. -->
 
 **Ablação por blocos** (aula 4.8; walk-forward de 2025, IC por bootstrap de canais pareado; um bloco fica se melhorar a
 manchete ou o `mae_log` com IC sem o zero, sem piorar a outra, #27):
@@ -302,7 +302,9 @@ canais; manchete pesada pelo número de Shorts de cada canal. Sem alarme de "bom
   Automotivo cobre 80,6% e beleza 71,4%; canais pequenos (10 a 50 posts) 63,2%; a cobertura cai de 84,3% em abril a
   65,7% em setembro. A resposta é o retreino (a v2) e, depois, o monitor da seção 9.
 - **Golden set "de-para":** 30 Shorts de 6 canais de fora da base (2 marcas e 1 criador por setor, sorteados), com
-  curtidas medianas de 10 a 59 por canal. <!-- PREENCHER: cobertura e par-a-par -->
+  curtidas medianas de 10 a 59 por canal, cada um como cliente novo (só o histórico anterior), com o modelo de uso:
+  cobertura de 24 de 30 (80%, erro-padrão de 7 pontos) e par-a-par intra-canal de 41 de 58 pares (70,7%, todos os
+  pares do canal, sem baseline); rótulos de 35 a 171 dias. É o "de-para" da demo, não uma segunda métrica de teste.
 - **Confiabilidade da rubrica do VLM:** teste-reteste em 50 Shorts, kappa de 0,72 (gancho) a 1,00 (rosto e close de
   produto); os 6 campos passam do limiar de 0,6. O kappa mede a estabilidade do VLM com ele mesmo, não o acerto.
 - **`confidence_flag` no teste (5.4):** dispara em **61,4%** dos Shorts (4.341 de 7.075), quase todos por
@@ -315,7 +317,13 @@ canais; manchete pesada pelo número de Shorts de cada canal. Sem alarme de "bom
   | Não sinalizados | 2.734 | 38,6% | 0,797 |
   | `data_fora_do_periodo` | 3.827 | 54,1% | 0,991 |
   | `intervalo_largo` | 1.290 | 18,2% | 1,265 |
-- **Onde o modelo erra:** <!-- PREENCHER (M9): os 20 piores erros, classificados; é do Vinicius (#38) -->
+- **Onde o modelo erra (M9, aula 2.6):** os 20 piores erros do modelo final no walk-forward de 2025 (run `e684ac8c`)
+  são todos subestimações, de 416× a 2.249×. Pela regra escrita antes de classificar (views ≥ 100× a mediana do
+  canal e menos de 5 comentários por mil curtidas = sinal de anúncio): **12 com sinal de impulsionamento** (Renault,
+  Natura, Dove, Honda, Chevrolet, Salon Line, Principia), **3 virais de verdade** (com conversa: 900+ comentários num
+  deles) e 5 ambíguos; nenhum canal novo, alvo imaturo ou dado quebrado. O maior erro é a mídia paga, que nenhum
+  modelo vê antes de publicar. A regra usa views e comentários do próprio vídeo só para a análise (nunca como
+  feature), e os vídeos não foram assistidos: "impulsionado" é inferência (`data/erros/m9_triagem_e684ac8c.csv`).
 
 ### Comparação com a literatura
 
@@ -328,8 +336,10 @@ Os números da literatura são os do hub da liga (`leituras`, `troubleshooting` 
 | Spearman de 0,71 e par-a-par de 76,3% em 11 mil YouTube Shorts educativos, com rubrica do VLM, K-Means e XGBoost (Gupta et al., arXiv:2512.21402) | hub, `leituras` | par-a-par intra-canal de 55,3% no teste temporal (+5,6 sobre o baseline) e 53,2% no canal novo (run `6b1f7e77`); abaixo dos 76,3%, esperado: outro alvo, outro split, outros setores |
 | Conteúdo visual soma de +0,02 a +0,04 de Spearman com a camada multimodal | hub, `roadmap` (aula 4.8) | capa: +2,3 pontos de manchete [+1,2; +3,3] no walk-forward de 2025, `mae_log` −0,012 [−0,023; −0,003]; rubrica do VLM: não mensurável com a amostra (−5,5 [−14,9; +3,4], 201 pares) |
 
-<!-- V: reescrever com as suas palavras (aula 6.7: "na mesma direção do que a literatura reporta"). Dizer em que ponto
-estamos dentro da faixa, acima ou abaixo, e o que isso sugere (acima de 0,85 seria alarme de vazamento). -->
+Na mesma direção do que a literatura reporta (aula 6.7): o Spearman global de 0,75 está dentro da faixa de 0,55 a
+0,85 e abaixo do alarme de vazamento (0,85); o intra-canal, de 0,18, é bem menor, como o hub avisa, porque o tamanho
+do canal sai da conta. O par-a-par fica abaixo dos 76,3% do artigo, e a capa soma na ordenação, como a camada
+multimodal da literatura.
 
 **Por que os números não são diretamente comparáveis.** O alvo do Prévia é a curtida relativa ao canal, e a régua
 que importa para a Galaxies é a ordenação dentro do mesmo canal; o artigo de 76,3% prevê curtidas/views, num split
@@ -339,12 +349,12 @@ rótulo difere (seção 8). Por isso a comparação é de ordem de grandeza e de
 
 ## 8. Limitações
 
-<!-- V: Vinicius reescreve esta seção com as suas palavras (A8, #38). Os números novos (cobertura por mês, flag) são do
-Claude, do teste `6b1f7e77`; não apague o que ele escrever. -->
-
-- **Canais novos e pequenos:** com menos de 10 posts maduros o alvo relativo não existe e a previsão sai com
-  baixa confiança; com menos de 3, ela é recusada. O golden set é de canais pequenos de propósito, para mostrar esse
-  caso. No teste, o `confidence_flag` disparou em 61,4% dos Shorts (seção 7).
+- **Canais novos e pequenos:** com menos de 10 posts maduros a previsão sai com o flag `canal_novo`; com menos de 3,
+  o número vem da cadeia de cold start (a mediana dos 1 ou 2 posts maduros, ou uma referência de canais parecidos), com
+  intervalo largo e o aviso de que é uma referência (#34). Esse regime não foi avaliado no teste.
+- **Flag acima da faixa:** no teste, o `confidence_flag` disparou em 61,4% dos Shorts, acima da faixa de 15% a 35% da
+  #14, quase todo pela regra de data com o modelo de janeiro; ele separa o erro (seção 7), mas a taxa da v2 não foi
+  medida.
 - **Idade do rótulo:** na base de desenvolvimento, 85% dos rótulos foram medidos com mais de 300 dias (mediana de
   636: a primeira coleta pegou o histórico inteiro), e no teste eles têm de 1 a 6 meses; o modelo aprende curtidas
   "de vida inteira" e é avaliado nas de poucos meses (H5).
@@ -352,17 +362,27 @@ Claude, do teste `6b1f7e77`; não apague o que ele escrever. -->
   canal usa uma faixa que pode ter mudado.
 - **Mix de setor e tipo:** na beleza, a maioria dos Shorts é de marcas; no automotivo, de criadores. Uma diferença
   de erro entre setores pode ser do tipo de canal.
-- **Mídia paga:** a API não diz se um Short foi impulsionado.
+- **Mídia paga:** a API não diz se um Short foi impulsionado, e é o maior erro do modelo: 12 dos 20 piores erros têm
+  o sinal de anúncio (seção 7, M9).
 - **Multimodal numa amostra:** a rubrica do VLM e os sinais do vídeo existem em 1.400 Shorts; em 2025, isso dá só
   ~206 pares a até 14 dias para medir o ganho.
 - **O que é associação:** os fatores da explicação dizem o que o modelo aprendeu, não o que causa curtidas.
 - **Drift:** nada depois de ~19/09/2026; mudanças do algoritmo do YouTube depois disso ficam fora. A cobertura do
   intervalo no teste caiu de 84,3% (abril) a 65,7% (setembro) e fechou em 76,5%, abaixo dos 80% (F41).
-- <!-- PREENCHER: P(A > B) supõe erros independentes (Tool 5) -->
+- **P(B > A) supõe erros independentes:** A e B dividem canal e modelo, então a probabilidade é uma aproximação
+  conservadora (aula 6.3, Tool 5).
+- **A v2 não tem teste próprio:** o modelo de uso foi retreinado com dados até maio de 2026, gastando os meses do
+  teste da v1; o número do teste é o do modelo de janeiro, e a cobertura da v2 só vale na calibração (#33).
+- **O agente:** o grafo chama a função inteira no nó `prever`, sem nós separados para extração e contexto; o
+  explicador por LLM só roda com Shorts publicados (free tier) e não foi avaliado com o LLM real em escala.
+- **Fora do modelo:** a transcrição e o idioma da fala (#35), a clusterização dos descritores (a rubrica tem campos
+  fixos, F38), o detector de objetos (o produto em close ficou na rubrica, #31), a leitura do texto na capa (só a
+  detecção: o PaddleOCR não instala na Stack 2026) e o baseline de regressão sobre os inscritos (os inscritos são os
+  do dia da coleta e vazariam o tamanho futuro do canal, F4).
 - **Memória do pré-treino do VLM:** o Gemini recebe a URL pública do Short (`file_data`), então existe um risco
   pequeno de ele "lembrar" do vídeo ou do contador de curtidas em vez de só descrever o que vê (aula 7.3,
-  "Vazamento pelo pré-treino"). A rubrica não pede nem recebe curtidas, e o modelo só usa os 6 campos extraídos, mas
-  o risco não foi medido.
+  "Vazamento pelo pré-treino"). A rubrica não pede nem recebe curtidas, não foi medido, e ela ficou fora do modelo
+  final (H8), então não afeta o número.
 - **Coletor sem varredura semanal completa:** a coleta diária para quando uma página inteira de IDs já é conhecida, e a
   aula 1.5 recomenda uma varredura completa por semana, porque a ordem da API não é garantida pela documentação. Não
   rodamos essa varredura; um Short antigo inserido fora de ordem pode ter ficado fora da base.
@@ -371,7 +391,7 @@ Claude, do teste `6b1f7e77`; não apague o que ele escrever. -->
 
 ## 9. Evolução
 
-O que faríamos com mais 4 semanas, em ordem de impacto esperado: <!-- V: confirmar a ordem -->
+O que faríamos com mais 4 semanas, em ordem de impacto esperado:
 
 1. **Rótulos de idade parecida:** recoletar com snapshots aos 30 dias de cada Short novo, para treinar no mesmo
    alvo que o cliente vai ver.
