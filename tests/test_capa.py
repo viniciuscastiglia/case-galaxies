@@ -102,3 +102,56 @@ def test_encaixa_no_features_de_um_short(tmp_path):
     novo = {"extras": valores, "extras_ausentes": {b: "sem capa" for b in ausentes}}
     assert set(novo["extras_ausentes"]) == set(_bundle().extras)
     assert isinstance(pd.Series(valores), pd.Series)
+
+
+class EncoderContador(EncoderFalso):
+    """O encoder falso, contando quantas vezes a imagem passou por ele."""
+
+    def __init__(self):
+        self.chamadas = 0
+
+    def embed_imagens(self, imagens):
+        self.chamadas += 1
+        return super().embed_imagens(imagens)
+
+
+def test_mesma_imagem_duas_vezes_chama_o_encoder_uma_vez(tmp_path):
+    caminho = tmp_path / "capa.jpg"
+    _capa_480x360(caminho)
+    enc = EncoderContador()
+    primeira = extras_da_capa(caminho, _bundle(), enc)
+    segunda = extras_da_capa(caminho, _bundle(), enc)
+    assert enc.chamadas == 1
+    assert primeira[0] == segunda[0] and segunda[1]["thumb"] == pytest.approx(primeira[1]["thumb"])
+
+
+def test_mesmo_conteudo_em_outro_caminho_usa_o_cache(tmp_path):
+    a, b = tmp_path / "a.jpg", tmp_path / "b.jpg"
+    _capa_480x360(a)
+    b.write_bytes(a.read_bytes())
+    enc = EncoderContador()
+    extras_da_capa(a, _bundle(), enc)
+    extras_da_capa(b, _bundle(), enc)
+    assert enc.chamadas == 1
+
+
+def test_mesmo_caminho_com_conteudo_novo_recalcula(tmp_path):
+    caminho = tmp_path / "capa.jpg"
+    _capa_480x360(caminho)
+    enc = EncoderContador()
+    antes = extras_da_capa(caminho, _bundle(), enc)[0]
+    Image.fromarray(np.full((360, 480, 3), 200, dtype=np.uint8)).save(caminho)
+    depois = extras_da_capa(caminho, _bundle(), enc)[0]
+    assert enc.chamadas == 2 and depois != antes
+
+
+def test_o_cache_devolve_copias(tmp_path):
+    caminho = tmp_path / "capa.jpg"
+    _capa_480x360(caminho)
+    enc = EncoderContador()
+    valores, embs, _ = extras_da_capa(caminho, _bundle(), enc)
+    original = dict(valores)
+    valores["thumb_brilho"] = -1.0
+    embs["thumb"][0] = 99.0
+    valores2, embs2, _ = extras_da_capa(caminho, _bundle(), enc)
+    assert valores2 == original and embs2["thumb"][0] != 99.0

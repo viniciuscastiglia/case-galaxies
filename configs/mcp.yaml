@@ -26,13 +26,18 @@ tools:
     de até 180 s, imagem ou só texto), a legenda, o setor, a data planejada COM fuso horário e o
     canal, por channel_id (canal da base) ou por channel_stats (canal fora da base: inscritos e
     posts com data e curtidas). Repasse o número e o intervalo como vieram, sem recalcular.
+    Custo: sem LLM e sem rede; cerca de 0,4 s por criativo na CPU com uma capa nova (a capa passa por
+    um modelo de imagem), quase nada com uma capa já vista. Limites: timeout de 120 s; só Shorts
+    verticais de até 180 s; data planejada até 90 dias no futuro; setores beleza e automotivo.
   comparar_criativos: >-
     Compara 2 ou mais criativos do MESMO canal para decidir qual publicar ou impulsionar. Envie em
     pedidos um pedido completo por criativo, no formato de prever_criativo, todos com o mesmo
     channel_id ou o mesmo channel_stats. Devolve o ranking pelo número do modelo, a previsão
     completa de cada criativo e, para cada par, a probabilidade de um render mais que o outro.
     Intervalos que se sobrepõem querem dizer que a ordem é provável, não garantida: diga isso ao
-    cliente.
+    cliente. Custo: o de prever_criativo vezes o número de criativos (cerca de 0,4 s cada com capas
+    novas), sem LLM e sem rede. Limites: timeout de 300 s; ao menos 2 criativos, todos do mesmo
+    canal; as mesmas regras de prever_criativo para cada um.
 
 prompts:
   decidir_entre_criativos: >-

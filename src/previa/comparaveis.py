@@ -30,7 +30,15 @@ def _sem_fuso(s) -> np.ndarray:
 
 class IndiceComparaveis:
     """Um índice por setor, em ordem cronológica. `posts` precisa de post_id, channel_id,
-    published_at, sector e rel (o alvo relativo, log); `emb` é alinhado às linhas de `posts`."""
+    published_at, sector e rel (o alvo relativo, log); `emb` é alinhado às linhas de `posts`.
+
+    `limiar_dist` e `periodo_limiar` são o limiar da regra "fora da distribuição" (5.4) e o período
+    de calibração de onde ele saiu (`previa.indice.construir_indice`). No nível da classe, `None`:
+    um índice gravado antes deles carrega sem o limiar, e a regra não roda.
+    """
+
+    limiar_dist: float | None = None
+    periodo_limiar: dict | None = None
 
     def __init__(self, posts: pd.DataFrame, emb, maturidade_dias: int = MATURIDADE_DIAS):
         self.maturidade = np.timedelta64(maturidade_dias, "D")
@@ -73,3 +81,18 @@ def vizinhos_no_tempo(indice: IndiceComparaveis, posts: pd.DataFrame, emb, k: in
             (v["rel"].median() if len(v) else np.nan, v["similarity"].max() if len(v) else np.nan)
         )
     return pd.DataFrame(linhas, index=posts.index, columns=["rel_vizinhos", "sim_vizinho"])
+
+
+def limiar_distancia(
+    indice: IndiceComparaveis, posts: pd.DataFrame, emb, percentil: float
+) -> float:
+    """O limiar de "fora da distribuição" (5.4): o percentil da distância ao vizinho mais parecido.
+
+    Distância = 1 - cosseno ao vizinho maduro mais parecido (`vizinhos_no_tempo` com k = 1: a regra
+    da tool). Os `posts` são os da CALIBRAÇÃO, nunca os do treino (5.4, erro comum 3). Post sem
+    vizinho maduro fica de fora; sem nenhum, levanta (princípio 7).
+    """
+    d = (1.0 - vizinhos_no_tempo(indice, posts, emb, k=1)["sim_vizinho"]).dropna()
+    if d.empty:
+        raise ValueError("limiar_distancia: nenhum post da calibração tem vizinho maduro no índice")
+    return float(np.percentile(d.to_numpy(float), percentil))

@@ -1,7 +1,7 @@
 # Sinal de baixa confiança (5.4; decisão #14). Lido por previa.flag.
 # Os limiares saem da CALIBRAÇÃO (nunca do caso) e vão no pacote do modelo, versionados (5.4, EC2).
 percentil_largura: 80   # intervalo_largo: largura em log acima do p80 da calibração
-percentil_knn: 99       # fora_da_distribuicao: distância ao k-ésimo vizinho, p99 da calibração (EC3)
+percentil_knn: 99       # fora_da_distribuicao: distância ao vizinho mais parecido, p99 da calibração (EC3; previa.indice)
 min_posts: 10           # canal_novo: menos que isso de posts maduros
 max_dias: 180           # data_fora_do_periodo: dias após o fim do treino do modelo em uso
 max_dias_passado: 365   # ... ou dias antes dele

@@ -13,6 +13,7 @@ torch: o encoder do SigLIP entra por argumento ou por `_encoder()`, e quem serve
 `previa.openmp.um_runtime()` antes dos imports (CLAUDE.md, armadilha do OpenMP).
 """
 
+import warnings
 from functools import lru_cache
 from math import erf, expm1, log1p, sqrt
 from pathlib import Path
@@ -222,6 +223,32 @@ def _comparaveis(emb, setor: str, quando: pd.Timestamp) -> tuple[list[dict], str
     ], None
 
 
+def _distancia_ao_vizinho(emb, setor: str, quando: pd.Timestamp, bundle: Bundle):
+    """(distância ao vizinho maduro mais parecido, limiar) para "fora da distribuição" (5.4, #14).
+
+    `(None, None)` sem índice, sem capa ou com um índice gravado antes do limiar: a regra não roda.
+    O limiar só vale se saiu da calibração do pacote em uso; um índice de outro pacote desliga a
+    regra com um aviso, em vez de emprestar o limiar dele em silêncio (princípio 7).
+    """
+    indice = _indice_de_comparaveis()
+    limiar = getattr(indice, "limiar_dist", None) if indice is not None else None
+    if limiar is None or emb is None:
+        return None, None
+    periodo = getattr(indice, "periodo_limiar", None) or {}
+    cal = bundle.calibracao or {}
+    if (periodo.get("inicio"), periodo.get("fim")) != (cal.get("inicio"), cal.get("fim")):
+        warnings.warn(
+            f"o limiar de 'fora da distribuição' do índice saiu de outra calibração ({periodo}) "
+            f"que a do pacote em uso ({cal}); a regra fica desligada: rode `previa.indice` de novo",
+            stacklevel=2,
+        )
+        return None, None
+    v = indice.buscar(emb, setor, quando, k=1)
+    if v.empty:
+        return None, limiar
+    return float(1.0 - v["similarity"].iloc[0]), float(limiar)
+
+
 # ---------------------------------------------------------------- passo 10: a explicação
 
 
@@ -364,9 +391,16 @@ def passo_prever(req: PredictionRequest, bundle: Bundle, ctx: dict, ext: dict) -
     n_flag = ctx["n_maduros"]
     if ctx["degrau"] != "mediana_do_canal":
         n_flag = min(ctx["n_maduros"], bundle.limiares_flag["min_posts"] - 1)
+    # F10: posts que já seriam maduros, mas com as curtidas ocultas, não contam; o flag diz isso
+    posts = ctx["posts"]
+    maduro = posts["published_at"] <= ctx["quando"] - pd.Timedelta(days=bundle.lacuna_dias)
+    ocultas = int((maduro & posts["y"].isna()).sum())
+    emb_capa = ext["embeddings"].get("thumb")
+    dist, limiar = _distancia_ao_vizinho(emb_capa, req.sector, ctx["quando"], bundle)
     flag = confidence_flag(
-        hi_log - lo_log, n_flag, extracao_falhou, None, req.planned_datetime, bundle.limiares_flag
-    )
+        hi_log - lo_log, n_flag, extracao_falhou, dist, req.planned_datetime,
+        {**bundle.limiares_flag, "dist_knn": limiar}, curtidas_ocultas=ocultas,
+    )  # fmt: skip
     return {"x": x, "numero": numero, "lo_c": float(lo_c), "hi_c": float(hi_c),
             "pred": max(expm1(numero), 0.0), "flag": flag}  # fmt: skip
 
@@ -377,7 +411,9 @@ def passo_explicar(
     """Tool 4, a explicação: os fatores aprovados (#36, F7), os comparáveis e o template (#17)."""
     cfg = carregar_cfg_explicacao()
     x = prev["x"]
-    drivers = top_drivers(bundle.modelo, x, None, cfg, aprovados=_aprovados(cfg, bundle, x))
+    drivers = top_drivers(
+        bundle.modelo, x, None, cfg, aprovados=_aprovados(cfg, bundle, x), setor=req.sector
+    )
     comparaveis, ressalva = _comparaveis(ext["embeddings"].get("thumb"), req.sector, ctx["quando"])
     pred, lo_c, hi_c, flag = prev["pred"], prev["lo_c"], prev["hi_c"], prev["flag"]
     return PredictionResponse(
@@ -427,7 +463,7 @@ def _frase_do_par(a: str, b: str, p_b: float) -> str:
     return (
         f"{melhor} tem a previsão mais alta, mas em ~{round(100 * (1 - p_melhor))}% dos cenários, "
         f"{outro} rende mais. A conta trata os dois como independentes, uma aproximação "
-        "conservadora."
+        "conservadora. A probabilidade é uma escala para ordenar, não uma garantia."
     )
 
 

@@ -147,6 +147,16 @@ def test_channel_stats_com_2_posts_da_numero_com_canal_novo(pacote, capa):
     assert r2.predicted_metric != r.predicted_metric  # mediana do setor, não a regressão
 
 
+def test_canal_com_todas_as_curtidas_ocultas_diz_isso(pacote, capa):
+    """F10: a tool não inventa histórico e diz por que o canal parece novo."""
+    posts = [{"published_at": f"2025-{m:02d}-10T12:00:00Z", "likes": None} for m in range(1, 13)]
+    for stats in ({"subscribers": 5_000, "posts": posts}, {"posts": posts}):
+        r = _prever(pacote, _req(capa, canal=None, channel_stats=stats))
+        assert np.isfinite(r.predicted_metric) and r.predicted_metric > 0
+        novo = next(m for m in r.confidence_flag.motivos if m.codigo == "canal_novo")
+        assert "12 posts têm as curtidas ocultas" in novo.texto
+
+
 def test_canal_com_poucos_posts_maduros_sempre_sai_canal_novo(pacote, capa, monkeypatch):
     """#34: degrau diferente da mediana do canal => canal_novo, mesmo se o limiar fosse menor."""
     bundle, _ = pacote
@@ -154,6 +164,26 @@ def test_canal_com_poucos_posts_maduros_sempre_sai_canal_novo(pacote, capa, monk
     stats = {"subscribers": 25_000, "posts": []}
     r = _prever(pacote, _req(capa, canal=None, channel_stats=stats))
     assert "canal_novo" in _codigos(r)
+
+
+@pytest.mark.parametrize(
+    "planejado, hora",
+    [
+        ("2026-02-10T22:00:00Z", 19),  # 22h UTC = 19h em São Paulo
+        ("2026-02-10T19:00:00-03:00", 19),
+        ("2026-02-11T01:30:00+00:00", 22),  # já é dia 11 em UTC, ainda dia 10 em São Paulo
+        ("2026-02-10T19:00:00+09:00", 7),  # Tóquio: 10h UTC = 7h em São Paulo
+    ],
+)
+def test_grade_de_horarios_vira_a_hora_local_de_sao_paulo(pacote, capa, planejado, hora):
+    """A7, grade de pedidos × horários (1.7, erro comum 4): a hora do público, em qualquer fuso."""
+    bundle, _ = pacote
+    req = _req(capa, planned_datetime=planejado)
+    ext = previsao.passo_extrair(req, bundle, EncoderFalso())
+    prev = previsao.passo_prever(req, bundle, previsao.passo_contexto(req, bundle), ext)
+    assert prev["x"]["hora_local"].iloc[0] == hora
+    r = _prever(pacote, req)
+    assert r.interval_low <= r.predicted_metric <= r.interval_high
 
 
 def test_sem_capa_da_numero_com_extracao_falhou(pacote):
@@ -212,6 +242,37 @@ def test_os_fatores_so_vem_dos_blocos_aprovados_na_36(pacote, capa):
         assert f"×{str(round(d.multiplicador, 2)).replace('.', ',')}" in f
 
 
+def test_explicacao_passa_o_setor_do_pedido_ao_top_drivers(pacote, capa, monkeypatch):
+    visto = {}
+    original = previsao.top_drivers
+
+    def espiao(*a, **kw):
+        visto.update(kw)
+        return original(*a, **kw)
+
+    monkeypatch.setattr(previsao, "top_drivers", espiao)
+    _prever(pacote, _req(capa, sector="automotivo"))
+    assert visto["setor"] == "automotivo"
+
+
+def test_no_automotivo_so_falam_as_sondas_validadas_no_setor(pacote, capa):
+    """Sem corte (k e min_abs folgados), toda sonda que fala tem de ter passado na validação."""
+    bundle, _ = pacote
+    req = _req(capa, sector="automotivo")
+    ext = previsao.passo_extrair(req, bundle, EncoderFalso())
+    prev = previsao.passo_prever(req, bundle, previsao.passo_contexto(req, bundle), ext)
+    cfg = previsao.carregar_cfg_explicacao() | {"k": 99, "min_abs": 0.0}
+    aprovados = previsao._aprovados(cfg, bundle, prev["x"])
+    drivers = previsao.top_drivers(
+        bundle.modelo, prev["x"], None, cfg, aprovados=aprovados, setor="automotivo"
+    )
+    sondas = {d["feature"] for d in drivers if d["feature"].startswith("sonda_")}
+    assert sondas <= set(cfg["sondas_validadas"]["automotivo"])
+    assert "sonda_produto_beleza_thumb" not in sondas and "capa (SigLIP)" in {
+        d["feature"] for d in drivers
+    }
+
+
 def test_explicacao_em_template_e_formato_brasileiro(pacote, capa):
     r = _prever(pacote, _req(capa))
     e = r.explanation
@@ -256,6 +317,68 @@ def test_comparaveis_do_mesmo_setor_e_so_do_passado_maduro(pacote, capa):
         assert por_id.loc[c.post_id, "sector"] == "beleza"
         assert c.published_at <= limite and c.likes == por_id.loc[c.post_id, "metric_target"]
     assert not any("indisponíveis" in t.lower() for t in r.explanation.ressalvas)
+
+
+def _indice_com(tabela, vetor, limiar, periodo=None):
+    """Um índice em que todo post tem a capa `vetor`, com o limiar de distância dado e o período
+    de calibração de onde ele saiu (por padrão, o do pacote de teste)."""
+    n = len(tabela)
+    posts = pd.DataFrame({
+        "post_id": tabela["post_id"].to_numpy(), "channel_id": tabela["channel_id"].to_numpy(),
+        "published_at": tabela["published_at"].to_numpy(), "sector": tabela["sector"].to_numpy(),
+        "likes": tabela["metric_target"].to_numpy(), "rel": np.zeros(n),
+    })  # fmt: skip
+    indice = IndiceComparaveis(posts, np.tile(vetor, (n, 1)))
+    indice.limiar_dist = limiar
+    indice.periodo_limiar = periodo or {"inicio": "2025-10-01", "fim": "2026-04-01", "n": 1}
+    return indice
+
+
+def _vetor_da_capa(capa):
+    from previa.visual import preparar_thumb
+
+    return EncoderFalso().embed_imagens([preparar_thumb(capa)])[0]
+
+
+def test_capa_longe_de_tudo_sai_fora_da_distribuicao(pacote, capa):
+    bundle, tabela = pacote
+    sem_indice = _prever(pacote, _req(capa))
+    v = _vetor_da_capa(capa)
+    orto = np.roll(v, 1) - (np.roll(v, 1) @ v) * v  # ortogonal à capa: cosseno 0, distância 1
+    ARTEFATOS.mkdir(parents=True, exist_ok=True)
+    joblib.dump(_indice_com(tabela, orto, 0.05), ARTEFATOS / "comparaveis.joblib")
+    r = _prever(pacote, _req(capa))
+    assert "fora_da_distribuicao" in _codigos(r)
+    assert r.predicted_metric == sem_indice.predicted_metric  # o flag só descreve (5.4)
+    joblib.dump(_indice_com(tabela, v, 0.05), ARTEFATOS / "comparaveis.joblib")
+    assert "fora_da_distribuicao" not in _codigos(_prever(pacote, _req(capa)))
+
+
+def test_limiar_de_outra_calibracao_desliga_a_regra_com_aviso(pacote, capa):
+    """Princípio 7: um índice gerado para outro pacote não pode emprestar o limiar em silêncio."""
+    bundle, tabela = pacote
+    assert bundle.calibracao["inicio"] == "2025-10-01" and bundle.calibracao["fim"] == "2026-04-01"
+    v = _vetor_da_capa(capa)
+    orto = np.roll(v, 1) - (np.roll(v, 1) @ v) * v
+    outro = {"inicio": "2026-07-01", "fim": "2026-09-15", "n": 3825}
+    ARTEFATOS.mkdir(parents=True, exist_ok=True)
+    joblib.dump(_indice_com(tabela, orto, 0.05, outro), ARTEFATOS / "comparaveis.joblib")
+    with pytest.warns(UserWarning, match="calibração"):
+        r = _prever(pacote, _req(capa))
+    assert "fora_da_distribuicao" not in _codigos(r)
+
+
+def test_sem_capa_ou_indice_antigo_a_regra_nao_roda(pacote, capa):
+    bundle, tabela = pacote
+    ARTEFATOS.mkdir(parents=True, exist_ok=True)
+    v = _vetor_da_capa(capa)
+    orto = np.roll(v, 1) - (np.roll(v, 1) @ v) * v
+    joblib.dump(_indice_com(tabela, orto, 0.05), ARTEFATOS / "comparaveis.joblib")
+    texto = _req(None, creative={"tipo": "texto"})
+    assert "fora_da_distribuicao" not in _codigos(_prever(pacote, texto))
+    antigo = _indice_com(tabela, orto, None)  # gravado antes do limiar existir
+    joblib.dump(antigo, ARTEFATOS / "comparaveis.joblib")
+    assert "fora_da_distribuicao" not in _codigos(_prever(pacote, _req(capa)))
 
 
 def test_posts_do_canal_injetado_substitui_a_base(pacote, capa):
@@ -305,6 +428,15 @@ def test_comparar_da_probabilidade_entre_0_e_1_e_os_dois_lados_somam_1(pacote, c
         (r["predicted_metric"] for r in rank), reverse=True
     )
     assert len(out["previsoes"]) == 2
+
+
+def test_a_frase_do_par_diz_que_a_probabilidade_e_uma_escala(pacote, capa):
+    """6.3, Tool 5: P(B > A) ordena; não é a chance real de um vencer o outro."""
+    bundle, _ = pacote
+    a = _req(capa, legenda="A")
+    b = _req(capa, legenda="B", planned_datetime="2026-02-12T21:00:00-03:00")
+    frase = comparar_criativos([a, b], bundle=bundle, encoder=EncoderFalso())["pares"][0]["frase"]
+    assert "uma escala para ordenar, não uma garantia" in frase
 
 
 def test_comparar_a_conta_da_6_3(pacote, capa, monkeypatch):

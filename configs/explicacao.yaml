@@ -3,8 +3,9 @@
 # k: quantos drivers entram na resposta (a aula 5.6 usa 5).
 # contexto: o que o marketing não muda e que se cancela entre dois Shorts do mesmo canal (6.3,
 #   Tool 4); fica fora do top_drivers. Padrões com * (fnmatch).
-# blocos: nome legível -> padrões das colunas que viram um fator só (5.6, erro comum 5). As sondas
-#   (sonda_*) e os detectores (det_*) não entram aqui: cada um aparece com o próprio nome.
+# blocos: nome legível -> padrões das colunas que viram um fator só (5.6, erro comum 5). Os detectores
+#   (det_*) não entram aqui: cada um aparece com o próprio nome. As sondas (sonda_*) seguem
+#   `sondas_validadas`, abaixo.
 # min_abs: contribuição com |φ| (log) abaixo disso é desprezível e sai antes do corte em k (aula
 #   5.6, "Blocos: o embedding vira visual", `top_drivers(min_abs=0.01)`; 6.3, Tool 4).
 k: 5
@@ -16,3 +17,12 @@ blocos:
 # blocos_argumento: os blocos que a #36 aprovou como argumento (só eles falam na resposta, F7).
 #   "capa" cobre o bloco "capa (SigLIP)" e as colunas dos blocos extras da capa (sondas e aparência).
 blocos_argumento: [capa]
+# sondas_validadas: as sondas que passaram na validação contra a rubrica do VLM (AUC >= 0,7 em 1.400 capas, aula
+#   4.4, `previa.sondas`): rosto 0,787, falando 0,871 e texto 0,703 nos dois setores; produto_beleza 0,814 só na
+#   beleza. A roda (0,670) não passa; maquiagem, batom, carro_estrada, interior_carro e logo não têm rótulo. As outras
+#   entram no modelo como antes, mas na explicação somam no bloco da capa: o número e a soma do SHAP não mudam, e a
+#   frase deixa de usar um nome que ninguém conferiu (4.4, erro comum 5).
+sondas_validadas:
+  beleza: [sonda_rosto_thumb, sonda_falando_thumb, sonda_texto_thumb, sonda_produto_beleza_thumb]
+  automotivo: [sonda_rosto_thumb, sonda_falando_thumb, sonda_texto_thumb]
+bloco_das_sondas_nao_validadas: "capa (SigLIP)"

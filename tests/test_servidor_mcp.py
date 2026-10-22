@@ -91,6 +91,14 @@ async def test_as_instrucoes_vem_da_config(cliente):
 
 
 @pytest.mark.anyio
+async def test_descricoes_dizem_custo_e_limites(cliente):
+    """6.3, as sete perguntas de uma tool: o host precisa saber o custo e os limites."""
+    async with cliente as c:
+        for t in await c.list_tools():
+            assert "Custo:" in t.description and "Limites:" in t.description, t.name
+
+
+@pytest.mark.anyio
 async def test_resources_e_prompt(cliente):
     async with cliente as c:
         esq = json.loads((await c.read_resource("schema://prediction-request"))[0].text)

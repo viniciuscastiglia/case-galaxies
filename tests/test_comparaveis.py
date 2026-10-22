@@ -5,7 +5,7 @@ import numpy as np
 import pandas as pd
 import pytest
 
-from previa.comparaveis import IndiceComparaveis, vizinhos_no_tempo
+from previa.comparaveis import IndiceComparaveis, limiar_distancia, vizinhos_no_tempo
 
 T0 = pd.Timestamp("2025-01-01", tz="UTC")
 
@@ -78,3 +78,32 @@ def test_setor_sem_indice_devolve_as_mesmas_colunas():
     vazio = indice.buscar(emb[0], "moda", T0 + pd.Timedelta(days=60))
     cheio = indice.buscar(emb[0], "beleza", T0 + pd.Timedelta(days=60))
     assert vazio.empty and list(vazio.columns) == list(cheio.columns)
+
+
+def test_limiar_e_o_percentil_das_distancias_ao_vizinho():
+    """5.4 (fora da distribuição): distância = 1 - cosseno ao vizinho maduro mais parecido."""
+    sims = [1.0, 0.9, 0.8, 0.7, 0.6]  # distâncias 0,0 a 0,4 ao post de referência
+    angulos = [0.0] + [float(np.degrees(np.arccos(c))) for c in sims]
+    emb = np.array([[np.cos(np.radians(a)), np.sin(np.radians(a))] for a in angulos])
+    posts = pd.DataFrame({
+        "post_id": [f"p{k}" for k in range(6)], "channel_id": "UCa",
+        "published_at": [T0] + [T0 + pd.Timedelta(days=60)] * 5,
+        "sector": "beleza", "rel": 0.0,
+    })  # fmt: skip
+    indice = IndiceComparaveis(posts, emb)
+    cal = posts.iloc[1:]
+    assert limiar_distancia(indice, cal, emb[1:], 50) == pytest.approx(0.2, abs=1e-6)
+    assert limiar_distancia(indice, cal, emb[1:], 100) == pytest.approx(0.4, abs=1e-6)
+
+
+def test_limiar_sem_nenhum_vizinho_levanta():
+    posts, emb = _posts()
+    indice = IndiceComparaveis(posts, emb)
+    with pytest.raises(ValueError, match="nenhum"):
+        limiar_distancia(indice, posts.iloc[[0]], emb[[0]], 99)  # p0 não tem passado maduro
+
+
+def test_indice_sem_limiar_tem_os_atributos_vazios():
+    posts, emb = _posts()
+    indice = IndiceComparaveis(posts, emb)
+    assert indice.limiar_dist is None and indice.periodo_limiar is None

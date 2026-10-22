@@ -5,7 +5,9 @@ descreve: o número e o intervalo seguem na resposta (5.4, "Não esconda o núme
 saem da calibração, uma vez, e vão no pacote do modelo (EC2); nunca são recalculados por chamada.
 
 `setor_desconhecido` não é usado: o contrato recusa setor fora de beleza/automotivo (#22).
-`fora_da_distribuicao` só existe quando a tool tem o índice dos comparáveis (a distância kNN).
+`fora_da_distribuicao` só existe quando a tool tem a capa e o índice dos comparáveis com o limiar:
+a distância (1 - cosseno) ao vizinho maduro mais parecido, contra o p99 da calibração do pacote,
+calculado uma vez em `previa.indice` (decisão #14).
 """
 
 from datetime import date, datetime
@@ -28,6 +30,11 @@ def carregar_cfg(caminho=None) -> dict:
 def _br(x: float) -> str:
     """Número no formato brasileiro, uma casa (5.4: `_br`)."""
     return f"{x:.1f}".replace(".", ",")
+
+
+def _br2(x: float) -> str:
+    """Duas casas: a distância de cosseno vive entre 0 e 1, e uma casa só esconderia a diferença."""
+    return f"{x:.2f}".replace(".", ",")
 
 
 def limiares_da_calibracao(
@@ -66,8 +73,14 @@ def confidence_flag(
     dist_knn: float | None,
     data_planejada: datetime,
     limiares: dict,
+    curtidas_ocultas: int = 0,
 ) -> ConfidenceFlag:
-    """As regras da 5.4; cada motivo diz o que resolveria, quando existe resolução."""
+    """As regras da 5.4; cada motivo diz o que resolveria, quando existe resolução.
+
+    `curtidas_ocultas`: posts que já seriam maduros, mas sem curtidas (o canal as esconde, F10).
+    Eles não contam como maduros; com `canal_novo` ligado, o texto diz isso, para o canal não
+    parecer novo sem explicação. O código continua `canal_novo` (os 6 códigos estáveis da 5.4).
+    """
     L = limiares
     motivos: list[Motivo] = []
 
@@ -82,11 +95,17 @@ def confidence_flag(
         )
     if posts_maduros < L["min_posts"]:
         faltam = L["min_posts"] - posts_maduros
-        motivo(
-            "canal_novo",
-            f"o canal tem só {posts_maduros} posts maduros (publicados há mais de 30 dias); "
-            f"com mais {faltam} posts publicados, a estimativa do canal melhora",
-        )
+        texto = f"o canal tem só {posts_maduros} posts maduros (publicados há mais de 30 dias); "
+        if (
+            curtidas_ocultas
+        ):  # publicar mais não resolve: os novos também viriam com as curtidas ocultas
+            texto += (
+                f"{curtidas_ocultas} posts têm as curtidas ocultas e não entram na conta; com as "
+                "curtidas deles enviadas em channel_stats, a estimativa do canal melhora"
+            )
+        else:
+            texto += f"com mais {faltam} posts publicados, a estimativa do canal melhora"
+        motivo("canal_novo", texto)
     if extracao_falhou:
         motivo(
             "extracao_falhou",
@@ -97,7 +116,7 @@ def confidence_flag(
         motivo(
             "fora_da_distribuicao",
             f"o criativo é diferente de tudo que o modelo viu "
-            f"(distância {_br(dist_knn)}, o normal vai até {_br(L['dist_knn'])})",
+            f"(distância {_br2(dist_knn)}, o normal vai até {_br2(L['dist_knn'])})",
         )
     plan = data_planejada.date() if isinstance(data_planejada, datetime) else data_planejada
     dias = (plan - date.fromisoformat(L["ultimo_treino"])).days

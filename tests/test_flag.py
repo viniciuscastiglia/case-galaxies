@@ -86,6 +86,20 @@ def test_canal_novo_sozinho_com_resolucao(limiares):
     assert "4 posts" in txt and "mais 6 posts publicados" in txt
 
 
+def test_canal_novo_diz_quando_as_curtidas_estao_ocultas(limiares):
+    f = _normal(limiares, posts_maduros=0, curtidas_ocultas=12)
+    assert _codigos(f) == ["canal_novo"]  # o código continua um dos 6 da 5.4
+    assert "12 posts têm as curtidas ocultas e não entram na conta" in f.motivos[0].texto
+    # o conserto sugerido é mandar as curtidas, não publicar mais (os novos também viriam ocultos)
+    assert "channel_stats" in f.motivos[0].texto and "com mais" not in f.motivos[0].texto
+    sem = _normal(limiares, posts_maduros=0)
+    assert "ocultas" not in sem.motivos[0].texto and "com mais 10 posts" in sem.motivos[0].texto
+
+
+def test_curtidas_ocultas_sem_canal_novo_nao_criam_motivo(limiares):
+    assert _codigos(_normal(limiares, curtidas_ocultas=5)) == []
+
+
 def test_canal_novo_no_limite(limiares):
     assert _normal(limiares, posts_maduros=10).motivos == []
     assert _codigos(_normal(limiares, posts_maduros=9)) == ["canal_novo"]
@@ -107,6 +121,12 @@ def test_fora_da_distribuicao_sozinho(limiares):
     flag = _normal(limiares, dist_knn=12.5)
     assert _codigos(flag) == ["fora_da_distribuicao"]
     assert "12,5" in flag.motivos[0].texto
+
+
+def test_distancia_com_duas_casas(limiares):
+    f = _normal({**limiares, "dist_knn": 0.38}, dist_knn=0.43)
+    assert _codigos(f) == ["fora_da_distribuicao"]
+    assert "0,43" in f.motivos[0].texto and "0,38" in f.motivos[0].texto
 
 
 def test_fora_da_distribuicao_so_com_indice(limiares):

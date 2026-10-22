@@ -25,6 +25,7 @@ def modelo_e_x():
             "titulo_pc00": rng.normal(size=n),
             "titulo_pc01": rng.normal(size=n),
             "thumb_pc00": rng.normal(size=n),
+            "sonda_roda": rng.normal(size=n),
         }
     )
     y = (
@@ -36,6 +37,7 @@ def modelo_e_x():
         - 0.3 * x["titulo_pc01"]
         + 0.2 * x["thumb_pc00"]
         + 0.3 * x["setor"]
+        + 0.5 * x["sonda_roda"]
         + rng.normal(0, 0.2, n)
     )
     params = {"objective": "regression", "verbosity": -1, "seed": 0, "num_leaves": 15}
@@ -147,3 +149,56 @@ def test_config_real_carrega():
     cfg = carregar_cfg()
     assert cfg["k"] == 5
     assert "setor" in cfg["contexto"] and "titulo_pc*" in cfg["blocos"]["significado do título"]
+
+
+# Só as sondas validadas contra a rubrica do VLM falam com o próprio nome, e só no setor em que
+# passaram (aula 4.4, erro comum 5); as outras somam no bloco da capa, e a conta não muda.
+CFG_SONDAS = CFG | {
+    "k": 20,
+    "sondas_validadas": {"beleza": ["sonda_rosto"], "automotivo": []},
+    "bloco_das_sondas_nao_validadas": "capa (SigLIP)",
+}
+
+
+def test_sonda_nao_validada_soma_no_bloco_da_capa(modelo_e_x):
+    modelo, x = modelo_e_x
+    drivers = top_drivers(modelo, x.iloc[[3]], None, CFG_SONDAS, setor="automotivo")
+    nomes = [d["feature"] for d in drivers]
+    assert "sonda_rosto" not in nomes and "sonda_roda" not in nomes and "capa (SigLIP)" in nomes
+    valores, _ = contribuicoes(modelo, x.iloc[[3]])
+    soma = valores[["thumb_pc00", "sonda_rosto", "sonda_roda"]].sum(axis=1).iloc[0]
+    capa = next(d for d in drivers if d["feature"] == "capa (SigLIP)")
+    assert capa["contribuicao_log"] == pytest.approx(soma, abs=1e-3)
+
+
+def test_sonda_validada_no_setor_fala_com_o_proprio_nome(modelo_e_x):
+    modelo, x = modelo_e_x
+    drivers = top_drivers(modelo, x.iloc[[3]], None, CFG_SONDAS, setor="beleza")
+    nomes = [d["feature"] for d in drivers]
+    assert "sonda_rosto" in nomes and "sonda_roda" not in nomes
+
+
+def test_a_soma_nao_muda_ao_juntar_as_sondas(modelo_e_x):
+    modelo, x = modelo_e_x
+    cfg = CFG_SONDAS | {"min_abs": 0.0}
+    antes = sum(d["contribuicao_log"] for d in top_drivers(modelo, x.iloc[[3]], None, cfg))
+    depois = sum(
+        d["contribuicao_log"]
+        for d in top_drivers(modelo, x.iloc[[3]], None, cfg, setor="automotivo")
+    )
+    assert depois == pytest.approx(antes, abs=2e-3)
+
+
+def test_sem_setor_as_sondas_seguem_individuais(modelo_e_x):
+    modelo, x = modelo_e_x
+    nomes = [d["feature"] for d in top_drivers(modelo, x.iloc[[3]], None, CFG_SONDAS)]
+    assert "sonda_roda" in nomes
+
+
+def test_pacote_sem_sondas_nao_quebra(modelo_e_x):
+    modelo, x = modelo_e_x
+    sem = x.drop(columns=["sonda_rosto", "sonda_roda"])
+    params = {"objective": "regression", "verbosity": -1, "seed": 0}
+    m = lgb.train(params, lgb.Dataset(sem, x["hora_local"]), num_boost_round=10)
+    drivers = top_drivers(m, sem.iloc[[0]], None, CFG_SONDAS, setor="beleza")
+    assert not any(d["feature"].startswith("sonda_") for d in drivers)

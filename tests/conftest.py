@@ -40,3 +40,13 @@ def pastas_de_teste_vazias():
         shutil.rmtree(pasta, ignore_errors=True)
         pasta.mkdir(parents=True)
     yield
+
+
+@pytest.fixture(autouse=True)
+def cache_da_capa_vazio():
+    """O cache das capas (`previa.capa`) é do processo: cada teste começa sem ele. O import fica
+    aqui dentro para respeitar a regra do topo (as variáveis antes de qualquer `previa`)."""
+    from previa.capa import limpar_cache_da_capa
+
+    limpar_cache_da_capa()
+    yield

@@ -7,9 +7,10 @@ embedding viram um fator só (5.6, erro comum 5). O contexto (`hist_*`, setor, i
 fica fora: o marketing não o muda e ele se cancela entre dois Shorts do mesmo canal (6.3). Com
 `aprovados` (#36, F7), só falam os blocos que a ablação aprovou. São associações do modelo, não
 causas (5.6, erro comum 6). `direcao` usa as palavras da aula ("aumenta" / "reduz") e as
-contribuições com |φ| abaixo de `min_abs` caem antes do corte em `k` (5.6). Sondas (`sonda_*`) e
-detectores (`det_*`) ficam individuais: cada um aparece com o próprio nome. A aditividade (base +
-soma = previsão) é conferida em `contribuicoes` (erro comum 7).
+contribuições com |φ| abaixo de `min_abs` caem antes do corte em `k` (5.6). Detectores (`det_*`)
+ficam individuais. Sondas (`sonda_*`) aparecem com o próprio nome só se foram validadas no setor do
+pedido (`sondas_validadas`; 4.4, erro comum 5); as outras somam no bloco da capa. A aditividade
+(base + soma = previsão) é conferida em `contribuicoes` (erro comum 7).
 """
 
 from fnmatch import fnmatch
@@ -46,8 +47,13 @@ def top_drivers(
     fundo: pd.DataFrame | None,
     cfg: dict,
     aprovados: set[str] | None = None,
+    setor: str | None = None,
 ) -> list[dict]:
-    """Os `k` fatores que mais mexeram na previsão de `x` (uma linha), por |φ| em log."""
+    """Os `k` fatores que mais mexeram na previsão de `x` (uma linha), por |φ| em log.
+
+    Com `setor` e `cfg["sondas_validadas"]`, a sonda fora da lista do setor soma no bloco
+    `cfg["bloco_das_sondas_nao_validadas"]`; sem um dos dois, cada sonda fala com o próprio nome.
+    """
     if len(x) != 1:
         raise ValueError(
             f"top_drivers explica uma linha por vez; veio {len(x)}. Passe x.iloc[[i]]."
@@ -58,6 +64,12 @@ def top_drivers(
         cols = _expandir(padroes, x.columns)
         if cols:
             blocos[nome] = cols
+    if setor is not None and "sondas_validadas" in cfg:
+        validadas = set(cfg["sondas_validadas"].get(setor, []))
+        soltas = [c for c in x.columns if c.startswith("sonda_") and c not in validadas]
+        if soltas:
+            capa = cfg["bloco_das_sondas_nao_validadas"]
+            blocos[capa] = blocos.get(capa, []) + soltas
     agrupado = agrupar_blocos(valores, blocos).iloc[0]
     contexto = set(_expandir(cfg["contexto"], x.columns))
     saida = []
