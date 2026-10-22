@@ -6,22 +6,18 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
 
 ## Agora
 
-- **Checkpoint (21/10, ~21h20; a sessão nova da conta trocada).** No branch `feat/lote-noite-2`, commitados e
-  verdes (596 testes): o servidor MCP e os testes da A7 (`8ca876b`), os documentos com os números do teste e a v2
-  `5373921a` (`3657a52`), a A2 escrita pelo Claude (`1729f84`; o Vinicius delegou às 21h15 e estuda depois). Índice dos
-  comparáveis gerado; fumaça do MCP por stdio com o pacote real ok (`.superpowers/sdd/2026-10-21-tool/fumaca.md`);
-  golden com a v2: cobertura 24/30, par-a-par 41/58 (`golden.md` na mesma pasta). O main e o GitHub seguem nos lotes 1
-  e 2. Teste final aberto UMA vez (run `6b1f7e77`): NÃO rodar `previa.final` de novo.
-- **Decisão do Vinicius (~21h20):** A6, A4 e M9 entram, feitas pelo Claude; ele estuda depois da entrega.
-- **Em voo:** dois subagentes em paralelo, sem git: A4 (`src/previa/explicador.py`, brief e relatório em
-  `.superpowers/sdd/2026-10-21-agente/`) e A6 (`src/previa/agente.py`, idem). M9 com o Claude: pré-triagem dos 20 piores
-  do modelo final no walk-forward (`data/erros/piores_e684ac8c.csv`, run `e684ac8c`).
-- **Próximo passo, nesta ordem:** (1) revisar e commitar A4 e A6 (integrar o nó `explicar` da A6 com a A4); (2) M9 no
-  README; (3) README 7 e 8 (do Claude, o Vinicius reescreve depois), tirar os `<!-- -->` e os `PREENCHER` (o hub manda
-  apagar antes de entregar), AUTOAVALIACAO; (4) suíte + ruff + review final; (5) merge no `main` e push com o ok dele;
-  (6) `/fechar-sessao`. **Corte às 23h15:** o que não estiver verde fica fora do merge e vira limitação; push até
-  ~23h40.
-- **Pendente do Vinicius:** como a liga recebe a entrega (o repositório no GitHub é privado); o ok do merge e do push.
+- **Checkpoint (21/10, 21h45).** Tudo commitado e verde (666 testes, ruff limpo) no `feat/lote-noite-2`, até
+  `39f0444`: MCP e A7, A2 (texto do Claude), A4 (`explicador.py`), A6 (`agente.py`), a demo (`previa.demo`, regra
+  #18), a M9 (triagem por regra, `.superpowers/sdd/2026-10-21-agente/m9.md`), o roteiro do vídeo
+  (`docs/ROTEIRO_VIDEO.md`), README e cards sem `PREENCHER` nem comentários, a opção B do repo público
+  (`docs/curadoria_canais.csv`; `data/canais.csv` fora do git). Teste final aberto UMA vez (run `6b1f7e77`): NÃO rodar
+  `previa.final` de novo.
+- **Falta, do Vinicius (o modo automático bloqueia o Claude de publicar):** (1) `git branch -f main feat/lote-noite-2
+  && git push origin main feat/lote-noite-2`; (2) `gh repo edit viniciuscastiglia/case-galaxies --visibility public
+  --accept-visibility-change-consequences`; (3) gravar o vídeo pelo roteiro e subir no YouTube; (4) enviar à liga o
+  link do repo e o do vídeo até 23h59.
+- **Depois da entrega:** `/fechar-sessao`; o Vinicius estuda e reescreve A2, A4, A6, M9 e as seções 7 e 8 do README
+  (delegados em 21/10); teach-backs em 22/10.
 
 ## Como funciona
 
