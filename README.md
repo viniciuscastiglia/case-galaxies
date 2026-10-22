@@ -282,6 +282,12 @@ canais; manchete pesada pelo número de Shorts de cada canal. Sem alarme de "bom
   erro típico cai de um fator de ×2,72 para ×2,52 [2,21; 3,06] (ganho relativo de 7,5% [1,8%; 12,7%]); Spearman
   intra-canal de 0,18 contra 0,05 do baseline, e global de 0,75 [0,55; 0,86]. IC por bootstrap de canais; métricas
   `temporal_*` e `canal_novo_*` do run.
+- **Painel do teste (F1, IC por bootstrap de canais, run `6b1f7e77`):**
+
+  | Cenário | `mae_log` | e^MAE | RMSE em log | Spearman global | F1 nas faixas | ganho relativo no MAE |
+  | :--- | ---: | ---: | ---: | ---: | ---: | ---: |
+  | Temporal | 0,925 [0,794; 1,117] | ×2,52 [2,21; 3,06] | 1,29 [1,08; 1,57] | 0,75 [0,55; 0,86] | 0,20 [0,18; 0,23] | 7,5% [1,8%; 12,7%] |
+  | Canal novo | 0,942 [0,815; 1,127] | ×2,56 [2,26; 3,09] | 1,29 [1,10; 1,56] | 0,73 [0,52; 0,85] | 0,17 [0,15; 0,20] | 5,7% [2,9%; 8,2%] |
 - **Cobertura do intervalo de 80% no teste (F41):** **76,5%** no total (alvo 80%; crua 68,9% antes do CQR), abaixo da
   faixa de 80% ± 3 da M6, e a queda é o drift da aula 7.5:
 
@@ -374,8 +380,15 @@ rótulo difere (seção 8). Por isso a comparação é de ordem de grandeza e de
 - **A v2 não tem teste próprio:** o modelo de uso foi retreinado com dados até maio de 2026, gastando os meses do
   teste da v1; o número do teste é o do modelo de janeiro, e a cobertura da v2 só vale na calibração (#33).
 - **O explicador por LLM:** só roda com Shorts publicados (free tier). Com o Gemini real, nos 6 Shorts da demo, 6 de
-  6 explicações passaram no validador na 1ª tentativa; o validador confere números, fatores e termos, mas não a
-  redação ("reduz a previsão em 23% a mais" passou). Não foi avaliado em escala.
+  6 explicações passaram no validador na 1ª tentativa. O validador confere números, fatores e termos, mas não a
+  redação: na 1ª rodada passou "reduz a previsão em 23% a mais", e uma regra nova no prompt corrigiu isso na 2ª (de
+  novo 6 de 6). Não foi avaliado em escala.
+- **O que a auditoria pedia e não foi feito** (`docs/AUDITORIA.md`, seção 3): o motivo `fora_da_distribuicao` do flag
+  não é calculado pela tool (a distância aos vizinhos não entra); a capa não tem cache por SHA-256 (é lida a cada
+  chamada); o índice dos comparáveis usa só a capa, sem o título; não há what-if (a Tool 5 só ordena); não há o
+  dogfooding com o `MultiServerMCPClient`, nem o teste no Claude Code e no Inspector (o MCP foi testado com o cliente
+  do FastMCP, em memória e por stdio); o agente não foi avaliado com um LLM real em 20 a 30 perguntas, nem com o
+  tracing do MLflow (F30); e a instalação não foi testada do zero numa máquina limpa.
 - **Fora do modelo:** a transcrição e o idioma da fala (#35), a clusterização dos descritores (a rubrica tem campos
   fixos, F38), o detector de objetos (o produto em close ficou na rubrica, #31), a leitura do texto na capa (só a
   detecção: o PaddleOCR não instala na Stack 2026) e o baseline de regressão sobre os inscritos (os inscritos são os

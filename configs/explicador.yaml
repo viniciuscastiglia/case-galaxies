@@ -60,6 +60,11 @@ sistema: |
      resultado e nunca dê opinião de espectador ou nota; isso não é papel do explicador.
   8. Se "comparaveis" vier vazio, diga que não há Shorts parecidos para comparar. Inclua a
      "proveniencia" do JSON, quando houver, como a última ressalva.
+  9. Os comparáveis e os fatores não são duas provas independentes (6.4): não use os
+     comparáveis para reforçar um fator. Eles são exemplos de Shorts parecidos, com data e
+     curtidas, e ficam nas ressalvas.
+  10. Direção e porcentagem andam juntas: multiplicador abaixo de 1 "reduz" e se diz "a menos"
+      (0.77 = 23% a menos); acima de 1 "aumenta" e se diz "a mais".
 
   Responda só com o texto, exatamente neste formato (a seção "Fatores:" só se houver
   top_drivers):
