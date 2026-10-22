@@ -1,0 +1,757 @@
+channel_id,handle,nome,setor,tipo,incluido,motivo,fonte,observacao,verificado_em
+UCBzHXqTZlKVe_aoDU5cbfRw,@oboticario,O Boticário,beleza,marca,sim,revisão 05/10: canal oficial confirmado,lista manual+busca,handle não encontrado; a busca achou @boticario (o Boticário); antes: achado por busca: confirmar o canal,2026-10-05
+UCSg89B-3bly27fu_5M2rtBQ,@natura,Natura,beleza,marca,sim,revisão 05/10: canal oficial confirmado,lista manual+busca,handle não encontrado; a busca achou @naturabemestarbem (naturabroficial); antes: achado por busca: confirmar o canal,2026-10-05
+UC1Gb2KWaul8Y4QqP0iEC5pA,@eudora,Eudora,beleza,marca,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UCcy4H48pGKyYwXYj1Yz7dWw,@avonbrasil,Avon Brasil,beleza,marca,sim,"revisão 05/10: canal brasileiro, conteúdo em português",lista manual+busca,handle não encontrado; a busca achou @avonbr (AvonBR); antes: país não informado: conferir idioma e país,2026-10-05
+UCffgKIBxrgHfemrk4LVZUpw,@quemdisseberenice,"Quem Disse, Berenice?",beleza,marca,não,menos de 30 Shorts (24),lista manual,,2026-10-05
+UC0H2SgQ_8CSfLwwMJBYuAjg,@vultcosmetica,Vult,beleza,marca,não,menos de 30 Shorts (8),lista manual,,2026-10-05
+UCayFqs933CpZtCHtTSiB2SA,@rubyrose,Ruby Rose,beleza,marca,sim,revisão 05/10: canal oficial confirmado,lista manual+busca,handle não encontrado; a busca achou @rubyrose-b1v (Ruby Rose); antes: achado por busca: confirmar o canal,2026-10-05
+UCnjK9YWSbd0AAjHhM3vAu7A,@salonline,Salon Line,beleza,marca,sim,revisão 05/10: canal oficial confirmado,lista manual+busca,cabelo; handle não encontrado; a busca achou @salonlinebrasil (SalonLineBrasil); antes: achado por busca: confirmar o canal,2026-10-05
+UC8UPW7OimcYAoSnPHwVU4-Q,@lolacosmetics,Lola Cosmetics,beleza,marca,não,menos de 30 Shorts (4),lista manual+busca,cabelo; handle não encontrado; a busca achou @lolabrasilusa (Lola Brasil USA),2026-10-05
+UC2ewdOD19Z_81Fo_j2AY3aQ,@sallve,Sallve,beleza,marca,não,sem Short há mais de 90 dias,lista manual,skincare,2026-10-05
+UCFoC2StbX364fRm6wBBvwmA,@principiaskincare,Principia,beleza,marca,sim,passa nos critérios automáticos,lista manual,skincare,2026-10-05
+UCYK0BAysVb1x4oJfA8esOgQ,@creamyskincare,Creamy,beleza,marca,não,sem Short há mais de 90 dias,lista manual,skincare,2026-10-05
+UCKlXyLKiQMdmvvTh8wpLyGA,@wepink,WePink,beleza,marca,não,menos de 30 Shorts (0),lista manual,,2026-10-05
+UCMtX4p-AoPi_g2XjWWm6L1w,@bocarosabeauty,Boca Rosa Beauty,beleza,marca,não,menos de 30 Shorts (0),lista manual,,2026-10-05
+UCcHR0RvLYk33ppkjBw3UaEA,@marimariamakeup,Mari Maria Makeup,beleza,marca,sim,"revisão 05/10: canal brasileiro, conteúdo em português",lista manual+busca,handle não encontrado; a busca achou @marimaria (Mari Maria); antes: país não informado: conferir idioma e país,2026-10-05
+UCXqnG7hbmGYDqC1iTNkVdew,@oceane,Océane,beleza,marca,não,país FR,lista manual,,2026-10-05
+UCZ5Pu0r8Sdmrl8CIv6FKm8Q,@dailus,Dailus,beleza,marca,não,menos de 30 Shorts (0),lista manual+busca,handle não encontrado; a busca achou @shhdailus (dailus),2026-10-05
+UC05SnyOT6pbU-79CiQzpVEA,@granado,Granado,beleza,marca,não,menos de 30 Shorts (20),lista manual+busca,handle não encontrado; a busca achou @djbrunogranado (Dj Bruno Granado),2026-10-05
+UCp5lRKP0SQivNrBStmCvJog,@trussprofessional,Truss Professional,beleza,marca,não,país US,lista manual,cabelo,2026-10-05
+UCNIPElrLSUtMSw4tODY9Rpw,@lorealparisbr,L'Oréal Paris Brasil,beleza,marca,não,menos de 30 Shorts (2),lista manual+busca,handle não encontrado; a busca achou @lorealparisbrasil (L'Oréal Paris Brasil),2026-10-05
+UCa6q0KnZPZChOXYV-HE08ZQ,@maybellinebr,Maybelline NY Brasil,beleza,marca,não,sem Short há mais de 90 dias,lista manual+busca,handle não encontrado; a busca achou @maybellinenybrasil (Maybelline NY Brasil),2026-10-05
+UCZoXyGtbWkfuZYPXuOumbFA,@niveabrasil,NIVEA Brasil,beleza,marca,não,menos de 30 Shorts (0),lista manual,,2026-10-05
+UCNWifvx-E-Y7Nykr5feg-Vw,@dovebrasil,Dove Brasil,beleza,marca,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UCM9HUeF8AcSzQ9V8w6QikVw,@sephorabrasil,Sephora Brasil,beleza,marca,não,menos de 30 Shorts (5),lista manual,varejo,2026-10-05
+UCu4b-uoxVPh64U3NK-4vgpg,@belezanaweb,Beleza na Web,beleza,marca,não,sem Short há mais de 90 dias,lista manual,varejo,2026-10-05
+UC4ff5P-Z2xXGmUY8h3zNwUw,@epocacosmeticos,Época Cosméticos,beleza,marca,sim,passa nos critérios automáticos,lista manual,varejo,2026-10-05
+UCvaNyFSn8VK5JSdOPG2TRjg,@marykaybrasil,Mary Kay Brasil,beleza,marca,não,sem Short há mais de 90 dias,lista manual,,2026-10-05
+UC2vnzOFyZkhgrcYhjHj9wQA,@jequiti,Jequiti,beleza,marca,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UC8UhwB7xNdqv_FPjQ4KxDGQ,@hinodegroup,Hinode,beleza,marca,não,menos de 30 Shorts (0),lista manual,,2026-10-05
+UC4NQ7KoxPjmzn1XUY07k5Lg,@payotbrasil,Payot,beleza,marca,não,menos de 30 Shorts (20),lista manual,,2026-10-05
+UCmnGjiFhDdfm0FwG0OjP-JQ,@simpleorganic,Simple Organic,beleza,marca,sim,passa nos critérios automáticos,lista manual,skincare,2026-10-05
+UCjW835eNjUmrYwFSeCvTY-A,@vizzelacosmeticos,Vizzela Cosméticos,beleza,marca,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UC5tiicggIvZJIRP7Nu-_PCg,@larocheposaybrasil,La Roche-Posay Brasil,beleza,marca,não,menos de 30 Shorts (0),lista manual+busca,skincare; handle não encontrado; a busca achou @larochebrasil (La Roche-Posay Brasil),2026-10-05
+UCt_0cViEijqNltH8IN5Y63g,@garnierbrasil,Garnier Brasil,beleza,marca,não,menos de 30 Shorts (13),lista manual,,2026-10-05
+UC8HGW9Jt-sRzF3i_M52BfgA,@skalacosmeticos,Skala Cosméticos,beleza,marca,sim,passa nos critérios automáticos,lista manual,cabelo,2026-10-05
+UChi07TnO_ftfDSaaY4l1PXQ,@widicare,Widi Care,beleza,marca,sim,revisão 05/10: canal oficial confirmado,lista manual+busca,cabelo; handle não encontrado; a busca achou @widicareblog (Widi Care); antes: achado por busca: confirmar o canal,2026-10-05
+UCcHR0RvLYk33ppkjBw3UaEA,@marimaria,Mari Maria,beleza,criador,não,canal repetido na lista,lista manual,,2026-10-05
+UCgSvw7asvNq7wJWKMSW28Eg,@bocarosa,Boca Rosa,beleza,criador,não,"revisão 05/10: contagem completa, 5 Shorts; último em 2023",lista manual+busca,Bianca Andrade; handle não encontrado; a busca achou @biancaandradebr (Bianca Andrade); antes: 5 Shorts entre os 500 uploads mais recentes,2026-10-05
+UCAkZ7bimIU9m7wT6Th0FcEw,@niinasecrets,Niina Secrets,beleza,criador,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UCYcClChNM-0rjqCGobSfJ4A,@karenbachini,Karen Bachini,beleza,criador,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UCnmaW_YVh9iJAFVOsLR7W2w,@camilacoelho,Camila Coelho,beleza,criador,não,"revisão 05/10: contagem completa, 0 Shorts",lista manual,parte do conteúdo em inglês; antes: 0 Shorts entre os 500 uploads mais recentes,2026-10-05
+UCoTM-vvs2hnv2mCvzNJ5uXA,@francinyehlke,Franciny Ehlke,beleza,criador,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+,@julianagoes,Juliana Goes,beleza,criador,não,handle não encontrado,lista manual,,2026-10-05
+UCobi8wbJKxiiooqYG0oMFkQ,@brunatavares,Bruna Tavares,beleza,criador,não,menos de 30 Shorts (18),lista manual+busca,também tem marca (BT); handle não encontrado; a busca achou @brunatavaresbt (Bruna Tavares),2026-10-05
+UCAQfsJwdaEy5L9ehl4q0QrQ,@alicesalazar,Alice Salazar,beleza,criador,sim,revisão 05/10: canal oficial confirmado,lista manual+busca,handle não encontrado; a busca achou @alicecsalazar (Alice Salazar); antes: achado por busca: confirmar o canal,2026-10-05
+UCobi8wbJKxiiooqYG0oMFkQ,@pausaparafeminices,Pausa para Feminices,beleza,criador,não,canal repetido na lista,lista manual+busca,handle não encontrado; a busca achou @brunatavaresbt (Bruna Tavares),2026-10-05
+UC42AtHmW1CM2MtKSJnsM6iA,@dudariedel,Duda Riedel,beleza,criador,não,menos de 30 Shorts (11),lista manual,beleza e lifestyle,2026-10-05
+UCi7t8j_s1AWqKN-EpLJEf7w,@karolpinheiro,Karol Pinheiro,beleza,criador,não,menos de 30 Shorts (0),lista manual,beleza e lifestyle,2026-10-05
+UChird53Is6y5IL5iBbAl_Iw,@rayzanicacio,Rayza Nicácio,beleza,criador,sim,passa nos critérios automáticos,lista manual,cabelo,2026-10-05
+UCjivwB8MrrGCMlIuoSdkrQg,@natalyneri,Nátaly Neri,beleza,criador,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UCAhe-slHtLFlWEHWKKmIvdg,@nahcardoso,Nah Cardoso,beleza,criador,não,"revisão 05/10: contagem completa, 14 Shorts; último em 2025",lista manual+busca,beleza e lifestyle; handle não encontrado; a busca achou @nahcardosovideos (Nah Cardoso); antes: 14 Shorts entre os 500 uploads mais recentes,2026-10-05
+UC5RD_kido8LXHWUjmMQUFfw,@micarocha,Mica Rocha,beleza,criador,não,sem Short há mais de 90 dias,lista manual+busca,handle não encontrado; a busca achou @micarochaoficial (Mica Rocha),2026-10-05
+UC9lREiVmeJvuqLhomuZv65w,@tacielealcolea,Taciele Alcolea,beleza,criador,não,menos de 30 Shorts (0),lista manual,beleza e lifestyle,2026-10-05
+UCvHWEkK_-MJzuPZj4ACLfxA,@marisaad,Mari Saad,beleza,criador,não,menos de 30 Shorts (0),lista manual,,2026-10-05
+UCbU4-Yr0DjIExjS4ki_1lSA,@thassianaves,Thássia Naves,beleza,criador,não,menos de 30 Shorts (0),lista manual,beleza e moda,2026-10-05
+UCgFRHNUhmAE1IEmSN_EbaWg,@vicceridono,Vic Ceridono,beleza,criador,não,"revisão 05/10: contagem completa, 1 Short; último em 2024",lista manual+busca,Dia de Beauté; handle não encontrado; a busca achou @diadebeaute_ (Dia de Beauté por Vic Ceridono); antes: 1 Shorts entre os 500 uploads mais recentes,2026-10-05
+UC5CJNzaaMLmmEWI7jXKT8vQ,@dudamolinos,Duda Molinos,beleza,criador,não,menos de 30 Shorts (0),lista manual,maquiador,2026-10-05
+UClDWCmkTqW2A44nH1jZN7SA,@agustinfernandez,Agustin Fernandez,beleza,criador,não,menos de 30 Shorts (0),lista manual,maquiador,2026-10-05
+UC1N7uZhq0JcSSgkt4EmjPSw,@vanessarozan,Vanessa Rozan,beleza,criador,sim,passa nos critérios automáticos,lista manual,maquiadora,2026-10-05
+UCww4HYJZlIk3fRgqTWEW4cA,@fiatbrasil,Fiat Brasil,automotivo,marca,sim,revisão 05/10: canal oficial confirmado,lista manual+busca,handle não encontrado; a busca achou @fiatbr (Fiat Automóveis Brasil); antes: achado por busca: confirmar o canal,2026-10-05
+UCRojKYdkvZcRQX1Vu7wEU5g,@chevroletbrasil,Chevrolet Brasil,automotivo,marca,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UCBXtBstNh5iIgm07keup0Gw,@volkswagendobrasil,Volkswagen do Brasil,automotivo,marca,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UCpgtCHAHTQXRB1_A43Im-vg,@toyotadobrasil,Toyota do Brasil,automotivo,marca,não,menos de 30 Shorts (0),lista manual,,2026-10-05
+UC6HXTcAD1Zzd2HiCRpf6PrQ,@hyundaimotorbrasil,Hyundai Motor Brasil,automotivo,marca,não,menos de 30 Shorts (0),lista manual,,2026-10-05
+UC1ZHtRLTK0Lrl1N6DVGshgg,@renaultbrasil,Renault Brasil,automotivo,marca,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UCZuERLdGT7WEPKgEPTmbSHg,@jeepbrasil,Jeep Brasil,automotivo,marca,não,"revisão 05/10: contagem completa, 17 Shorts",lista manual+busca,handle não encontrado; a busca achou @jeepdobrasil (Jeep | Brasil); antes: 17 Shorts entre os 500 uploads mais recentes,2026-10-05
+UCFy0Z7HS5OQGHeb-sTnjsNA,@hondaautomoveis,Honda Automóveis,automotivo,marca,sim,revisão 05/10: canal oficial confirmado,lista manual+busca,handle não encontrado; a busca achou @hondabr (Honda Automóveis); antes: achado por busca: confirmar o canal,2026-10-05
+UChpihrq2RRLyzgLtpcoMVbw,@nissanbrasil,Nissan Brasil,automotivo,marca,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UCtDew4iI18GOrvPXrvhXzhw,@peugeotbrasil,Peugeot Brasil,automotivo,marca,sim,"revisão 05/10: canal brasileiro, conteúdo em português",lista manual,antes: país não informado: conferir idioma e país,2026-10-05
+UC8YKpC9NJy3BKPoWYYWc6EA,@citroenbrasil,Citroën Brasil,automotivo,marca,sim,revisão 05/10: canal oficial confirmado,lista manual+busca,handle não encontrado; a busca achou @citroen (Citroën do Brasil); antes: achado por busca: confirmar o canal,2026-10-05
+UCMDN2p8PMyBoMVDpOQ5r9Ew,@bydbrasil,BYD Brasil,automotivo,marca,não,sem Short há mais de 90 dias,lista manual,,2026-10-05
+UCsENDdrL8OTU8GDmRKLpspw,@gwmbrasil,GWM Brasil,automotivo,marca,não,menos de 30 Shorts (0),lista manual,,2026-10-05
+UCo3iqVlz3pzmXlSoipcAWEw,@caoachery,CAOA Chery,automotivo,marca,não,menos de 30 Shorts (15),lista manual,,2026-10-05
+UCEmi0v44ZknNFkzc2_a2Uhw,@mitsubishimotorsbrasil,Mitsubishi Motors Brasil,automotivo,marca,sim,revisão 05/10: canal oficial confirmado,lista manual+busca,handle não encontrado; a busca achou @mitsubishimotors (Mitsubishi Motors BR); antes: achado por busca: confirmar o canal,2026-10-05
+UCSO52TQhDwp9W-nI2LwVepg,@kiabrasil,Kia Brasil,automotivo,marca,não,menos de 30 Shorts (0),lista manual,,2026-10-05
+UCNdmMv0UNG470K6YHYznwKA,@bmwbrasil,BMW Brasil,automotivo,marca,sim,"revisão 05/10: canal brasileiro, conteúdo em português",lista manual+busca,handle não encontrado; a busca achou @bmwtvbrasil (BMW Brasil); antes: país não informado: conferir idioma e país,2026-10-05
+UC1yLUcwlC_f2vaSBoaOLcgg,@mercedesbenzbrasil,Mercedes-Benz Brasil,automotivo,marca,não,sem Short há mais de 90 dias,lista manual,,2026-10-05
+UCdlSVdgDNGRTRljyk-hhWSQ,@audibrasil,Audi Brasil,automotivo,marca,não,menos de 30 Shorts (27),lista manual+busca,handle não encontrado; a busca achou @audibraudibrasil (Audi Brasil),2026-10-05
+UCeoxJyBwpgNhAB8ZQEhyb9w,@volvocarbrasil,Volvo Car Brasil,automotivo,marca,não,menos de 30 Shorts (29),lista manual,,2026-10-05
+UCYwxNtSgKdbNEwOJ0Q7G8Iw,@rambrasil,Ram Brasil,automotivo,marca,não,menos de 30 Shorts (0),lista manual,,2026-10-05
+UCV1aAz5q_yh3jMOnLa-lk7Q,@fordbrasil,Ford Brasil,automotivo,marca,não,curtidas ocultas,lista manual,,2026-10-05
+UCBfvceulEkHn9XaFTJ1-ckA,@porschebrasil,Porsche Brasil,automotivo,marca,não,menos de 30 Shorts (5),lista manual+busca,handle não encontrado; a busca achou @porschebrasiloficial (Porsche Brasil),2026-10-05
+UCcL1xAFzwrWEMqOzHkoT6Zg,@landroverbrasil,Land Rover Brasil,automotivo,marca,não,menos de 30 Shorts (2),lista manual+busca,handle não encontrado; a busca achou @landroverbr (Land Rover Brasil),2026-10-05
+UCLVeCHg8SmVDlNsdiP-_rRg,@jacmotorsbrasil,JAC Motors Brasil,automotivo,marca,não,menos de 30 Shorts (16),lista manual+busca,handle não encontrado; a busca achou @jacmotorsbr (JAC Motors Brasil),2026-10-05
+UCA7fZzws4W1DDfZcYbsXm0A,@omodajaecoobrasil,Omoda Jaecoo Brasil,automotivo,marca,não,menos de 30 Shorts (3),lista manual,,2026-10-05
+UCiP0SDcAH_y6ytU8Cr4MdVw,@leapmotorbrasil,Leapmotor Brasil,automotivo,marca,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UCFUY-50DV24301n0_apK0lA,@kavakbrasil,Kavak Brasil,automotivo,marca,sim,passa nos critérios automáticos,lista manual,varejo,2026-10-05
+UCih5OCQysXeJwyTtvjWYHBA,@localiza,Localiza,automotivo,marca,não,"revisão 05/10: critério 1, maioria dos Shorts é de serviço (app, frota, aluguel)",lista manual+busca,serviço: aluguel de carros; handle não encontrado; a busca achou @localizaoficial (Localiza); antes: achado por busca: confirmar o canal,2026-10-05
+UCz2Bb7YdduN4x7qN9oFrJjQ,@webmotors,Webmotors,automotivo,marca,sim,passa nos critérios automáticos,lista manual,varejo e portal: conferir tipo,2026-10-05
+UCWYuQ9_2boHBxm59n6lSzDA,@autoesporte,Autoesporte,automotivo,criador,sim,passa nos critérios automáticos,lista manual,revista,2026-10-05
+UCIvQJmPaDR2lMDDNhb4--bA,@quatrorodas,Quatro Rodas,automotivo,criador,sim,passa nos critérios automáticos,lista manual,revista,2026-10-05
+UC6Rk7BKVPWkFJ9FiBrts5Vg,@motor1brasil,Motor1.com Brasil,automotivo,criador,sim,passa nos critérios automáticos,lista manual,portal,2026-10-05
+UChUvS75BR7ziAr7WhrecVsA,@autopapo,AutoPapo,automotivo,criador,sim,passa nos critérios automáticos,lista manual,portal,2026-10-05
+UC3oviyQaE-lcnSZDIGzO15w,@carplace,Carplace,automotivo,criador,não,país AU,lista manual+busca,portal; handle não encontrado; a busca achou @carplace2414 (CARPLACE),2026-10-05
+UCGBIIPnw0AYM3BFsmTsjeAw,@acelerados,Acelerados,automotivo,criador,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UCCykAaNbtxUpGwvkSYWWSKg,@garagemdobellote,Garagem do Bellote,automotivo,criador,sim,"revisão 05/10: contagem completa, 67 Shorts em 2.562 uploads",lista manual+busca,handle não encontrado; a busca achou @garagemdobellotetv (Renato Bellote); antes: 24 Shorts entre os 500 uploads mais recentes,2026-10-05
+UCAQv_zwTlaFNcdnUFsA2kWA,@jornaldocarro,Jornal do Carro,automotivo,criador,não,menos de 30 Shorts (0),lista manual,mídia,2026-10-05
+UChRWJELUc49Usp7VrPEfs3g,@autosegredos,AutoSegredos,automotivo,criador,sim,revisão 05/10: canal oficial confirmado,lista manual+busca,portal; handle não encontrado; a busca achou @autossegredosoficial (Autos Segredos); antes: achado por busca: confirmar o canal,2026-10-05
+UCq8vjlYNJ2y48kuJPYEFvww,@noticiasautomotivas,Notícias Automotivas,automotivo,criador,não,sem Short há mais de 90 dias,lista manual,portal,2026-10-05
+UCzySGyh1QVkPar3ZjV0TiZA,@mobiauto,Mobiauto,automotivo,criador,sim,revisão 05/10: canal oficial confirmado,lista manual+busca,portal; handle não encontrado; a busca achou @mobiautocanal (Mobiauto); antes: achado por busca: confirmar o canal,2026-10-05
+UCnSQ937NANN7dJ6HVFLhVew,@icarros,iCarros,automotivo,criador,sim,passa nos critérios automáticos,lista manual,portal,2026-10-05
+UCQdZoOFeUX4PTUe0TNnjHLg,@kbbbrasil,KBB Brasil,automotivo,criador,não,sem Short há mais de 90 dias,lista manual+busca,portal; handle não encontrado; a busca achou @kelleybluebookbrasil (Kelley Blue Book Brasil),2026-10-05
+UCWnrcSOPif0tHfBg9Wz0u8A,@revistacarro,Revista Carro,automotivo,criador,sim,revisão 05/10: canal oficial confirmado,lista manual+busca,revista; handle não encontrado; a busca achou @revistacarrooficial (Revista Carro); antes: achado por busca: confirmar o canal,2026-10-05
+UCfReg1ecXWG9Gscjba-dGgw,@fullpowertv,Fullpower TV,automotivo,criador,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UChU6qQR8Af0Xd3LSbQHN2sA,@carroscomcamanzi,Carros com Camanzi,automotivo,criador,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UCfyWVInB4nPkZGgiVwGtAiw,@falandodecarro,Falando de Carro,automotivo,criador,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UCQcv6d9owkbJKdqFjkHuHpA,@garagem360,Garagem 360,automotivo,criador,não,menos de 30 Shorts (1),lista manual,,2026-10-05
+UCcNXh7N80Y19t7ajwkrI2Qg,@vrum,Vrum,automotivo,criador,sim,revisão 05/10: canal oficial confirmado,lista manual+busca,mídia; handle não encontrado; a busca achou @portalvrum (Vrum); antes: achado por busca: confirmar o canal,2026-10-05
+UCMk1wBIsHmalYeE16GkD6bg,@carrochefe,Carro Chefe,automotivo,criador,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UCcvhB5_WWaX-Bto2rBVzB6w,@sergioquintanilha,Sérgio Quintanilha,automotivo,criador,não,menos de 30 Shorts (0),lista manual,jornalista,2026-10-05
+UCD5mKgau2FjqC8hv86WcnnA,@autoentusiastas,AutoEntusiastas,automotivo,criador,sim,passa nos critérios automáticos,lista manual,,2026-10-05
+UCFDowZQu8BNamGSmk6j1xAQ,@mundodoautomovelpcd,Mundo do Automóvel para PCD,automotivo,criador,sim,revisão 05/10: canal oficial confirmado,lista manual+busca,nicho PCD; handle não encontrado; a busca achou @mundoauto (MUNDO AUTO); antes: achado por busca: confirmar o canal,2026-10-05
+UCnjK9YWSbd0AAjHhM3vAu7A,@salonlinebrasil,,beleza,marca,não,"reserva: marca de cabelo, sem vaga (teto de 70 canais do plano)",colab,citado 1984x nas descrições da base,2026-10-07
+,@mobiauto.https,,,,não,handle não encontrado,colab,citado 1635x nas descrições da base,2026-10-07
+,@mobiautobr,,,,não,handle não encontrado,colab,citado 922x nas descrições da base,2026-10-07
+,@segeralseguros,,,,não,handle não encontrado,colab,citado 859x nas descrições da base,2026-10-07
+,@mundoautooficial,,,,não,handle não encontrado,colab,citado 782x nas descrições da base,2026-10-07
+,@mundo.auto,,,,não,handle não encontrado,colab,citado 725x nas descrições da base,2026-10-07
+,@icarros_oficial,,,,não,handle não encontrado,colab,citado 536x nas descrições da base,2026-10-07
+UCoPj0L291sfn8eOHXFOJ3Qw,@marciosalvo,,,,não,menos de 30 Shorts (0),colab,citado 528x nas descrições da base,2026-10-07
+,@carroonline,,,,não,handle não encontrado,colab,citado 292x nas descrições da base,2026-10-07
+UCN77N6LYDnTqmQjGDVgDSig,@quatro_rodas,,,,não,menos de 30 Shorts (21),colab,citado 222x nas descrições da base,2026-10-07
+UCo1A4VwnW9NTTjzHVZA2Itw,@mamutefilms,,,,não,menos de 30 Shorts (0),colab,citado 199x nas descrições da base,2026-10-07
+,@renatovmaia,,,,não,handle não encontrado,colab,citado 186x nas descrições da base,2026-10-07
+,@nina.santina,,,,não,handle não encontrado,colab,citado 175x nas descrições da base,2026-10-07
+,@rayzahome,,,,não,handle não encontrado,colab,citado 174x nas descrições da base,2026-10-07
+,@chevroletbr,,,,não,handle não encontrado,colab,citado 146x nas descrições da base,2026-10-07
+,@trovike_,,,,não,handle não encontrado,colab,citado 140x nas descrições da base,2026-10-07
+UChZh07nx3-92M8oNMJyS8Ag,@hard_garage,,,,não,menos de 30 Shorts (0),colab,citado 139x nas descrições da base,2026-10-07
+UCgkLJx-vjSFtJZg_NFpT1vA,@bmwdobrasil,,,,não,menos de 30 Shorts (2),colab,citado 133x nas descrições da base,2026-10-07
+,@hardperformance,,,,não,handle não encontrado,colab,citado 127x nas descrições da base,2026-10-07
+,@apartamento84,,,,não,handle não encontrado,colab,citado 112x nas descrições da base,2026-10-07
+UCKnMcgDLxDeq9HqUgLhtYbQ,@diatv,,,,não,reserva sem revisão: sem vaga (teto de 70 canais do plano),colab,citado 99x nas descrições da base,2026-10-07
+,@shoprayza,,,,não,handle não encontrado,colab,citado 76x nas descrições da base,2026-10-07
+,@nicaciorayza,,,,não,handle não encontrado,colab,citado 73x nas descrições da base,2026-10-07
+,@descomplicapcdcenter,,,,não,handle não encontrado,colab,citado 62x nas descrições da base,2026-10-07
+,@revistafullpower,,,,não,handle não encontrado,colab,citado 59x nas descrições da base,2026-10-07
+,@despachantepne,,,,não,handle não encontrado,colab,citado 51x nas descrições da base,2026-10-07
+UCHf4KO8iyMFBNhrHMM9-UPA,@paulokeller,,,,não,menos de 30 Shorts (0),colab,citado 49x nas descrições da base,2026-10-07
+UCTDFJAg-qb7kCT8flzEFHAg,@oi_rods,,,,não,menos de 30 Shorts (0),colab,citado 48x nas descrições da base,2026-10-07
+,@mundoauto4,,,,não,handle não encontrado,colab,citado 46x nas descrições da base,2026-10-07
+,@ucjld4pjqrup_tut0vanbhfa,,,,não,handle não encontrado,colab,citado 45x nas descrições da base,2026-10-07
+UCTEQ4h79H503UW0pt47peFA,@getglamwithsadaf,get glam with Sadaf,beleza,,não,"revisão de 08/10 (Claude, delegada): idioma não confirmado (títulos só com emojis, sem descrição)",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCOb91a7CixjjjLijnlZqwSw,@cristinaamaro-d3n,moça simples ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UC-2DVwE7hiwp7EDeRzqK3BA,@madisonlhandleyy,Madison Handley,beleza,,não,"revisão de 08/10 (Claude, delegada): idioma: inglês",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCUsFfsr5c3Mih9DUprl5m7Q,@danielrodriguesyt,Daniel Rodrigues,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCDX_R4oHReL_jKvX7-PNHkA,@isabelysellarii,Isabely Sellari,beleza,criador,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:video,termo: maquiagem de farmácia; nicho: maquiagem,2026-10-08
+UCNwlKPX1JXrA1yFXgrsIhTw,@theferashorts,Fera,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCRayLwpveHlvPS6nGJfMg1Q,@shellyanne7,BrownBeatss,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCaQZJRyo0TsBxanhAYg_pYw,@andyrodriguesmakeup,Andy Rodrigues Makeup,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCy2v0_2wtKLv9ZooEe_Es9A,@danycunha_vlog,Dany Cunha | Vlog de Beleza e Autocuidado,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCcg6dQKHH6GxAGXUprisjPg,@voualievolto,Vou ali e volto.,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCRI9AZMsgTPN98KLq-AIWsw,@iepcortes,IEP Cortes,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCziq5oDM07FkwZ6o1Ba3ehw,@deucileneribeiro,Deucilene,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCAOoUfku-zIsN5CExOLQtmQ,@maripmoura,Mariana Moura,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCC5Fz2DbSSjDMfaHvqEyNxA,@pripoka23,PRIPOKA,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCFZbZxHdl6Ig6cpPOUmGhVg,@rededrogariasc,Rede Drogaria SC,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UC63iwP6BtIjxB6xn1GKR6Lw,@emillyvickof,Emilly Vick,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCl1BFpu_GlmymlnttDWjojw,@khushhyy-s1o,Khushhyy,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UC9CxMgScrtKuBx9GrFdYgQg,@pobrelarissinha,Pobre Larissinha  | MAKES BARATINHAS 💸,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCSosdbSmLHX9904UhMkm2Iw,@biancakaneko,Bianca Kaneko,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCTpI0zTHoMh-aph02V4xUWA,@mihtanino,mihtanino,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCH4P1IISjeQvnEDnbHPPjkw,@gabsolivee,gabs olivee ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCUbnO3ZojZmafoAk0QWhEDg,@beautycue,Beautycue,beleza,,não,menos de 30 Shorts (8),busca:video,termo: maquiagem de farmácia,2026-10-08
+UCjinNzraZvUYMy9agBtbxRg,@oiemabi,"Oie, Mabi!",beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCjhvOo5Pz0NH-9TTIbHW49Q,@iamshaysullivan,Shay Sullivan,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCQJTjCTEHUaRS3e17S9E_8g,@paolabrachodicas,Paola Bracho Dicas,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCFuRkKcZXL6TEriPPQdB0Ag,@drursinhocarinhoso,Dr Ursinho Carinhoso,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCnwtBWeXwOjPw6RZyVrGayg,@beautybybanda,BeautyByBanda,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCaCM4_Cf-PsD3lDoKjPG46w,@viciadas_make,Viciadas em Makes,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCEyyax6f6NJx7PaWiF6s9WQ,@imgabriellahall,Gabriella H.,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCim8EJW1iu3m8illLDmqyXA,@dianaboscan_,Dianaboscan_,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UC0yM-t1qslKrb4h-m3CE7Sg,@mollypashbymua,Molly Pashby 🌷,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCsnp6rab3TpLA1A-hpgiJzw,@evelynaraujo,Evelyn Araújo,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UC74HfjwEcznhlvgJzmboWBg,@leahcomptonn,Leah Comptonn,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCaXuFsbk0bopuA0vy5Qwe8w,@wagnecarvalho,Wagnê Carvalho,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCnKSCB60R7hpsrfqVBqVrLw,@luanarosa3717,Luana Rosa,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UChtopmeB2WrRQ-78Ap-kGmg,@tarantinomakeup,Camila Tarantino,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem de farmácia,2026-10-08
+UCeEgxBigedSC3fSD-wMVmMw,@hostelmaresiasdoleme,Hostel Maresias do Leme,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCob8UrNcpXC1jFazAgEMtKw,@diaadiacomericarocha,Dia a dia com Érica Rocha,beleza,,não,"revisão de 08/10 (Claude, delegada): setor: casa e economia doméstica",busca:video,termo: resenha base barata,2026-10-08
+UCBokXnfo1A2w_8ZEVm8zbqg,@chantellefenwick,Chantelle Fenwick,beleza,,não,"revisão de 08/10 (Claude, delegada): idioma: inglês",busca:video,termo: resenha base barata,2026-10-08
+UC7agWQhIneOlA0OiLz8vjjw,@gatosvsareia,Gatos Vs Areia,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCgkwlRN0EfZH7JeiKkTatSA,@swillaneves,Daily da Fininha,beleza,criador,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:video,termo: resenha base barata; nicho: maquiagem,2026-10-08
+UCePpSV1qcQv0oPGa8999YoQ,@giondulada,Gi Ondulada,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCiv5ysKhCfwWNyHiBOEQ1UA,@juju_romero,Juju.romeiro💓,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCY8On3Ch1rO81qxwO6tWEfg,@claudinhascho,Cláudinha | Make e penteados ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCusZ0Mt-z5Sz1zUQB9REz-g,@lilabeautybr,Lila,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCjUyketvWJtYK7im71hPcmQ,@produtosdj9635,Produtos Dj,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCjauLZYkXigtX90q6tC4-iA,@oficialdudafernandes,Duda Fernandes,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCqw-9T4yVsSQieiUOo9PTug,@vicioblog,Vício Blog,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCRZjbvJaHFCMUDDrpP8PV7A,@stylewithpreethi,Preethi Vengat,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCsGbeUUYJu5_mxSSMli4AEQ,@andersonminhaopiniao3050,Anderson Minha Opinião,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCZ-j64hk6O3EPM90LfCZZgA,@steffanyreis13,Steffany Reis,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCjcAHM03JjKORhoYtnSXyxw,@tvdaphne,Daphne & Co,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCSiJ52nU3SvS9Ou1PVejrKQ,@leticiamourablog,Letícia Moura Blog,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UC10Zb5-9Q3CBJAgusjp5Shg,@poressadica,Por essa Dica,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCvc9rlyEWPNGM3fUaa-6NHA,@transitodicasehumor,Trânsito Dicas e Humor,beleza,,não,curtidas ocultas,busca:video,termo: resenha base barata,2026-10-08
+UCaFJPAYi7fHczGjHDrM9ABA,@setupsaudavel,Setup Saudável,beleza,,não,menos de 30 Shorts (13),busca:video,termo: resenha base barata,2026-10-08
+UC3nN-YaugdHrD8ub7z7H97g,@brendarolt,BRENDA ROLT | Criadora da PELE ENVELOPADA®,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCHfxUBLZ97UlsjmLSPjf8gA,@mirta-miler,Mirta Miler Fans,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCnhZ7Vie1wfORP1CoZ-G09g,@jocielymuller24,Jociely Muller,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCyVItyLZv9JyTw3xDvvGgmA,@joaodabarbabr,JOAO DA BARBA,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCEiHoyBWjdwCm-rWtmP6pTA,@milcapacheco1,🍃Milca Pacheco 💋,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UChfRTFlFK0IL43tf0DvHTPg,@escolhacertaa,Escolha Certa,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCoLMHrzn5rbPK-U-3IOts5g,@vivacosmetic,Viva Cosmetics,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCLnITsOfUrN3k8iMj--gX_Q,@custocerto,Custo Certo,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCrC2k-ILLgteMtPqBkTb-Vw,@viu_levou,Viu Levou,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCdbUdwrSzWbofkJKEu7TiEA,@manifaco,MANIFACO,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: resenha base barata,2026-10-08
+UCB9DCPdpucg5Cnp1t3draXA,@thaynaleiitee,Thayna Leite,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UCfOMqHqa9EQilVnfWazrQ6Q,@francinemonteiroo,Francine Monteiro,beleza,criador,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:video,termo: maquiagem para pele negra; nicho: maquiagem,2026-10-08
+UCvu2MvWjNozGxCdRlY1034Q,@papodepreta,Papo de Preta,beleza,,não,"revisão de 08/10 (Claude, delegada): setor: notícias e política",busca:video,termo: maquiagem para pele negra,2026-10-08
+UC7g4U4ReEunxRrsuKtsyziA,@giselemua,giselemua,beleza,criador,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UCQz9f1JU2jGbLdJ8otuaRWA,@amandacarneiro,Amanda Carneiro,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UClaSsPEKbruUnMxisB2JhGQ,@diana.eleuterio,Diana Eleuterio,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UCCpogZ_sQ-bu57wJOVC01Xw,@marisalopes,Marisa Lopes,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UCRt08oZ9ty27O4MjJ9QcaKg,@thaygutierrez,Thay Gutierrez,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UCUoQYqvVHxcUPmQA3qUIPKA,@luanycristina,Luany Cristina,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UC0pWx38SiuBjr9j_0OTDgoA,@afcerqueira,André Cerqueira,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UCn2Jte-075YjT1Dv17Kxvjw,@sandralopezz1994,Sandralopez,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UC2_ICGK3zgwM00dm_SroGbA,@preterapias,Preterapias,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UCDKajzdC_GSjenTetYhuNcA,@desireebrandao,Desiree Brandao,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UC561ZCT6e7qeqt58fcfuvRA,@softday_m,Soft Day 🩷,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UCW_uMe1AT8FZKXv8YLBFjTQ,@raynarapazos,Raynara Pazos,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UCWgrIRQJ8e9bvLorsUMUEDg,@makeupdajaque,Jaqueline lima Makeup ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UCBX_Hq2cigrUc_aNFAbV2AQ,@jamileinfluencer,Fale com jamile por Jamile Influencer,beleza,,não,menos de 30 Shorts (9),busca:video,termo: maquiagem para pele negra,2026-10-08
+UC5u430J0Dugg69VqQk0vIiw,@helltatto,Hell Tattoo,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UCctjYjPCgT6SVdFcIkC5v4g,@joan_beautie_,JOAN BEAUTIE,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UCKVv99chcev7rpMVDsPMhbA,@brendadantass,Brenda Dantas,beleza,,não,curtidas ocultas,busca:video,termo: maquiagem para pele negra,2026-10-08
+UCXw70qwWTCzy3odqxG1AxdQ,@luanadiza,Luana Diza,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UCNRYgWcIjxGQgWhxMyh9eSQ,@theartofmakeup01,The Art Of Makeup,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UCkuow2IFrwveqUxuOtmIRtA,@karolinasousai,Karolina Sousa,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UCUeeEsz4kOfXI8PXCtFjvMw,@claudiacustodiopele2,Claudia Custodio PeleMadura,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para pele negra,2026-10-08
+UC0qYrIZcQvJKNbXnoAtzebw,@ab_alinebarroos,Aline | Maquiagem para Iniciantes ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCYtI-862ojEBkTZDiIg74uA,@bbiamarall,Bia Amaral,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCCfw4aT7GUmCRMlqmcrziVw,@helena.coloma,Helena Coloma,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCiRGodQWfFWyGmRyO9Ldg9g,@rotinadoeva,ROTINA DO EVA,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCF4iYcHSG2ZxU1OHPeNJgiA,@verdadesdeumobjeto,Verdades de um Objeto,beleza,,não,"revisão de 08/10 (Claude, delegada): setor: dicas genéricas de casa",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCt5xIkZE56YUrFeaub5_ATw,@aelisaensina,A Elisa Ensina,beleza,criador,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCH8pogdxUeaqqv6q0ViUUsQ,@natihaidferreira,Nati Haid,beleza,,não,"revisão de 08/10 (Claude, delegada): setor misto: moda, casa e maternidade",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UC5uDoIJJ1jvfeh0xCNOeQIg,@marimariamakeup_,Mari Maria Makeup,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCYdhao890KhYbbAVH--SY6A,@brunamaraniglow,Bruna Marani Glow,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCzRC9dR-5DQMODpJzgpMfOw,@maquiagemlucrativa-br,Maquiagem Lucrativa ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCqSNf79ZWjYLn2pYypLPTpQ,@jessicalais-13,Jéssica Silva,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCsqdbUzJudcLLNk-Ot4HtAw,@makeuplohaine,Lohaine Brito,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCO2WaPkb76CGPeYpp7moxHA,@camile_schwede,camile schwede,beleza,,não,menos de 30 Shorts (15),busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCuussnphtAzeouPmF3CZMqA,@anne.danttas,Anne Danttas,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCPTwq4_7bVzmAZMtyeA_zrA,@marciamacena,Márcia Macena,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCpzZEZgSzlfZEh2FG6Mg0mw,@belezadedicada,Beleza Dedicada,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCyfv83j948gMBO7agyWhqiQ,@studiotaisbertini,Tais Bertini de souza,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCn1ItcgdL5QbguToMvn2m1A,@toia7,Maria Vitoria Toia,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCwbeHYRZ3PODvWAZeVNm6kw,@isabellaglatthardt,Isabella Glatthardt,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCeN6CJo3GI6mwuYMRGmtqww,@chiquesemfrescura,Chique Sem Frescura,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCFmhD46PALcTft7c5KQAITQ,@gickmaria,Gick Maria,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UC3XQFYbAEes4ThyDv4IHG4A,@thejojonotes,Jojo,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCUTwa1XCm_ZHp8w3xsvmmyQ,@priiferreirx,priferreirx,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCyDlbVWjphz88h9mUsZi56Q,@raybeauty04,Ray Beauty,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCBYo-PThKuenhPeweqzBSXA,@dicass_da_lu,Dicas da lu ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCZ9PqgYp9YBPJuaBAZ8k6Yw,@mayaracapella,Mayara Capella,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCoRNJRTNoWRTRSDxsGZUP7Q,@thiguees,Thiguees,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCPWrSStaZxIvsRKLHxfCXDw,@carolinabruna,Carolina Bruna,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UCNoECRRE5LcWAszJxLlkAqw,@vih7676.,Vitoria Alves,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: maquiagem para iniciantes,2026-10-08
+UC_L-W_w9d2p6b0oRkFLudjg,@itsbaguinha,Baguinha,beleza,,não,"revisão de 08/10 (Claude, delegada): humor sobre vídeos de terceiros (critério 7)",busca:video,termo: testando maquiagem viral,2026-10-08
+UC-3kEXJ8qXRe8d9nAyv3tFA,@amandakristina1716,Amanda Kristina,beleza,,não,"revisão de 08/10 (Claude, delegada): setor: música",busca:video,termo: testando maquiagem viral,2026-10-08
+UCyRyJyiIFD6Onn4kdc5adTQ,@brennalopes,Brenna Lopes,beleza,criador,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCS6Mdx95pN0Xu_W29qEuG5g,@letoliveiraoficial,Let Oliveira,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UChj9eOuBivMvuFp55uyCnnQ,@agulhoisabella,AGULHÓ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCX_5MS8xkdvtDXoFbxtc_Xw,@nosferotika,Nosferotika,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCqzXofTtvJ6xZfQl-e-0ZDQ,@helena_pessoaa,Helena Blue ★,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UC-ysQ65qiuk0_4Ue80St0BQ,@mariia_lima,Marysunn🌞,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCq0oEqsWXv12eS18ijDfKOg,@louise_grace_lourdieres,Louise grace,beleza,,não,curtidas ocultas,busca:video,termo: testando maquiagem viral,2026-10-08
+UCAc8wr8hJfXOjQA7lwH8zqA,@mundodamakee,mundo da make,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCERbmy6i_BUjZENgs56CYzg,@thamyres_caardoso,Thamyres Cardoso,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCDqGMOvYz4sefp3V0jGNF4w,@samyrapriscila,Samyra Priscila,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCr0FIC_af7QMGtg1nRi3Qtg,@thalitaemmanuelle,Thalita Emmanuelle,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCatRBFZnn779faU48CXgpyg,@garnnize,GARNIZE,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UC1cbcM1W5cDr9mBBzaAk4hQ,@hadassakarolyne,Hahh 🎀,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCGA6LVVPvncoq-92hmbdVDA,@dannyarosa,DanyArosa,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCo6jf2nvWAljrx4j7w3qmgA,@bibi_galvao,Gabriela Galvão,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCh65nAiIoIBP8-wWQEoliaA,@marcoo._f,Marcô,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UC8tna5j9y6A7C33dgUXTQTw,@jumendesoficial,Ju Mendes,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UC17vP-_GZWU2wGm_zXqTziw,@ryangabxoxo,Ryangabxoxo ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCkirJYAAiiKMlMTF-J8Zo6g,@seananthonyv_6,Seananthonyv_6,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCQeehz4RfPkx1AZEFXM8LwQ,@bea.zevedo,Bea Azevedo,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCe5MZCcZbJCl572_RW-Q1jA,@familiaecarol,Carol Caroline ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UC3hUiy_08Ss-QHyDNQphRSQ,@radamakeups,Rada Makeups,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCIuUBdxs2fNx1DQPb3YdZZQ,@brunaluizaoli,Bruna Luiza,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCK0oFT3Lk0kVB9rnjU4nTYg,@tourdabeleza,Tour da Beleza,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCXnRa9FHrdet-dS3veX617A,@thaisbraz,Thais Braz,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCNdku2T4pn9gfbM9j-of80g,@brennalins,Brenna Lins,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCAoi8ABHnB26elbX9y8JT9g,@girobatini,Gi Robatini,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCF6z5i9_bXQGJjtvZm9JAKg,@curiostad,Curiostad,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCjx7GYeJvQSyHfNvG7oGkag,@lilly.rangell,Lilly Rangel ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCW0GAN6-265k6CNzcJMSIcw,@danieledeloreto,Daniele Deloreto,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCucyV9jAUe2PFNiEY6_0rnQ,@vicksbarros,Vick Barros,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: testando maquiagem viral,2026-10-08
+UCPP8q3-cpnp08siQrzfBWQQ,@lemoncarecosmeticos,Lemon Care,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCbswJosTcO1mNAa-sOVQc-w,@draleilanecatricala,Dra. Leilane Catricala - Médica Dermatologista,beleza,criador,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:video,termo: skincare pele oleosa; nicho: pele,2026-10-08
+UCzTZboVv4rvnv8X8sq9rY4Q,@thainaraalmeida26,Thainara Almeida,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCeIlhJfATqd9D-uauMyCcvQ,@alineteixeira4062,Aline Teixeira,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCm6w8NinB2Elk0XSS4RzUpA,@oficialbruhhfreitas,Bruna Freitas,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCgTXvdc0mgE2Ow4LhiqTuCg,@e.stefny_,Nini,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UC6YFY1zbloEzRLCm5dRQqrg,@hikarishinestudio,Hikari Shine Studio,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCCpfr6n_1zJwq6l_qB-Bzpg,@achadinhosdanati-e1y,Achadinhos da Nati,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCfB6vIR1_I3p6FG9dP0srdA,@canaldanicky,Nicoly nic,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCyFMUuAbJHwBaA-UtW1Td_Q,@saboariaserenaaromas,Mundo Serena Aromas!,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCbe5DQdS_LTvxa75KpnM6EQ,@flaviaspace,flaviaspace,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCQQY7EaSjxrWNnVPqN__sDA,@enayllelimaa,Enaylle Lima - Skincare,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCnOXEfdinE0crb4i-YrnCrQ,@achadinhoabencoado,Achadinho Abençoado,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCbceTA4ue6b4m_vatdFdKZg,@dapoderosa,Canal Da Poderosa,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCQjvgMybrW2OFMcKJ9rMVSA,@lopessmannu,Mannu ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCFkuWZsUBi6guk4076aJFCA,@rebecapuccino,Rebecapuccino,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCh5VqhNMeHvixln8umiJ5Yg,@yesmilc,Yesmil,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCo7Pm7rR0tOo9JqmyarQn0Q,@karinatereza,Karina Tereza,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCSO3sUxvZJNjZvpkiLZKnYA,@sabia.qu1,Sabia Quê!,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCux9DkKp8V-3UFOicLf8kTw,@anaisarina,Ana Isarina,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UC1rquzsa4QI5Ff7KRTMBQXA,@eu.monicafrancisco,Eu Mônica,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCGi-GPk8_V37IDNrVvLzkcA,@kallynatiele,Canal da Kally,beleza,criador,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:video,termo: skincare pele oleosa; nicho: cabelo,2026-10-08
+UCbizVFKC0PARAVXoLly9e_w,@paullarochaofc,Paulla Rocha ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCM3xFq4Itk3nqZNs75KKLOg,@mirelaiindica,Mi Indica ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCM8a9XbcvQRIGXlQRNS37RQ,@meumundo-2021,meu mundo,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UClsSzXVeFYnsOjY-jpOHVvQ,@eunicefarias4260,Vidadikas ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCQZcwF7VFtyzE_HFw1nglfg,@rohnas,Rosana Nass,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCrOf4qm_oN2VlqtQ7HScT-A,@inaessentialsportugal1392,InaEssentials Portugal,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCKADRYqES6gMEKFGT8MVaSQ,@dembeautyoficial,dembeautyoficial by Jessica Demarchi,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: skincare pele oleosa,2026-10-08
+UCnRN3hxCMnAPFs2c0XQpbnw,@dani.segatto,Dani Segatto,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCadX71QMa4H-eXmISrAYxiA,@adatinaitaly,ADA TINA Italy ,beleza,,não,curtidas ocultas,busca:video,termo: protetor solar resenha,2026-10-08
+UCnL8mRaSwxBbgXNqIR8qEzQ,@jessicafreitas_o,Jessica Freitas,beleza,criador,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:video,termo: protetor solar resenha; nicho: maquiagem,2026-10-08
+UCB4i0BfpBvd0hcZEec5MpQg,@moniqueandery,Monique Andery,beleza,criador,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UC-H4qBmQcuau4l36UDBitjA,@belezacomdu,Beleza com Du | Skincare & Beauty,beleza,criador,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:video,termo: protetor solar resenha; nicho: pele,2026-10-08
+UC-MNZlGhaNWXMgXdgSriUaw,@eutodemake,Eu Tô de Make,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCjY1Ge_X5i7X2rKQ516lBKA,@coisasdediva,Coisas de Diva,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCs-y1CN02jV5n2SF40CJhQg,@priscilakellymartins9723,PRISCILA KELLY MARTINS,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UC8ftQ7FgPE6deK6fOWeocUg,@blogvaidadeorganica,Blog Vaidade Orgânica,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCW2cnTVKfXDDvbYaSpkULmw,@fabiporai,Fabi Por aí...,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCRju0hynxBmNOxZOCzB-beA,@felipescarabeli,Felipe Scarabeli,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCyeA3b64-Ly5-vy_9VOZtCg,@gustavosaber,Gustavo Saber,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UChtML2r0nfwngCSdKdftRwg,@analuantonioli,Ana Lu Antonioli,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCf16vDJ77RiSKk1TdK6cqDw,@leyaragao,Leya Aragão,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCd1OJTd7QiD7OK08J00nqqQ,@ingridlorranemakeup,Ingrid Lorrane,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCzSlwHUyqfMYfe2_MlBoN_w,@arthucko,Arthur Pires,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCLMIA-i9YnzfMvInYH-pkww,@fit.alinesteffens,Aline Steffens,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCPx35flhXfBrgZ5hf__pCFA,@jeanroddrigues,Jean Rodrigues,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCFVTF31oCsetCZx4hLDPJ6A,@compramosetestamos,Compramos e Testamos,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UC-upyEA3YnN2iSKm3P-u1pg,@patriciacella,Patricia Cella,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UC_BGwLrO1_DPu-k9pwSdDqg,@bia_tramonto,Bia Tramonto ,beleza,,não,menos de 30 Shorts (18),busca:video,termo: protetor solar resenha,2026-10-08
+UCmFZ2dzR6n5HqSpPC_yKYBA,@testeieresenhei,Testei e Resenhei - Dayana Silva,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UClnwMfxz8maU4jGyNp852mA,@lucianavilela,Luciana Vilela,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCJkMgoARxsYTNHj5HsYMr4w,@luizandradec,Luiza Andrade,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCEO0PD57Ug6FIOjq9KAdsgg,@lariiprime,Larissa Rodrigues,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCnMp19rhHlmzYHjd9ArAkQQ,@tianodicasnaturais,Tiano | Dicas Naturais,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UClFDGBfGAJDtSfdi7UOD-Lw,@cantinhodaagna,Cantinho da Agna,beleza,,não,curtidas ocultas,busca:video,termo: protetor solar resenha,2026-10-08
+UCPd0pvmPy-8u3-zcrQPJh9g,@suellenmarques,Suellen Marques,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCpBxyJZCE5Bi32WX28Yb14A,@ayumediias,Ayume Dias,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UC6Gq3Uwb2NRjXpYuQJc6kyg,@tamirescamargo,Tamires Camargo,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCTP60Seo_08-kyu33t2Fdxg,@jana__arau,Janaína Araujo,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCeG3Zq41dHYgze5X_QLFTAw,@monny2554,RESENHA DA M♡NNY,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UC4rDSDj3emTHTUG5nHt1GXA,@atorvitorduarte,Vitor Duarte,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UC88DH8W3_08cBXQ9kSmHhNg,@bianca.arcangeli,Bianca Arcangeli | Beleza Premium ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: protetor solar resenha,2026-10-08
+UCewTTctbtZ7Yj4s5ZUfDfNw,@carlossilx,Carlos Paixão ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCMJ3E47XKun31UNPVcwfedQ,@janainadeloster,Janaína Deloste,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCyjrUFaD3je5WB8v8F87bZA,@euheloy_,euheloy_,beleza,,não,"revisão de 08/10 (Claude, delegada): setor misto: vlog de rotina",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCHi8AG7BCyMZzXLA0Qqi2Bg,@gyov4nna.s,Gyo💋,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UC_S8p2knlNnijC7k6YS8i9Q,@samirarodriguesdasilva222,Samira Rodrigues,beleza,criador,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:video,termo: cabelo cacheado finalização; nicho: cabelo,2026-10-08
+UCoCNQIj15nvqsFwrUz76Ieg,@cintiaaraujo7911,Cintia Araújo,beleza,criador,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UC_dbk_tM6x2wt9FjJLvUoFQ,@fefemunizz,Fefemunizz,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UC7llj3L7ZLpBN85YMlSv8IQ,@universoglowv,Universo Glow,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UChIPAhWG2VQvRC-v_nSj9HA,@cacheiadaphne,Daphne Souza,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCmYvHTufCaLDJ4rjTWs5KHg,@curlyhairdiaries0,dailycare🌸🎀,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCqmj6moub-4uMz3rX4abbKw,@mariavitoriadsm,MaVi ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCPvRzCVXnioQL-WcSqhM72Q,@marianaa.moller,Mariana Moller,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCwhnNxKcznF4XrojOyb8p0A,@ameliefernandes,Amelie Fernandes,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCWGLiptJ_WKD5OPQyyTd99g,@th444yna,THAYNÁ PONTES,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCd7qkMi0sF8N8HFv60i4qjw,@diariodarhana,Diário da Rhana,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UC_ZmxiSf2x157zmHFGk1Nbg,@eumillareis,Camilla Reis,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCsBBRzT_6kRfIiqb3qVVjrw,@byesterlima,Ester Lima,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCfCkIZsrsvUHDOAoaTui0Qw,@raquelcvertelo,Raquel Vertelo,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCqAVA0EropPPXHw1A8bdPxg,@keittylorrane.mota02,Keitty Lorrane,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCdjFrabcN85IJGkFJjtwb8g,@isabela_froes,Isabela Froes,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCKHDES0YXmXnp1fQWbmL4tw,@caradecacho,Cara de Cacho,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCImBRUfgQ6appcdTJmhTF6A,@cacheadaseonduladas,Cacheadas e Onduladas,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UC4ScfogpQ1y3goiy6XOA3qw,@vivi.gomes97,Vitoria maximiano ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCsKwZL-Mf6SfKxDRIh4HA0Q,@metacachos5339,meta cachos,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCBVL5h-ov-D5Mp4DXPTJi0Q,@dudaclarki,Duda Clarki,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCGgx_DNl_5Upv_QZkj9vJyg,@clarinha8457,Ana clara santtos,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UC6bi6Dx1tuklixxUwHV0mQw,@jordannycampos02,Jordanny campos 02,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCnQB28grKxTB6e4Y1Tlq8lA,@cachosdeleite,Cachos de Leite,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCtnJKoAvzjBMxaRO_m_Wgug,@yasmincarvalhojss,Yasmin Carvalho,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCYGfCmFN5WS1RwT18IHI0QQ,@beatrizmaria,Beatriz Maria,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCfPxkjjfZaZ4XlwMtMW8aFA,@xtslo,Loh Oliveira,beleza,,não,curtidas ocultas,busca:video,termo: cabelo cacheado finalização,2026-10-08
+UCErNow2r4PQuGTClYJR3DbQ,@yulajeniffe,Yula Jeniffer,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cabelo cacheado finalização,2026-10-08
+UChdu6L4XoQU1yqX6jGCaRPw,@juliadoorman,Julia Doorman Cabelos de Rainha,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UCFxLk3HLFVPvAk87ZaeSiZA,@daianeveigand,Daiane Veigand,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UCZJsjPIdun2hc_jXjx-1LVQ,@cintporfir,Cintia 🌹,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UC8NeiKQIadGB7RgBnpOPJiQ,@thainasantanacabeloalisado,Thaina Santana,beleza,,não,"revisão de 08/10 (Claude, delegada): setor misto: moda e maternidade",busca:video,termo: cronograma capilar,2026-10-08
+UCj4djAcrjt2NSmPiZh-W1Wg,@ficandogatablog,Ficando Gata,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UCoZhP8MeAqtMpuu9PFGkqiA,@rogermartins.official,ROGER MARTINS,beleza,criador,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UC2DInPi-ojL1sjUsFex5-og,@maxieli_santos,Maxieli Santos,beleza,,não,"revisão de 08/10 (Claude, delegada): setor: moda e humor",busca:video,termo: cronograma capilar,2026-10-08
+UCSvQcfwp6PZWAZ_sh6AujgQ,@julianalouise,Juliana Louise,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UCjvYsCcE_JPaN5shUU0lyVQ,@amitiecosmeticosoficial,Amitié Cosméticos,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UCymhHDJR-IdgiTRv5Ql9lKQ,@evolutyfree,Evoluty Free,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UC4JjQyT7dWoKHZN2gfsxBnQ,@tamaravioto,Tamara Vioto,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UCwJYJsphO2zV2qP4oL41uAA,@tamiresaraujo6715,Tamires Araújo,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UCcv2abIrB4UXPz0D5OGh6og,@euangelicamonteiro,Angélica Monteiro,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UCSLPcWg9a29n59LfkeskqVw,@delemoss,Talia Lemos,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UC2bfDWzfdxJH2UbRg2KsJcw,@planetamulhershoplucianagomes,Planeta Mulher Shop - Luciana Gomes,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UCL2jzQtDobP9LVQ018x98Rw,@virginiaoliveiraoficial,Virginia Oliveira oficial,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UCCmK43vpitRExnAQ6jz-WXg,@canaldadey,Canal da Dey ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UCKXTYb_5WK89dxfaMAhgRZQ,@pablinetorrecilla,Pabline Torrecilla,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UCJ68MifCVVXoLSzuZWostDA,@carolinevairo,Caroline Vairo,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UCpjRMs4AvgYS0N_l2dtIr7g,@tonyglanprofessional,Tony Glan Professional,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UClqAe4_K52cSXrZ4loOIzSQ,@nathiblog,Nathi Blog,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UC3KhxgHegnEMTRGUzUP43JA,@meyrereiss,Meyre Reis,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UCdRsvTkF9wTyhOhXZ1m4EYA,@eidriih,Adriele Santos (Ei Driih ) ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UCFd59KLQV_AVD2yMtdWN7aw,@rebecaaraujo97,Rebeca Araújo,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UCb5YkpJY74i6EjaCRs2Xvuw,@camilaassuncao-c8p,Camila Assunção,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UCqxtFdarcmM9IfX8v1ZlRdA,@belezalatina,Beleza Latina,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cronograma capilar,2026-10-08
+UC0D2TlB_pV3hijc-HchgUIw,@rodrigovizu,rodrigo vizu,beleza,criador,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:video,termo: transição capilar; parte dos Shorts mostra trabalhos de outros cabeleireiros: conferir reupload,2026-10-08
+UCp15PUx8w89ZbhCsV2_B9PQ,@natibaggicachos,Nati Baggi,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCmlg0K3WvwHESVBcXjAbqzw,@vencendoatransicao,Vencendo a Transição,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCfxNho3AxzuBDlZOzZ0Dlrw,@klleyaaaa,𝕂𝕝𝕝𝕖𝕪𝕒𝕒𝕒 ♡,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCKq_oJatXdyIWTqlkR-ra5g,@carinaaravjo,Carina Araújo,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCUDk9RgdFKmTcty4cfUDcXg,@analidialopess,Ana Lídia Lopes,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UC9azT2kGde9dpqLHNyXL8aw,@duddamaryah,Dudda,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCw54KlRcI8KmI8_jjRaY8xg,@nicolealeksiejuk,Nicole Aleksiejuk,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCD0WJK1nirOO7EL97NDS0Bg,@chay_any,Chaiany Faustino,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UC0vQZvMeK6H_-BjDPrJxeDg,@cleidianyoficial,Cleidianyoficial ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCQ8VwYBNbvGWPcA41ylX-kQ,@luannareisbrazil,Luanna Reis Brazil,beleza,,não,"revisão de 08/10 (Claude, delegada): setor misto: vlog de rotina",busca:video,termo: transição capilar,2026-10-08
+UCK7dKSndfkVHObvcyoZpgoQ,@raianerudrigues,RAIANE RUDRIGUES,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCtjpjhOarJf4-CKwZF-WT2A,@ninninhasouzaa,Ninninha Souza,beleza,,não,"revisão de 08/10 (Claude, delegada): setor misto: vlog e moda",busca:video,termo: transição capilar,2026-10-08
+UCW0vYBiXs_e3kWlOB78YqMg,@belezaabreportas,Beleza Abre Portas,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UC5xEfV8TeWLHyQ0DMg6837g,@lopesc3,Carol Lopes,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCTk0xQUHAPHP5vdTisH0fjQ,@bythiifanny,Thifanny Lawany,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCHfc7g8Zr-UGKkuwziZciYw,@rraisoares,Rai Soares,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCQjPmL2qi-TAjROg62jQUrg,@dicasdamalu1,Malu Alves,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCMGS2B64aETBWvnXcdeL0_w,@natielyf,Natiely,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCKtxRFec0wy-84yZWrKuFPQ,@resenhasdascelebridades,Resenhas das celebridades 😜,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UClwub8WD5PN0pciZoQtpFrQ,@mestre_dos_cachos,mestre_dos_cachos,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCk8FyBenMLLEtId8bz3R_8Q,@amaandaa_maartins,𝑫𝒊𝒗𝒂𝒂 𝒅𝒐𝒔 𝑪𝒂𝒄𝒉𝒐𝒔,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCytuE6bmht5J_6DeuQiv0AQ,@carina_altami,Carina Altamiro,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCP-lo-nXyB5JrHXY1sJ8nJQ,@themelissaamorim,Melissa,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCctRJeKF83HgIOpVXS3LV3A,@ane.cachoos,Aleê siilva,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCOlzvPTvjChP7AhrZ7OF5VA,@byraytavares,By Ray,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCZjDmj09AjjfSqj8QtOw1tA,@mchenny,MC Henny,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCEhkEygfrxwWPSHlSK6aM1w,@voguebrasil,Vogue Brasil,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCFZxU6ridxUqoLfd7SvAr_A,@llorenafarias,Lorena Farias,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: transição capilar,2026-10-08
+UCPWtuIU6xaPPNVAxlLg8Ejw,@estavu,Estavu,beleza,,não,"revisão de 08/10 (Claude, delegada): setor: humor",busca:video,termo: luzes no cabelo,2026-10-08
+UCAYiQ20NMpvMy06O67IPWrw,@gui07barbeiro,Gui 07 barbeiro,beleza,criador,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:video,termo: luzes no cabelo; nicho: cuidados masculinos,2026-10-08
+UCLRFPwngVYV4MWEa6tsv26A,@jefinholucena8303,Jefinho Lucena,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCu7YX5v04dnwN7qBJhk7B8g,@felipelorenzoprotesecapilar,Felipe Lorenzo Prótese Capilar,beleza,marca,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCCY6Gig6kzupv2FyfAqNJ_Q,@mbdocorteof,Mb do corte OF,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UC0OLB8DaK_nJV_b67JMV8mA,@brubsbru,Bruna Isabella ,beleza,,não,curtidas ocultas,busca:video,termo: luzes no cabelo,2026-10-08
+UCwXOUtvPmuTiUvZy1Kv9PdQ,@jovemcurioso10,Jovem Curioso,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCeqHtbHlOYuq5qDe_wLfF8Q,@amaisvida,Aline Amais Vida em Ação ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCwimW9miTZf52yK3lPcKBmg,@mistergilvanegui,Mister Gilvan & Gui,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCy33u6FuY7N75EvYYy4Nfnw,@boaventurastudiodbeleza,Boaventura Studio de Beleza,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCZXlnma5Vnu3nqqg91uCfTA,@matheusluen730,Matheus Lucena ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCn-ToTdf187UDYuGHHTjMEQ,@juliamendon,Julia Mendon,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCkzFWVL9nrAugPo_OS_YN3w,@canaldatita,Canal da Tita by Pati Gotti,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UC01qm9OcIjbaT0572IQTNNA,@lublancocachoscabeleireira,Lu Blanco Cachos Cabeleireira,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCcb0ldiQoeSyHI25pS_xc7g,@anamirandatricologista,Ana Miranda Tricologista,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCRgokMS8bdykDY6NU8H42lg,@lysoree,Lysorée - Beauté d'Élite,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UC2yG9O6gKxB0F8mvER_3ITg,@igordossantos01,IGOR BARBER,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCEbWGB2dhuVGF0aqPM3dytw,@salao2722,Salão 2722 - Especialista em Loiras,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCqyfqs2JsVYEl6IHm6Q2Blg,@andersonmelohair,Anderson Melo Hair,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCucO9OMSH5piulyaDaaoqTw,@nellcarmooficial,Nell Carmo,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCfYuGEvUWaS-DDPCp5EVSZw,@marciowcampos,Márcio Campos,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCzWzpLsXToPylYQFZyrDWuQ,@mannubahia4104,Mannudabahiaoficial,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCNfmA5tB96IQ5tOxGNx4Mng,@patybeijo11vieirabarbosa77,Studio Patrícia Vieira🫶🏾,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UC_k-UzWGYr0D_Es7eoJN6fA,@lopesm_guuh,Lopesm_guuh,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCtL0RiFe7gSLyao06kGnBNQ,@ngdocorte,Ng do corte,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCXkQSI5Eczm8NERUwZZWRTw,@jhay83,MARCIAL VLOGS,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCjLeHJBkh9TX4UTxRDRU1TA,@camilaleandro,"Camila Leandro ""dicas de cabelo""",beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCCJnk6ozX4cI8etOzfuvXhg,@perfeita.beleza,Perfeita Beleza,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCaGSDaoKiX7rm376HqarK-w,@ronnisantanaa,Ronni Santana,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCOkzuVDUW3IuPPgrp0ovwMQ,@estillusbarber,Barbearia Estillus barber,beleza,,não,menos de 30 Shorts (28),busca:video,termo: luzes no cabelo,2026-10-08
+UCmnS_mdPJBV-cBRu-UVWExg,@annabarthollo,Anna Bartollo,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCmjw6joSRPtwLoLLsXhiUug,@gabrielacapone,Gabriela Capone,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCdCktp34knT-VJgSLiCsHsQ,@tatacarioca,Tata Carioca,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: luzes no cabelo,2026-10-08
+UCV166pTXg7Klp2cvnJZ9Z4w,@juniorbarreiros,Junior Barreiros,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume árabe resenha,2026-10-08
+UCsLmtF8nwXqOsHJ5iAAHBCA,@perfum_culture,Perfum culture,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume árabe resenha,2026-10-08
+UCWR18x1i3M7Rfv5OloValIw,@brunotorresperfumes,Bruno Torres | Perfumes,beleza,criador,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:video,termo: perfume árabe resenha; nicho: perfumaria,2026-10-08
+UCkog8MFwJzha-vtSPZgjALQ,@perfumesdolucas,Perfumes do Lucas,beleza,criador,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:video,termo: perfume árabe resenha,2026-10-08
+UC8QLtT_9pvkkXKHHUIL2b4w,@matheusueta,matheus ueta,beleza,criador,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:video,termo: perfume árabe resenha; nicho: perfumaria,2026-10-08
+UClTpR17xvQ4orhr-TRwN00A,@bernardo.entusiasta,Bernardo Britto | Entusiasta,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume árabe resenha,2026-10-08
+UCo9HVHh9lbQVqQFpAnUvBfg,@miguelpalencar,Miguel Alencar,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume árabe resenha,2026-10-08
+UC56Csv2Xc-opzgv25cVA3uw,@stylefragrance,Euller Style Fragrance,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume árabe resenha,2026-10-08
+UCaNisY8TpRFW2UXf_20V8cQ,@operfumedicassio,O Perfume Di Cassio,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume árabe resenha,2026-10-08
+UCZXvS5bsAG_fcMdRTVv9Kkg,@flaviamor,FlaviAmor,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume árabe resenha,2026-10-08
+UCBReizxTFZrCl03_0RQtumA,@exala.perfumaria,Exala Perfumaria ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume árabe resenha,2026-10-08
+UCpPHbjVLLjHdVo80Pyn7e-w,@fernandagrilloperfumes,Fernanda Grillo Perfumes,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume árabe resenha,2026-10-08
+UCLLsvVfMUtecDg45jQABypQ,@operfumolatra,O Perfumólatra,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume árabe resenha,2026-10-08
+UCuk-F4PYR8IDYmwKuZqUjAQ,@kevinlopesoficial,Kevin Lopes Shorts,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume árabe resenha,2026-10-08
+UCqi_-IGx8rbugVXEdZY5jog,@luisjordao,Luis Jordao,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume árabe resenha,2026-10-08
+UCfXUaPDJyuZ57ihgFqWdpOA,@renanperfumes,Renan Perfumes,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume árabe resenha,2026-10-08
+UCci16tfKP0iDExuFURaJgmw,@jpcriatividade,JP.CRIAÇÕES ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume masculino barato,2026-10-08
+UCNsv6WIaoT-06oTDeiCGDWg,@glowupmatheuscouto,Glow Up | Matheus Couto,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume masculino barato,2026-10-08
+UCJ1MrWiIDJwpIYCVi4plM5Q,@michelisilva3.0,MicheliSilva3.0,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume masculino barato,2026-10-08
+UCQPr5rm12wv-fnLhtjTatjg,@deocleciooliveira1718,Deoclecio Oliveira,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume masculino barato,2026-10-08
+UC-T5IzMfGjr5tIfA1OypDWg,@notasdepromo,Notas de Promo🍃,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume masculino barato,2026-10-08
+UChF66hN7b0LN9b9xmNUd2wg,@albertokouty.perfumes,Alberto Kouty Perfumes,beleza,criador,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:video,termo: perfume masculino barato,2026-10-08
+UCUmV8hYXBN0Nl_TKPsBJN6w,@_gus.andrade,Gustavo Andrade,beleza,,não,"revisão de 08/10 (Claude, delegada): setor misto: testes de produtos variados",busca:video,termo: perfume masculino barato,2026-10-08
+UCaO8FHd4QkjqSEseGgo9Vxw,@carolindicaonline,Carol Indica,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume masculino barato,2026-10-08
+UCUKhaPwII1o_V8NR2qzW4ww,@shortsessencias,Shorts Essências,beleza,,não,"revisão de 08/10 (Claude, delegada): agregador sem autor: perfumes e relógios (critério 7)",busca:video,termo: perfume masculino barato,2026-10-08
+UCx96pVaC0qyBOlT8RliP_3g,@gabrielcavallioficial,Gabriel Cavalli,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume masculino barato,2026-10-08
+UCNmV4NtKLMwEHuRDBbo5zYA,@andrearaya,Andrea Raya,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume masculino barato,2026-10-08
+UCDuKGXxlEhQh04DaHeNjthQ,@techachados-h8l,Tech Achados,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume masculino barato,2026-10-08
+UCYpAjqNgAM5-7BtmQGt26Iw,@borajuntoclaytonekarina,Bora Junto / Clayton e Karina,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume masculino barato,2026-10-08
+UC0LS9SVIoxGS66lj0xfUDDA,@homemcheiroso,Homem Cheiroso | Perfumes Masculinos,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume masculino barato,2026-10-08
+UCO1Iq5TYsgrTOOSASOqbrdg,@lab8oficial,LAB 8 Oficial • Perfumes,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume masculino barato,2026-10-08
+UC7-8k1fG-8GTqTLFToOdf3g,@gabrielmartimgamashop7439,GABRIELMARTIM GAMASHOP,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: perfume masculino barato,2026-10-08
+UCckoVTXE9K7CQcR4dIWvwHg,@carlaesteticaedepilacao,Carla Estética e Depilação ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UCsNHlVT9CBNRK_eStf16C1A,@fatoclik,Fato Clik,beleza,,não,"revisão de 08/10 (Claude, delegada): compilação de curiosidades (critério 7)",busca:video,termo: cuidados com a barba,2026-10-08
+UCkSYBpM-oZC7nuO-cYKny4w,@dom_cesar,Dom Cesar,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UClv3rxZZCSRyUXJXpj_aZVg,@barbaderespeito01,BARBA DE RESPEITO,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UCeXlUyIwhzUbxnO6fliMzSg,@omundodabarba,O MUNDO DA BARBA | Thiago Ramin,beleza,criador,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UCYAWbrUdQz100EY-8vvXtJA,@sailebernardo,Saile Bernardo,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UCnrMBtrtBbB731wCEnsEoJQ,@brunobispobarbeiro,Bruno Bispo,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UCTPxphiBtv6k9RenFZ1Gvfw,@sobrebarba_tv,Sobrebarba,beleza,marca,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UCmGFTx_EpYOEiR6RR2cHSrw,@alebarbaruiva,Canal do Barba Ruiva,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UCb_F_GU172zVazPWTDbisZg,@beiraaltacosmetico,Beira Alta Cosméticos ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UCaFMe3QHJeCzFsjxUCHwh_w,@scoutoficial,Use Scout Oficial,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UCAAS1MPspDQhKqPh4_WyzXQ,@barbaroucca,Barba Roucca,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UCp_1WlGLG_fdhP6IhrRA9JA,@variedadespoa,Variedades POA,beleza,,não,curtidas ocultas,busca:video,termo: cuidados com a barba,2026-10-08
+UC1nCwVLSZaaBwqlW3WhaWOA,@lalmeidabespoke,L'Almeida Bespoke,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UC1m_2uvKQtqtqx-YV3XIVaw,@purelicosmeticos,Pureli Cosméticos,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UCUMXSJg_afgrwAGIDm1ViUw,@middefesaresenha,Ministério da Defesa da Resenha,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UCb7LY7VkHbFybkHI5_DqLNA,@julianafelixvisagista,juliana felix visagista - Visagismo masculino,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UCWbUk1FJbEThnKY_lQ99jjg,@alexcursino,Alex Cursino ,beleza,,não,curtidas ocultas,busca:video,termo: cuidados com a barba,2026-10-08
+UC7LXhjz8CY6enbkSalwt-0g,@josymendes-i3y,Josy Mendes,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UCg1zkxPpsb8l-RuZgcjml8A,@tvparau,TV Paraú,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UCjJnG5bAqWesCFPtDd0_8XA,@barbadeursooficial,Barba de Urso,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UCReizfHgcW7Mi2G9jy4qEkw,@mileideachadinhos,Oferta Certa🛍️🛍️,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UC1Z51uxe6T5NOY2xfNW-jKw,@ronazim,Ronazim,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: cuidados com a barba,2026-10-08
+UCbQLyVYD5OOSFfG0aiC9ZQQ,@isissupermaquiadora,Isis maquiadora ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: maquiadora,2026-10-08
+UCHPLHDAjnMTlQHZGbPB4uwg,@helenmaquiadora,Helen Maquiadora,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: maquiadora,2026-10-08
+UCmHiTzbemRHvm4WIwK9mssw,@isabelvolkertmaquiadora,Isabel Garcia -Maquiadora,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: maquiadora,2026-10-08
+UCQTpektBsar9wEwT4ntvGKw,@beatrizcastilho,Beatriz Castilho Maquiadora ,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: maquiadora,2026-10-08
+UC7eNoH8Rnqc7snyw4O6QMMg,@maquiadoraprofissional8799,maquiadora profissional,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: maquiadora,2026-10-08
+UCeXDJY8iZhZOBLZcfkD_0hg,@josefinlarssonca,Maquiadora Gringa,beleza,,não,menos de 30 Shorts (0),busca:canal,termo: maquiadora,2026-10-08
+UC5MzN3gWZ6T6z7mWyCG_NAw,@leomaquiadora2022,Leo Maquiadora ,beleza,criador,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:canal,termo: maquiadora,2026-10-08
+UCIKlM_sC4oJiIms8av0OTAw,@rosyseixas9733,Maquiadora Isis,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: maquiadora,2026-10-08
+UCU4ChpajlFvSVK093T8g5yA,@kessyamaquidora,kessia maquiadora ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: maquiadora,2026-10-08
+UCb4sG9Scmn4xdeDRrWgEH4g,@lucilasouzamaquiadora,Lucila Souza Maquiadora,beleza,,não,menos de 30 Shorts (0),busca:canal,termo: maquiadora,2026-10-08
+UCkYoQgXXDUj8A9wGkkHaLGg,@daniellelopesbeauty,Danielle Lopes Beauty | Maquiadora,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: maquiadora,2026-10-08
+UCvaf0TTt4Ssm2GwlmQCfqEQ,@alineinsuelamaquiadora,Aline Insuela Maquiadora,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: maquiadora,2026-10-08
+UCtvAUA--UUHRUWv--ar-fTQ,@nayara_makeup,Nayara | Maquiadora ,beleza,criador,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:canal,termo: maquiadora,2026-10-08
+UCguv3XOVKLRfhfziNXspd-g,@vanessacarra,Vanessa Carra,beleza,,não,menos de 30 Shorts (13),busca:canal,termo: maquiadora,2026-10-08
+UCev1izcs9q2upXISqXr4I9w,@beatrizribeiromaquiadora,Beatriz Ribeiro Maquiadora,beleza,,não,menos de 30 Shorts (29),busca:canal,termo: maquiadora,2026-10-08
+UCkU3v5KW_g9iArZN7FJnzEw,@maquiadorarealistacomtatif5628,Maquiadora Realista com Tati Ferreira,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: maquiadora,2026-10-08
+UCgB7C69Y8hjb7UETOvffeNA,@mickamakeupmaquiadoramirin,Micka-MakeUp Maquiadora Mirin,beleza,,não,menos de 30 Shorts (6),busca:canal,termo: maquiadora,2026-10-08
+UCUcscDnD5DQXJvpYOjhaK2w,@dramarisamoretto-dermatolo4600,Dra Marisa Moretto - Dermatologista,beleza,,não,menos de 30 Shorts (0),busca:canal,termo: dermatologista skincare,2026-10-08
+UC4oKZRsAwxMhUdFFvdPuzQA,@christieviviane-medicadermato,Christie Viviane - Médica Dermatologista,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: dermatologista skincare,2026-10-08
+UCgyxiyEJ_KWufibW__IUi0g,@drasuelendermato,Dra. Suelen Mattos Dermatologista,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: dermatologista skincare,2026-10-08
+UCink0-4nc4khLkZkReOWFqA,@drluizporto,DR LUIZ PÔRTO DERMATOLOGISTA,beleza,criador,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:canal,termo: dermatologista skincare,2026-10-08
+UCpi7ebRe7jKzszbtiwR5A1A,@lucianagadelhadermato,Dra. Luciana Gadelha | Dermatologista,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: dermatologista skincare,2026-10-08
+UCAVokRyfsEdbRCITE60C62g,@corre.dermato,Luiza Amaral,beleza,,não,menos de 30 Shorts (0),busca:canal,termo: dermatologista skincare,2026-10-08
+UC1hzrFSt21uWHp95kA20z2A,@ricardovilladermato,"Ricardo Villa, dermatologista ",beleza,,não,menos de 30 Shorts (0),busca:canal,termo: dermatologista skincare,2026-10-08
+UCaHkICUURHEFEhBYFotoSKw,@draalinebaptista,Dermatologista Aline Baptista,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: dermatologista skincare,2026-10-08
+UCVdhPzBpvfcc_BnK8p5ZXQw,@dermatologiaalemdapele,Dermatologia além da pele,beleza,,não,menos de 30 Shorts (23),busca:canal,termo: dermatologista skincare,2026-10-08
+UCYFQu8KNGscQHLpQ6myWt3w,@lasalcantara,Lays De Alcântara Dermatologista,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: dermatologista skincare,2026-10-08
+UC-VvXGaI7PDOR5Hc0e5TJbQ,@ivansilva.dermato,Ivan Dermatologista,beleza,,não,menos de 30 Shorts (24),busca:canal,termo: dermatologista skincare,2026-10-08
+UCUfeabbX-0uCUtgFhgLb1EA,@drapauladermatologia,"Dra. Paula Ferreira | Dermatologista PhD, MD USP ",beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: dermatologista skincare,2026-10-08
+UCIOhqvfIG86xXbYBSvmE2Ug,@dermatologistazuleikaandra8123,Dermatologista Zuleika Andrade,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: dermatologista skincare,2026-10-08
+UCGrjM5xVPbhRwnVlUorKfzA,@drmauricioconti,Dr Mauricio Conti | Dermatologista ,beleza,,não,menos de 30 Shorts (1),busca:canal,termo: dermatologista skincare,2026-10-08
+UCin27y4I7zoV9zKojOBOn1A,@patriciaelias,Patricia Elias,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: dermatologista skincare,2026-10-08
+UC9NGONwioBXPL6O5DtQ_7YA,@dragiselesiqueira-dermatol97,Dra Gisele Siqueira - Dermatologista (Dermatologista),beleza,,não,menos de 30 Shorts (11),busca:canal,termo: dermatologista skincare,2026-10-08
+UCf0xQ1VXZHamoB_L20ySkqQ,@dra.cintiamartins,Dra. Cintia Martins,beleza,criador,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:canal,termo: dermatologista skincare; nicho: pele,2026-10-08
+UCaH8UW2wGErjvfM17r-K41A,@dermatosemfiltro,Dermato Sem Filtro,beleza,,não,menos de 30 Shorts (9),busca:canal,termo: dermatologista skincare,2026-10-08
+UC0_EYXWSY67ASSmh6DmH67g,@dratatianeviegas,Tatiane Viegas | Dermato,beleza,criador,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:canal,termo: dermatologista skincare,2026-10-08
+UCyXAk6wNyu_mqCau-J2yCCw,@dramarinahayashida,Dra. Marina Hayashida,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: dermatologista skincare,2026-10-08
+UCWrtIbNUbEyvRctwydVyhyQ,@aulasdedermato,Aulas de Dermato,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: dermatologista skincare,2026-10-08
+UCA5cDLeYarYCQbBLDhTbc2Q,@drpaulomuller,Dr. Paulo Müller,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: dermatologista skincare,2026-10-08
+UCSkc88NEpsF_Z5Pp4rF_Gwg,@dra.barbaramilan,Bárbara Milan - Dermatologista,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: dermatologista skincare,2026-10-08
+UCRkJi_v_qRftDC3dJbX10RQ,@drajulianahypolitodermato,Dra. Juliana Hypólito | Dermatologista,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: dermatologista skincare,2026-10-08
+UCgStmFSNz8opE4ijZ99rXAA,@gustavo.borchardt,Sem Filtro | Borchardt,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: dermatologista skincare,2026-10-08
+UCaE_2DjKurJTmC5tHlrMqNw,@dracarolinehespanhol,Dra Caroline Hespanhol - Dermatologia & Saúde,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: dermatologista skincare,2026-10-08
+UCl1PZuZB1Li8W1TzV212ZyA,@dra.alexandraderma,Dra.Alexandra Santos dermatologia ,beleza,,não,menos de 30 Shorts (22),busca:canal,termo: dermatologista skincare,2026-10-08
+UCnb07nZOGFVGi5wJC_gUKWg,@drakarenborgesdermatologista,Dra. Karen Borges I Dermatologista,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: dermatologista skincare,2026-10-08
+UCeEoiTeZ1j8aHMOP4q4HyGg,@dermatodicas,Dra Giuliane Minami- Dermato Dicas,beleza,,não,menos de 30 Shorts (18),busca:canal,termo: dermatologista skincare,2026-10-08
+UCJFpTTB-XhjFu-68piXiPNA,@talitarodrigues,Talita Rodrigues,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: dermatologista skincare,2026-10-08
+UCCY_zByWRNGgCUoQ_p3qCFw,@marceladermatologista,Dra Marcela Baraldi,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: dermatologista skincare,2026-10-08
+UCVZLAbxvTeN3XoBJ0l278Ng,@drgabrieldeamorim,Dr. Gabriel de Amorim Dermatologista,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: dermatologista skincare,2026-10-08
+UC3NnENJRESBCyLgeOTS0ybw,@dra.brunaclaumandermatolog7685,Dra. Bruna Clauman Dermatologista,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: dermatologista skincare,2026-10-08
+UC9ZaYbtodsLErXitPFpo6xQ,@dra.heloisadavo,Dra. Heloísa de Avó - Dermatologista ,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: dermatologista skincare,2026-10-08
+UCpZPt87JNe88xcgQA9ErtrA,@raqueldecastrodermato,Dra. Raquel de Castro - Dermatologista,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: dermatologista skincare,2026-10-08
+UCxbTjMPpDVuwUfBBKgKv4GA,@dermatologistafernanda,Dermatologista Fernanda,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: dermatologista skincare,2026-10-08
+UCrLsM2K8RXylv-q-aBP1r6Q,@dra.vanessacasteli9079,Dra. Vanessa Casteli ,beleza,,não,menos de 30 Shorts (28),busca:canal,termo: dermatologista skincare,2026-10-08
+UCuUy-tgNHWGzzCz4LlONUQQ,@dramonicafelici,Dra. Mônica Felici - Dermatologista,beleza,,não,menos de 30 Shorts (29),busca:canal,termo: dermatologista skincare,2026-10-08
+UCWDCodoXnma3ejVyAAxIVTg,@dramarinabarlettadermatolo3370,Dra Marina Barletta Dermatologista,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: dermatologista skincare,2026-10-08
+UCJKL9mXmmqUEaF5xs7W7DrA,@dr.renatolima-dermatologia2448,Dr. Renato Lima - Dermatologia para os Homens,beleza,,não,menos de 30 Shorts (0),busca:canal,termo: dermatologista skincare,2026-10-08
+UCNzGHv9frN8lziS_gHJqwIg,@glorinhacabelos,Glorinha Cabelos,beleza,criador,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:canal,termo: cabeleireira; nicho: cabelo,2026-10-08
+UCe4N8Hi5YMdiT0_KWODvkig,@sarafreoli,Eu Cabeleireira por Sara Freitas,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: cabeleireira,2026-10-08
+UCukUcRHDIbLYTH4-0PxOelQ,@cursodecabeleireiro,Claudia Cabeleireira - Cursos,beleza,,não,menos de 30 Shorts (1),busca:canal,termo: cabeleireira,2026-10-08
+UCxjoArOyKn3shEaIbg-roDg,@rosaterapeutacapilar,Cabeleireira e Terapeuta Capilar,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: cabeleireira,2026-10-08
+UCGawB6Lw8RAEtjKsnTVK0Ew,@jocabeleireirainternaciona5068,JÔ CABELEIREIRA INTERNACIONAL,beleza,,não,menos de 30 Shorts (13),busca:canal,termo: cabeleireira,2026-10-08
+UC4Guili7tX3201Qdbx_nBew,@soniacabeleireira,Sônia Cabeleireira,beleza,,não,menos de 30 Shorts (21),busca:canal,termo: cabeleireira,2026-10-08
+UCwX76i4f1gfKXwSuuuPgfaA,@marusacabeleireira,Marusa cabeleireira ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: cabeleireira,2026-10-08
+UCgbnhjsluGaH_MgiDZkualw,@patriciacabeleireira.3467,Patrícia cabeleireira.,beleza,,não,menos de 30 Shorts (23),busca:canal,termo: cabeleireira,2026-10-08
+UCvcBfTLM-ct8RT5Qd0VbhTg,@lilianeteixeira7588,Liliane cabeleireira 😍,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: cabeleireira,2026-10-08
+UCbwpLambSalvUMldxHVDJYA,@leehdiamante,LS Cabelos de Diva - Cabeleireira Profissional,beleza,,não,menos de 30 Shorts (20),busca:canal,termo: cabeleireira,2026-10-08
+UCk4g1tgMBlN6jZUHLWmz0aA,@danielamachadocabeleireira7290,DANIELA MACHADO CABELEIREIRA,beleza,,não,menos de 30 Shorts (10),busca:canal,termo: cabeleireira,2026-10-08
+UCOU-RoYLI_mNLw64ymNiU3Q,@jeanesantosterapeutacapilar,Jeane Santos Cabeleireira e TERAPEUTA CAPILAR 🌿,beleza,,não,menos de 30 Shorts (4),busca:canal,termo: cabeleireira,2026-10-08
+UCE5gI7xAHqso8hlh_ClayIA,@nadiajessyca8317,Nádia jessyca cabeleireira ,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: cabeleireira,2026-10-08
+UC6QScKTYvjczrDIUrKiP5ow,@cabeleireirocalvo,Cabeleireiro Calvo,beleza,criador,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:canal,termo: cabeleireira,2026-10-08
+UCfu2oxpIvkaI3PxqS3eZ4dg,@rosineidemonteirosampaio,Rosineide Monteiro cabeleireira ,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: cabeleireira,2026-10-08
+UCBth7e4H2RQFRl45NN74bjg,@karlafreitascabeleireira,Karla Freitas cabeleireira,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: cabeleireira,2026-10-08
+UCMRl3-Io5t4kt3X0M6ABtSQ,@dionefortescabeleireira,Dione Fortes Cabeleireira,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: cabeleireira,2026-10-08
+UCtXJefMCEccDJGvq7sVW2PA,@rogerriverascabeleireiro,Roger Riveras Cabeleireiro,beleza,,não,menos de 30 Shorts (6),busca:canal,termo: cabeleireira,2026-10-08
+UCSaKUckX6eGCrs-aPHu1FiA,@dicasdagiu,Cabeleireira Giu,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: cabeleireira,2026-10-08
+UCcpMaFV97ky62CimZtvZCRg,@dioneiacabeleireira,Dionéia Cabeleireira,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: cabeleireira,2026-10-08
+UCPDZnCtEOO5NjaKitzpZh6w,@helenacabeleireira3616,Helena cabeleireira,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: cabeleireira,2026-10-08
+UCrOqFOihK69tIsaOSEwXPag,@simonemeloeducadora2625,Simone Melo Cabeleireira ,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: cabeleireira,2026-10-08
+UCa410GdhBLq_ClKXwcGyizQ,@escovistamaster,Cabeleireira | Escovista Master | Modelada torcida,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: cabeleireira,2026-10-08
+UC8iG4bnQOkeLzzZ7whd-G0A,@fala_cabeleireiro,Fala Cabeleireiro(a),beleza,marca,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:canal,termo: cabeleireira,2026-10-08
+UCUex0KYDUjzdyG6s3IZ6ieA,@cabeleireirodesucesso,Cabeleireiro de Sucesso,beleza,,não,curtidas ocultas,busca:canal,termo: cabeleireira,2026-10-08
+UCp02_i9nOSsJbQz8cmm4xBg,@analanacabeleireira1999,Analana Cabeleireira,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: cabeleireira,2026-10-08
+UC-QYlucUeqbXtg4Dh0WfMvw,@moisescabeleireiros,Moisés de Carvalho Cabeleireiro,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: cabeleireira,2026-10-08
+UCA4wkCQlfN31H31swfQzfHg,@alessandracabeleireira-koc3637,Alessandra CABELEIREIRA-,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: cabeleireira,2026-10-08
+UCuBh8lmEcKYnGBZ1oXreqkw,@taenezarembacabeleireira412,Taene Zaremba Cabeleireira,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: cabeleireira,2026-10-08
+UCSU6ey5K60aIpZ5M97JYzzg,@claudiacabeleireira,Claudia Cabeleireira,beleza,,não,menos de 30 Shorts (6),busca:canal,termo: cabeleireira,2026-10-08
+UCfgcKs8M_R-9goC3HSHN3dg,@erissongehlenhairstylist,Erisson Gehlen Escola de Cabeleireiros,beleza,,não,menos de 30 Shorts (9),busca:canal,termo: cabeleireira,2026-10-08
+UCB-IdsuPEEK__rrSDr-eH-Q,@gloriacabeleireira3363,GLÓRIA CABELEIREIRA,beleza,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: cabeleireira,2026-10-08
+UCvV3fbY6YAO9Efsv6-CKxAQ,@bethcabeleireiraalves.,Beth cabeleireira alves (Bete Cabeleireira),beleza,,não,menos de 30 Shorts (23),busca:canal,termo: cabeleireira,2026-10-08
+UCAMRZx6zyIE-8xwUq13j8sQ,@mihbelezanegra3123,Mih Beleza negra,beleza,,não,menos de 30 Shorts (12),busca:canal,termo: beleza negra,2026-10-08
+UCsIhzOHpN79CCwE2LrSAd2g,@concursobelezanegracampogr2416,Movimento Beleza Negra Mato Grosso do Sul,beleza,,não,menos de 30 Shorts (0),busca:canal,termo: beleza negra,2026-10-08
+UCSOr2YpThkdoD5gjzFMDXCQ,@patiavelino,Patrícia Avelino - Beleza Negra,beleza,criador,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:canal,termo: beleza negra,2026-10-08
+UCc_jrsEgjz6axemBp7Oi2ZA,@belezanegrahairoficial,Gi Matthias - Beleza Negra Hair ,beleza,marca,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:canal,termo: beleza negra,2026-10-08
+UC5jZeqK6XI0fMCm31uBZsFg,@belezanegramultirracialper8440,BELEZA NEGRA MULTIRRACIAL PÉROLAS NEGRAS,beleza,,não,menos de 30 Shorts (0),busca:canal,termo: beleza negra,2026-10-08
+UCq1Txr3hjMxhfS9xDVLT2Vw,@missbelezablack,Miss Beleza Negra - Despertando Talentos,beleza,,não,sem Short há mais de 90 dias,busca:canal,termo: beleza negra,2026-10-08
+UCw7SkyLBx3_bNmfVIig_qKg,@belezanegra5025,Beleza negra 502,beleza,,não,menos de 30 Shorts (1),busca:canal,termo: beleza negra,2026-10-08
+UCnwXgM7ABtRAaE3g74ZUJMw,@belezanegrafla30,Beleza Negra,beleza,,não,menos de 30 Shorts (0),busca:canal,termo: beleza negra,2026-10-08
+UCjSMu8paFFTkHlpQ3Wqd2YQ,@oespecialistavicenza,O Especialista Vicenza,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UC6hTDXpdJsneZxSqqD4Uqiw,@veiculocerto,Veículo Certo,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UCtyksl5OBDC-HPuB9grQ18Q,@avaliacaoreal,Avaliação real - Thiago Brito,automotivo,criador,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:video,termo: avaliação carro usado; nicho: avaliação,2026-10-08
+UCAiRhB-CjWSfipbsSnRns3w,@vitoriaespecialistaseminovos,Vitória | Especialista em Seminovos,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UCc0cU92Tf7rvd2gr-CpVO4Q,@opiniaosincera,Opinião Sincera,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UCE_ZBWY4XS65ml2mG6aYO4w,@lojasoumaiscarroabc,SOU MAIS CARRO - Loja de Carros em Santo André,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UCUWkthiVD_hzf1UjR5EFdDQ,@tkfanclub.m,FAN.CLUBTK,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UCTzYgAtmod3dmBbdPxwOFlA,@alpiniveiculos-y6j,Alpini Veículos,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UC-MJYAt3jq-vGhnhLpmNAmQ,@facilitaautos5749,Facilita Autos,automotivo,,não,menos de 30 Shorts (2),busca:video,termo: avaliação carro usado,2026-10-08
+UCAuJ4ri0HsbgFG6iYz1aRnA,@peritoautomotivo,Perito Automotivo,automotivo,criador,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UCo4f5RaOQfmASA07GZVHK7g,@carversebr,CarVerse BR,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UCn6n5po_-i8Siwn2y8nX_yA,@bucarveiculos,Bucar Veículos,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UCVRCXUNF1-B92iRyv565VKQ,@autoforteveiculos,Autoforte Veiculos | Seminovos em Araraquara,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UCT6_R9E0gO6OYJaQoqGl53A,@palma.veiculos,Palma Veículos 🛞,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UCHmDCS1OoqMju8NHkxPZMAg,@comparabem,Comparabem,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UCb4QR2AYHMoKGXaA8UfQvNA,@kraken_performance,Kraken Performance,automotivo,,não,menos de 30 Shorts (20),busca:video,termo: avaliação carro usado,2026-10-08
+UCe4gttmOt2kft8QOnrw-DPQ,@armazemveiculosmaraba,ARMAZÉM VEÍCULOS MARABÁ ,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UCyzz5ekEtsa2kScxVQ9Diug,@michaelrlima,Michael Ribeiro - Car Hunter,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UCDarv6kbQp_0R26j-m5mmNw,@marchasobrerodas,marchasobrerodas,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UCLFnwPOa6J3dKaXszrzrBag,@wilbr659,Wil Br,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UC4RfwQUVBgZD63hQrnQF0vQ,@mecanicadebirosca01,Mecânica de Birosca,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: avaliação carro usado,2026-10-08
+UCwUtRe0XZIRG3nA5-kf7AIw,@autolabdiagnosticos,AutoLab Diagnósticos,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: dicas de mecânica,2026-10-08
+UCJXo1Q2iJUBjOQLCFR61d4g,@aicartech1,AiCar Tech,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: dicas de mecânica,2026-10-08
+UCh3ismKM49_00OooQI75Rhg,@runacaroficial,Runa Car Oficial,automotivo,criador,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:video,termo: dicas de mecânica; nicho: mecânica,2026-10-08
+UCTAPVCgmYRzelw5KQIm1E2A,@vivendodecatira,Vivendo de catira ,automotivo,,não,"revisão de 08/10 (Claude, delegada): motos e divulgação de apostas na descrição",busca:video,termo: dicas de mecânica,2026-10-08
+UCnZWrgsI2MiC6cUj1FUfVKw,@marcosadrianoalmeida,Auto Elétrica Sem Mistério,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: dicas de mecânica,2026-10-08
+UCjxzaewZrWDu0KYGa5npKfw,@silvaautocenter2181,Dicas mecânicas ,automotivo,marca,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:video,termo: dicas de mecânica,2026-10-08
+UC0j2uHTkzI56EUrx-hpsTdw,@retificalitoral,retifica litoral,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: dicas de mecânica,2026-10-08
+UCzBqDowIqSuzQra51kEOTbA,@netshowcar,NetShowCar,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: dicas de mecânica,2026-10-08
+UChQcLlZCFWQCIUrC_ZW3hiQ,@carupdicasautomotivas,CAR UP Dicas Automotivas,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: dicas de mecânica,2026-10-08
+UCpS4jrXtirb14Qm6jB9knXQ,@torqx_oficial,TORQX ,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: dicas de mecânica,2026-10-08
+UCsilEN6qkMQEnkcCPCPTI1g,@gambiarra100limites,Gambiarra100limites,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: dicas de mecânica,2026-10-08
+UCYkOCUsToo1R3DWajmH6p1g,@hacketica,Hacketica,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: dicas de mecânica,2026-10-08
+UCHaDbDV-x8WUKlWVukHiCIw,@vidademecanico-o3p,Vida de Mecânico,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: dicas de mecânica,2026-10-08
+UCPj4or5ud4NOcCHgHi2sLkA,@mecanicaalternativa,mecanica alternativa,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: dicas de mecânica,2026-10-08
+UCAgPYYnx7i2YTuD-c0XlkNQ,@edgleymecanico,Mecânico raiz ,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: dicas de mecânica,2026-10-08
+UCX_C19lSLDmFqnNpDJfswDQ,@directborrachas,Direct Borrachas,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: detalhamento automotivo,2026-10-08
+UC79zTE4T3XFOnIwgnJjS4vA,@snowflakestv,Snow FlakesTv,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: detalhamento automotivo,2026-10-08
+UCoIzRbVUzwiKr3aDr8g_cCQ,@lpstudioautomotivo-rz6lz,LP Studio Automotivo,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: detalhamento automotivo,2026-10-08
+UCPFxuxytahMsYCaUOyWCKHQ,@edydetailer,Vitrine Estética Automotiva,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: detalhamento automotivo,2026-10-08
+UCmivNUnfabww_BUuGMx_o7Q,@mmcgarageestetica,MMC Garage Estética Automotiva ,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: detalhamento automotivo,2026-10-08
+UCiNpEqT5yPqQTmTiBbGa-4w,@pissinattistudio,Antony Pissinatti | DETALHAMENTO AUTOMOTIVO,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: detalhamento automotivo,2026-10-08
+UClMR5xc3ta23aYfg4xYAJvw,@detaileresteticaautomotiva,Detailer Estética Automotiva,automotivo,marca,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:video,termo: detalhamento automotivo; nicho: estética automotiva (loja),2026-10-08
+UCafkq7KxkpoxFH-SBVAawGw,@menzstoreofc,MENZ STORE,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: detalhamento automotivo,2026-10-08
+UCPhSXaJ0wQp3HOFRXJexnlw,@estetica.garagem738,Garagem 738 Estética Automotiva,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: detalhamento automotivo,2026-10-08
+UCflcAVLpPmH-03R-njMSayw,@vonderferramentas,Vonder,automotivo,,não,"revisão de 08/10 (Claude, delegada): setor: ferramentas",busca:video,termo: detalhamento automotivo,2026-10-08
+UCiChbrgmvJYx4fGpNVW8Fkw,@defoxx,DEFOX,automotivo,,não,"revisão de 08/10 (Claude, delegada): setor: ferramentas e criptomoedas",busca:video,termo: detalhamento automotivo,2026-10-08
+UCIJgzzKeKreeL5cmVyaIIQA,@carprimedetailing,CarPrime Detailing Estética Automotiva,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: detalhamento automotivo,2026-10-08
+UCnsNnpjfCKhbepiMCUyv5Lg,@alandias22,Alan Dias,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: detalhamento automotivo,2026-10-08
+UC9jwFHVUSb45vTUOZuvYM5g,@dubboyz,Dub Boyz,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: detalhamento automotivo,2026-10-08
+UCPzSlhnxr2ksSUx2PCKUZMQ,@oitavocilindro,Oitavo Cilindro,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: test drive suv,2026-10-08
+UCZHgSwCNbJlzudu-pr8J1NQ,@morelveiculosbr,Renault Morel,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: test drive suv,2026-10-08
+UCfg1g81-3gx1sJgyxqv8c8w,@gwmpanama,GWM Panama,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: test drive suv,2026-10-08
+UCSNM9ydrO8AKT_dhMXgxqVg,@jirautofiatpeugeotcitroen,Jirauto,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: test drive suv,2026-10-08
+UCJzcoP5sbmxN8ehoWsBklQA,@darealkimkim,DaReal KimKim,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: test drive suv,2026-10-08
+UC_vU8qbEhX3b8Dff3A2Mv6Q,@adigaming976,Adi Gaming,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: test drive suv,2026-10-08
+UCF6labFjzVf0WblkuzuP4SQ,@publiracing,Publiracing Portal de Notícias,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: test drive suv,2026-10-08
+UCPIWGhrjn_fRAVf92H2_vFg,@blogdonelsonlisboa,Blog do Nelson Lisboa,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: test drive suv,2026-10-08
+UCLBwctrI2cVsTheATmwscGQ,@onlinecars7976,online.cars_,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: test drive suv,2026-10-08
+UCdGIDQfJ7FwHIPzB4dOZJFQ,@redhotpowersports,Red Hot Powersports,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: test drive suv,2026-10-08
+UC8KtncJZ21uWRiUDTyNrXYw,@chevroletsponchiado,Chevrolet Sponchiado,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: test drive suv,2026-10-08
+UClEDz-QJFtkZJ5dKEAEW7zg,@gwm_brasil,GWM Brasil,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UC7NlwbD_TIRUFbAO0pn6HGg,@sobrecarrosbr,sobre carros,automotivo,criador,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:video,termo: picape avaliação; nicho: notícias e rankings,2026-10-08
+UC9cCMLuv3HrDGBrr0ZYhdTQ,@canalanave,Canal A Nave Francis Silva ,automotivo,,não,"revisão de 08/10 (Claude, delegada): compilação de vídeos virais de trânsito (critério 7)",busca:video,termo: picape avaliação,2026-10-08
+UCp7LTRYn7Of4xGAEMNnf3HA,@tudodecarro,Tudo de carro,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UCTeJ1RpWClaHDvPFnpyL9ig,@programa.autoplay,Auto Play,automotivo,marca,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UCW_jDX-RGsP_bl_ryYq5QmA,@autoespecialista,Auto Especialista com Tarcisio Dias,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UCYMFGjT3SC81mgwQmhJZd9A,@shiftautomotivo,Shift Automotivo,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UC541ySeXIEcXYxCQ8KlLCHA,@garagemsecreta89,Garagem Secreta,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UC1QSI9HjpqQls-vNU8ewX9Q,@wptestdrive,Wesley TestDrive,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UCYsXGUwBfI5M2XerrT2OlSg,@canalmotorsnews,CANAL MOTORS NEWS,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UC68FwogiWj7MuppW-TnwGEQ,@herbertdf1,HERBERT FENELON,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UCsjO4umwGWTyVfSZJENY2VA,@explorecarros,Explore Carros ,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UCQ43CbXTA2KwqPTYyw-lxAg,@jeanveiculosoficial,JEAN VEÍCULOS,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UCl1e_AUmZjtt2OmRW3u3ugA,@autovista2027,AutoVista 2027,automotivo,,não,menos de 30 Shorts (4),busca:video,termo: picape avaliação,2026-10-08
+UCW9WrSkNdhM_iVck6Od4ioA,@uai.carros,Uai Carros,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UCt_oS5q8BA5iiXv_mmqSByQ,@arodatv,A Roda,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UCl7Tp97M02DBO3Wwdph0VFg,@diogofmorales,Diogo Morales ,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UCYnUHhTV_I-DAYNjI6Z19hQ,@eletricarbr,Eletricarbr,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UCmYyvUGs3Ww0Y33YWGr999w,@carroscomrick,Carros Com Rick,automotivo,,não,curtidas ocultas,busca:video,termo: picape avaliação,2026-10-08
+UCMdCCBJFBaOq1mGGVmKfiYg,@carrosemfoco_007,Carros em Foco,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UC_An0CjxH7j5qMrVu_RAhtw,@tk_clipsoficial,Tk_ClipsOficial,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UCBw0oqqxRXa31Lp8KEFGw7A,@carangoscarangas,Edu Carango,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UCDGK6yYhBX9yL9HRejazFLA,@joaobrigatonoyoutube,João Brigato no YouTube,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UCjgwBpKz_2-G4dWA8Ou5OJw,@mestreautomotivo,Mestre Automotivo - Daniel Aboud,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UCmGE_9ufkjFxgpfHmpc87og,@rachidcarros,Rachid Carros,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UCSLd_75QD1tKsLGhR39nAHg,@maiscarveiculos1,Mais Car Veículos,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:video,termo: picape avaliação,2026-10-08
+UCuzlwaE6phT9qd7tKBB1Bzg,@veiculosphenom,Avaliação & Dicas Automotivas,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UCxFBGY68PJqq0pSFcCodh5w,@canalmaniadecarro,Mania de carro,automotivo,criador,sim,"revisão de 08/10 (Claude, delegada): setor e idioma conferidos",busca:canal,termo: avaliação de carros; nicho: avaliação,2026-10-08
+UCbc1bOM4El-nby1uv6VD3KA,@personalcarbrasiloficial7983,Personal Car Brasil oficial,automotivo,,não,menos de 30 Shorts (3),busca:canal,termo: avaliação de carros,2026-10-08
+UC4wJTdzJNnYh99SM8GNSYLA,@korncars,KORN CARS,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UCWytf0zZ5RZAinqoONatKbw,@eusouigorsalviano,Igor Salviano,automotivo,,não,sem Short há mais de 90 dias,busca:canal,termo: avaliação de carros,2026-10-08
+UCQmkM00VARUgkaOsLbWOsHg,@felipecarvalho-p9m,Felipe Carvalho,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UCeYZ_7-LERMef3BC9dnS_HA,@buscadordecarro,Edson Viana,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UC_lgBhtOVtLexnGkwZ2v4zQ,@javeiculos,JA Veiculos,automotivo,,não,sem Short há mais de 90 dias,busca:canal,termo: avaliação de carros,2026-10-08
+UCwOfCB61S8XE7bqZbSso8WA,@carroeanalise,Carro e Análise,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UCUBTwlpNFzf9M5-H6R2b2MA,@carrodereview,carro de review,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UC7t5hLA16PAFEkGT7HUsWrw,@carcara-l8h,Carcará,automotivo,,não,menos de 30 Shorts (0),busca:canal,termo: avaliação de carros,2026-10-08
+UCM5HEJQ3CeA7g1DgN5ID0Cw,@instacarro,InstaCarro,automotivo,marca,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UCdkSpgLX4aHUuvtC_AYmS5A,@auto_carros,Auto Carros,automotivo,,não,menos de 30 Shorts (9),busca:canal,termo: avaliação de carros,2026-10-08
+UCXE6BJpmjNKFJQZINZH57Xw,@valecarros,Vale Carros ,automotivo,,não,menos de 30 Shorts (26),busca:canal,termo: avaliação de carros,2026-10-08
+UCKN-lrYYXi60QObYKMVcGTg,@gurudoscarros,Guru dos Carros | César Tizo,automotivo,marca,não,"reserva: passou na revisão de 08/10 (Claude, delegada), sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UC93BvLipXnyhhCcNzPEtDvg,@auto-xveiculos,Auto-X Veículos,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UCw6UzZvejqepfMk_dS5SsQA,@vendepramimval,Val Consultoria Automotiva,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UCeSu6-j3LxdlBLZZfmEpcpg,@meucarrolifestyle,Meu Carro LifeStyle,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UCV7ZpRaSA8EsuCNT3ouygWQ,@carrosdoxenao,Carros do Xenão,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UCueatwVhvVRWVF8gxbh32uQ,@carrofavorito,Carro Favorito,automotivo,,não,menos de 30 Shorts (7),busca:canal,termo: avaliação de carros,2026-10-08
+UCLvznfvBs5QQP2Qn11kzY9g,@carrospravoce,Carros pra Você,automotivo,,não,menos de 30 Shorts (0),busca:canal,termo: avaliação de carros,2026-10-08
+UCkCY2r2BW4g8ZXDECVzffug,@alecarros,Alê Carros,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UCRenPY5CfR343BX7HcHGZiw,@carroscomdiego,Carros com Diego,automotivo,,não,menos de 30 Shorts (29),busca:canal,termo: avaliação de carros,2026-10-08
+UCn-3UvyZJ_EMT5wFk0Y4DdA,@carroscoml1,Carros com L1,automotivo,,não,sem Short há mais de 90 dias,busca:canal,termo: avaliação de carros,2026-10-08
+UCNivNxrsX2ZfYkiLLq_Y-4w,@avaliacaoautomotiva,Avaliação Automotiva,automotivo,,não,sem Short há mais de 90 dias,busca:canal,termo: avaliação de carros,2026-10-08
+UCaqrKXx5zPzfI7Kdfnrl9pw,@rogeriocars,Rogério Henrique,automotivo,,não,menos de 30 Shorts (15),busca:canal,termo: avaliação de carros,2026-10-08
+UCOjGyMEX7rkRocCCg2J3mYQ,@jamesdoorman82,Carro e Carros,automotivo,,não,menos de 30 Shorts (0),busca:canal,termo: avaliação de carros,2026-10-08
+UCdXe9sPHKvEWw46pu0JNdOg,@aprendasobrecarros,Aprenda Sobre Carros,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UCcrk4_xvks3RtoDxMYmrJFQ,@analisedecarros-b3t,Análise de Carros,automotivo,,não,sem Short há mais de 90 dias,busca:canal,termo: avaliação de carros,2026-10-08
+UC0bS-s1hkl2vmIHpVprlV3A,@rodrigoplatinum,Rodrigo Platinum,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UCJazSm4SMrAajR1OsdXaa0g,@topdrivebrasil,Top Drive - @victorpicolli,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UCKCXv7YzPEAlicllgC5cTow,@carrocurioso1249,Revisacar Mecânica Diesel e Automóveis,automotivo,,não,sem Short há mais de 90 dias,busca:canal,termo: avaliação de carros,2026-10-08
+UCDW7bdxH0eN0kwyKwvLkVSQ,@williamguimaraes,William Guimarães,automotivo,,não,menos de 30 Shorts (11),busca:canal,termo: avaliação de carros,2026-10-08
+UCBamsjacEypcBD8nRP6jgJQ,@rodrigoautomoveis,Rodrigo Automóveis,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UCfFmFF1WeU3u04J6VIslY4Q,@autocarross,Auto Carros,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UCjkL4YfPk3i02_Dd3ptECPg,@stanleyravagnani,Stanley Ravagnani,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UCKUdxj8zvFH52JCvB73BdoQ,@nelson.consultorautomotivo,Nelson Ferreira - Avaliação Veicular,automotivo,,não,"reserva sem revisão: passou nos critérios automáticos, sem vaga",busca:canal,termo: avaliação de carros,2026-10-08
+UC1ywgYYB3qXkeKVujg-wICg,@veiculosvelocidade,Veículos & Velocidade,automotivo,,não,sem Short há mais de 90 dias,busca:canal,termo: avaliação de carros,2026-10-08
+UCPN9LoZsvmKt6gZlJM93JUQ,@sensacaodecarro,Sensação de carro,automotivo,,não,sem Short há mais de 90 dias,busca:canal,termo: avaliação de carros,2026-10-08

@@ -53,7 +53,7 @@ Data card completo: [`docs/DATA_CARD.md`](docs/DATA_CARD.md). <!-- PREENCHER: o 
   com snapshots diários dos Shorts com até 60 dias, de 180 a 205 unidades de cota por dia.
 - **Canais:** 70, 35 por setor, escolhidos por critérios escritos antes de olhar resultados
   ([`docs/PLANO_DA_BASE.md`](docs/PLANO_DA_BASE.md)): 52 da lista manual revisada e 18 da busca por termo de 08/10,
-  que trouxe os criadores de beleza que faltavam. Inclusões e exclusões, com o motivo, em `data/canais.csv`.
+  que trouxe os criadores de beleza que faltavam. Inclusões e exclusões, com o motivo, em `docs/curadoria_canais.csv` (sem os números da API).
 - **Shorts rotulados:** 31.303 na base congelada v1 (14.290 de automotivo e 17.013 de beleza), publicados de
   14/05/2014 a 19/09/2026 e coletados de 05/10 a 19/10/2026. O rótulo é o `likeCount` do primeiro snapshot com 30
   dias ou mais.

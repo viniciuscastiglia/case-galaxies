@@ -93,7 +93,7 @@ opção é apagar só os `previsoes.json` e manter as métricas. -->
 
 ## Coleta
 
-- **Curadoria:** `data/canais.csv` lista incluídos e excluídos, com o motivo de cada um. Os critérios foram escritos
+- **Curadoria:** `docs/curadoria_canais.csv` (a versão pública de `data/canais.csv`, sem as colunas da API) lista incluídos e excluídos, com o motivo de cada um. Os critérios foram escritos
   antes de olhar resultados (`docs/PLANO_DA_BASE.md`). Origem dos 70 canais: 33 da lista manual, 19 da lista manual
   com o handle corrigido pela busca e 18 da busca por termo de 08/10 (15 pelo modo vídeo, 3 pelo modo canal).
 - **Método:** playlist de uploads (`UU…`) → `playlistItems.list` → `videos.list`, de forma incremental. Snapshots
@@ -234,7 +234,7 @@ curtidas. O modo estrito trava coluna faltando ou sobrando. A validação roda a
 | :--- | :--- | :--- |
 | `collected_at` e `age_days` em toda linha | ✅ | — |
 | Refresh ou exclusão em até 30 dias, agendado | ✅ renovação diária (25 dias) + auditoria diária que falha alto | — |
-| Base, vídeos, frames e áudios fora de repositório ou pasta pública | ⚠️ base fora do git, mas `data/canais.csv`, versionado, guarda inscritos e contagens da API | Decidir até 30/10: tirar os números da API do arquivo versionado (e do histórico do git) ou registrar a exceção |
+| Base, vídeos, frames e áudios fora de repositório ou pasta pública | ⚠️ base fora do git; desde 21/10, o arquivo versionado é `docs/curadoria_canais.csv`, sem as colunas da API (inscritos, nº de Shorts, último Short, país, título), e o `data/canais.csv` completo saiu do git. As versões antigas dele seguem no histórico: reescrever o histórico quebraria os commits citados nos runs do MLflow e no DECISOES | Exceção registrada (decisão de 21/10, opção B); apagar o arquivo local em 30/10 |
 | Nenhum vídeo baixado guardado | ✅ o vídeo da amostra é apagado depois da extração, também com falha de etapa; as thumbnails ficam até 30/10 | Apagar em 30/10 |
 | Nada confidencial ou pessoal no Gemini free tier | ✅ só URLs de Shorts publicados | Manter: criativo não publicado nunca vai ao free tier |
 | Comentários não coletados | ✅ só o `commentCount`; nenhum texto, nenhum autor | — |

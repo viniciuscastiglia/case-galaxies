@@ -10,7 +10,6 @@ __pycache__/
 
 # dados e mídia: os termos do YouTube proíbem redistribuir (aula 1.8)
 data/*
-!data/canais.csv
 !data/candidatos.csv
 !data/termos_busca.csv
 !data/buscas.csv
