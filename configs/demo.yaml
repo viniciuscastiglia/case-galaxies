@@ -1,0 +1,16 @@
+# A demo (aulas 6.6 e 6.7; decisões #4 e #18). Lido por previa.demo.
+#
+# golden: limiares de ALARME do de-para nos 30 Shorts dos 6 canais fora da base (6.6, camada 4: "limiares folgados").
+#   Não são metas: um golden pequeno oscila muito (o erro-padrão da cobertura em 30 Shorts é ~7 pontos). Fora deles, o
+#   comando sai com código 1, para alguém olhar antes de confiar no modelo em uso.
+golden:
+  cobertura_min: 0.6
+  cobertura_max: 0.97
+  par_a_par_min: 0.5
+
+# sanidade (aula 1.4, "No projeto Galaxies"): um canal fictício por faixa de tamanho, cada um com `posts` Shorts
+#   semanais, todos maduros, com as mesmas `curtidas`. O número tem de seguir o tamanho do canal; a largura do
+#   intervalo mostra onde a base é rala. É uma conferência, não uma métrica.
+sanidade:
+  curtidas: [20, 500, 20000]
+  posts: 30

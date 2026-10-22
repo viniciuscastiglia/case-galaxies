@@ -10,7 +10,17 @@ As respostas ficam em `DADOS/demo/` (fora do git), o plano B se a chamada ao viv
 "Roteiro de demonstração"). Com `--mcp`, o par A/B do 1º canal passa pelo servidor MCP real, por
 stdio, e a saída mostra que o número pelo MCP é o da função.
 
-    uv run python -m previa.demo [--mcp]
+Com `--langchain`, o mesmo par passa pelo adaptador do LangGraph (`MultiServerMCPClient`, uma
+sessão, `load_mcp_tools`; 6.5, erro comum 4), com o servidor lançado de OUTRO diretório e os
+caminhos absolutos no ambiente, como um host faria (6.5, erro comum 2), e mede o tempo da chamada.
+
+Com `--golden`, os 30 Shorts do golden, cada um como cliente novo, com a cobertura do intervalo e o
+par-a-par dentro do canal (6.6, camada 4), em `DADOS/demo/golden.json`; sai com código 1 se algum
+alarme de `configs/demo.yaml` disparar.
+
+    uv run python -m previa.demo [--mcp] [--langchain]
+    uv run python -m previa.demo --golden
+    uv run python -m previa.demo --sanidade   (um canal fictício por tamanho, aula 1.4)
 """
 
 from previa.openmp import um_runtime
@@ -20,13 +30,17 @@ if __name__ == "__main__":
 
 import asyncio  # noqa: E402
 import json  # noqa: E402
+import os  # noqa: E402
 import sys  # noqa: E402
+import time  # noqa: E402
 import urllib.request  # noqa: E402
+from pathlib import Path  # noqa: E402
 
 import numpy as np  # noqa: E402
 import pandas as pd  # noqa: E402
+import yaml  # noqa: E402
 
-from previa.caminhos import DADOS, RAIZ  # noqa: E402
+from previa.caminhos import ARTEFATOS, CONFIGS, DADOS, RAIZ  # noqa: E402
 
 PASTA = DADOS / "demo"
 GOLDEN = DADOS / "golden" / "golden_v1.parquet"
@@ -76,6 +90,46 @@ def _n(x: float) -> str:
     return f"{x:,.0f}".replace(",", ".")
 
 
+def ler_config_demo(caminho=CONFIGS / "demo.yaml") -> dict:
+    """`configs/demo.yaml`: os limiares de alarme do golden."""
+    return yaml.safe_load(Path(caminho).read_text(encoding="utf-8"))
+
+
+def avaliar_golden(prev: pd.DataFrame, cfg: dict) -> dict:
+    """O de-para do golden em números (6.6, camada 4): cobertura e par-a-par dentro do canal.
+
+    `prev`: um Short por linha (`channel_id`, `real`, `predicted_metric`, `interval_low`,
+    `interval_high`). Os pares são do mesmo canal; empate no real fica fora e empate na previsão
+    vale 0,5 (`metricas.por_canal`, a regra da 2.4). Fora dos limiares de `configs/demo.yaml`, um
+    alarme por regra: são folgados, para pegar um modelo quebrado, não para medir um bom.
+    """
+    from previa.metricas import por_canal
+
+    real = prev["real"].to_numpy(float)
+    dentro = int(((prev["interval_low"] <= real) & (real <= prev["interval_high"])).sum())
+    t = por_canal(real, prev["predicted_metric"].to_numpy(float), prev["channel_id"].to_numpy())
+    acertos, pares = float(t["acertos"].sum()), int(t["pares"].sum())
+    n = len(prev)
+    r = {
+        "n": n,
+        "dentro": dentro,
+        "cobertura": dentro / n if n else np.nan,
+        "acertos": acertos,
+        "pares": pares,
+        "par_a_par": acertos / pares if pares else np.nan,
+    }
+    lim = cfg["golden"]
+    alarmes = []
+    if not lim["cobertura_min"] <= r["cobertura"] <= lim["cobertura_max"]:
+        alarmes.append(
+            f"cobertura {r['cobertura']:.0%} fora de {lim['cobertura_min']:.0%} a "
+            f"{lim['cobertura_max']:.0%}"
+        )
+    if not r["par_a_par"] >= lim["par_a_par_min"]:
+        alarmes.append(f"par-a-par {r['par_a_par']:.0%} abaixo de {lim['par_a_par_min']:.0%}")
+    return r | {"alarmes": alarmes}
+
+
 async def _pelo_mcp(pedidos: list[dict]) -> dict:
     from fastmcp import Client
     from fastmcp.client.transports import StdioTransport
@@ -89,6 +143,120 @@ async def _pelo_mcp(pedidos: list[dict]) -> dict:
     return r.structured_content
 
 
+def _golden(g: pd.DataFrame) -> int:
+    """Os 30 Shorts do golden pelo mesmo caminho do de-para; imprime e grava a avaliação."""
+    from previa.historico import historico_congelado
+    from previa.previsao import prever_criativo
+    from previa.schemas import PredictionRequest
+
+    linhas = []
+    for _, s in g.sort_values(["handle", "published_at"]).iterrows():
+        r = prever_criativo(
+            PredictionRequest.model_validate(pedido(s, historico_congelado(s["channel_id"])))
+        )
+        linhas.append({"handle": s["handle"], "video_id": s["video_id"],
+                       "channel_id": s["channel_id"], "real": float(s["likes"]),
+                       "predicted_metric": r.predicted_metric, "interval_low": r.interval_low,
+                       "interval_high": r.interval_high,
+                       "motivos": [m.codigo for m in r.confidence_flag.motivos]})  # fmt: skip
+    prev = pd.DataFrame(linhas)
+    a = avaliar_golden(prev, ler_config_demo())
+    print(f"golden: {a['n']} Shorts de {prev['channel_id'].nunique()} canais fora da base")
+    print(f"dentro do intervalo de 80%: {a['dentro']} de {a['n']} ({a['cobertura']:.1%})")
+    print(f"par-a-par no canal: {a['acertos']:g} de {a['pares']} ({a['par_a_par']:.1%})")
+    for motivo in sorted({m for ms in prev["motivos"] for m in ms}):
+        print(f"flag {motivo}: {sum(motivo in ms for ms in prev['motivos'])} de {a['n']}")
+    for alarme in a["alarmes"]:
+        print(f"ALARME: {alarme}")
+    (PASTA / "golden.json").write_text(
+        json.dumps({"avaliacao": a, "previsoes": linhas}, ensure_ascii=False, indent=1)
+    )
+    print(f"\nsalvo em {PASTA / 'golden.json'}")
+    print("comando: uv run python -m previa.demo --golden")
+    return 1 if a["alarmes"] else 0
+
+
+def sanidade_por_tamanho(
+    cfg: dict, quando: str, setor: str, capa: str | None = None, bundle=None, encoder=None
+) -> pd.DataFrame:
+    """Um canal fictício por nível de `cfg["sanidade"]["curtidas"]` (aula 1.4), pela tool.
+
+    Cada canal é `channel_stats` com `posts` Shorts semanais, todos maduros (o mais novo 31 dias
+    antes de `quando`), com as mesmas curtidas. Uma linha por nível: o número, o intervalo, a
+    razão (alto + 1) / (baixo + 1), que é a largura na escala log1p do modelo, e os códigos do flag.
+    """
+    from previa.previsao import prever_criativo
+    from previa.schemas import PredictionRequest
+
+    sc = cfg["sanidade"]
+    t = pd.Timestamp(quando)
+    datas = [t - pd.Timedelta(days=31 + 7 * k) for k in range(sc["posts"])]
+    criativo = {"tipo": "imagem", "arquivo": capa} if capa else {"tipo": "texto"}
+    linhas = []
+    for nivel in sc["curtidas"]:
+        posts = [{"published_at": d.isoformat(), "likes": int(nivel)} for d in datas]
+        req = PredictionRequest.model_validate({
+            "creative": criativo, "caption": "Canal fictício de sanidade",
+            "planned_datetime": t.isoformat(), "sector": setor, "cover": capa,
+            "channel_stats": {"posts": posts},
+        })  # fmt: skip
+        r = prever_criativo(req, bundle=bundle, encoder=encoder)
+        linhas.append({
+            "curtidas_canal": nivel, "predicted_metric": r.predicted_metric,
+            "interval_low": r.interval_low, "interval_high": r.interval_high,
+            # na escala do modelo (log1p): o alto/baixo cru exagera nos canais pequenos, pelo +1
+            "razao_intervalo": (r.interval_high + 1) / (r.interval_low + 1),
+            "motivos": [m.codigo for m in r.confidence_flag.motivos],
+        })  # fmt: skip
+    return pd.DataFrame(linhas)
+
+
+def config_do_servidor() -> dict:
+    """O servidor MCP como um host o lança: de outro diretório, com os caminhos absolutos no
+    ambiente (`GALAXIES_ARTEFATOS`, `PREVIA_DADOS`; 6.5, erro comum 2)."""
+    env = {**os.environ, "GALAXIES_ARTEFATOS": str(ARTEFATOS), "PREVIA_DADOS": str(DADOS)}
+    return {
+        "previa": {
+            "transport": "stdio",
+            "command": "uv",
+            "args": ["run", "--directory", str(RAIZ), "python", "-m", "previa.servidor_mcp"],
+            "cwd": "/",
+            "env": env,
+        }
+    }
+
+
+def _json_da_tool(saida) -> dict:
+    """A saída de uma tool do adaptador (texto ou blocos de conteúdo) como o dict da tool."""
+    if isinstance(saida, tuple):  # (conteúdo, artefato)
+        saida = saida[0]
+    if isinstance(saida, list):
+        saida = "".join(b.get("text", "") if isinstance(b, dict) else str(b) for b in saida)
+    return json.loads(saida)
+
+
+async def _pelo_langchain(pedidos: list[dict]) -> tuple[dict, dict, list[str]]:
+    """(resultado de `comparar_criativos`, segundos por chamada, nomes das tools) pelo adaptador.
+
+    Uma sessão para todas as chamadas (6.5, erro comum 4). O servidor já sobe aquecido (`aquecer`
+    no `main` dele): a 1ª chamada mede capas novas (o SigLIP roda), a 2ª as mesmas capas, que vêm do
+    cache pelo conteúdo (`previa.capa`).
+    """
+    from langchain_mcp_adapters.client import MultiServerMCPClient
+    from langchain_mcp_adapters.tools import load_mcp_tools
+
+    cliente = MultiServerMCPClient(config_do_servidor())
+    tempos = {}
+    async with cliente.session("previa") as sessao:
+        tools = {t.name: t for t in await load_mcp_tools(sessao)}
+        comparar = tools["comparar_criativos"]
+        for rotulo in ("capas_novas", "capas_do_cache"):
+            t0 = time.perf_counter()
+            r = await comparar.ainvoke({"pedidos": pedidos})
+            tempos[rotulo] = time.perf_counter() - t0
+    return _json_da_tool(r), tempos, sorted(tools)
+
+
 def main(argv=None) -> int:
     from previa.historico import historico_congelado
     from previa.previsao import comparar_criativos, prever_criativo
@@ -97,6 +265,19 @@ def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     PASTA.mkdir(parents=True, exist_ok=True)
     g = pd.read_parquet(GOLDEN)
+    if "--golden" in argv:
+        return _golden(g)
+    if "--sanidade" in argv:
+        capas = sorted((PASTA / "capas").glob("*.jpg"))
+        quando = pd.Timestamp.now(tz=FUSO).normalize() + pd.Timedelta(hours=19)
+        t = sanidade_por_tamanho(
+            ler_config_demo(), quando.isoformat(), "beleza", str(capas[0]) if capas else None
+        )
+        nome = capas[0].name if capas else "-"
+        print(f"sanidade por tamanho (beleza, {quando:%d/%m/%Y %H:%M}, capa {nome}):")
+        print(t.round(2).to_string(index=False))
+        print("comando: uv run python -m previa.demo --sanidade")
+        return 0
     recentes, pares = selecionar(g)
     salvo = {"de_para": [], "pares": []}
 
@@ -165,6 +346,22 @@ def main(argv=None) -> int:
             [(x["criativo"], round(x["predicted_metric"], 1)) for x in r["ranking"]],
         )
         print("igual ao da função:", r["ranking"] == salvo["pares"][0]["ranking"])
+    if "--langchain" in argv:
+        a, b = pares[0]
+        hist = historico_congelado(a["channel_id"])
+        pedidos = [pedido(x, hist, corte=a["published_at"]) for x in (a, b)]
+        print(
+            f"\n== O mesmo A ou B pelo adaptador do LangGraph, de outro diretório ({a['handle']})\n"
+        )
+        r, tempos, nomes = asyncio.run(_pelo_langchain(pedidos))
+        print("tools carregadas:", nomes)
+        print("ranking pelo adaptador:",
+              [(x["criativo"], round(x["predicted_metric"], 1)) for x in r["ranking"]])  # fmt: skip
+        print("igual ao da função:", r["ranking"] == salvo["pares"][0]["ranking"])
+        n = len(pedidos)
+        print(f"tempo de uma comparação de {n} criativos com o servidor aquecido: "
+              f"{tempos['capas_novas']:.2f} s com capas novas (~{tempos['capas_novas'] / n:.2f} s "
+              f"por criativo), {tempos['capas_do_cache']:.2f} s com as mesmas capas")  # fmt: skip
     return 0
 
 
