@@ -291,9 +291,34 @@ def prever_criativo(
     sem saída levantam (princípio 7); só o que a tool sabe degradar (capa ausente) vira flag.
     """
     bundle = bundle or carregar()
-    quando = pd.Timestamp(req.planned_datetime).tz_convert("UTC")
+    # os passos em ordem fixa; o grafo da A6 chama as mesmas funções, um nó por passo (6.2, EC1)
+    ext = passo_extrair(req, bundle, encoder)
+    ctx = passo_contexto(req, bundle, posts_do_canal)
+    prev = passo_prever(req, bundle, ctx, ext)
+    return passo_explicar(req, bundle, ctx, ext, prev)
 
-    # 2. os posts do canal e os inscritos
+
+# ---------------------------------------------------------------- os passos (Tools 1 a 4 da 6.3)
+
+
+def passo_extrair(req: PredictionRequest, bundle: Bundle, encoder=None) -> dict:
+    """Tool 1, a capa (F11): a da marca ou a imagem do criativo; sem ela, blocos ausentes."""
+    c = req.creative
+    capa = req.cover or (c.arquivo if c.tipo == "imagem" else None)
+    if capa is not None and encoder is None:
+        encoder = _encoder()
+    valores, embeddings, capa_ausente = extras_da_capa(capa, bundle, encoder)
+    return {
+        "capa": capa,
+        "valores": valores,
+        "embeddings": embeddings,
+        "capa_ausente": capa_ausente,
+    }
+
+
+def passo_contexto(req: PredictionRequest, bundle: Bundle, posts_do_canal=None) -> dict:
+    """Tool 2, o contexto: os posts anteriores do canal, os inscritos e a âncora (#34)."""
+    quando = pd.Timestamp(req.planned_datetime).tz_convert("UTC")
     if posts_do_canal is not None:  # injetado (golden set, cliente externo): não toca a base
         posts = posts_do_canal[_COLUNAS_POSTS].copy()
         posts["published_at"] = pd.to_datetime(posts["published_at"], utc=True)
@@ -301,69 +326,69 @@ def prever_criativo(
         inscritos = _inscritos(req, bundle)
     else:
         posts, inscritos = _posts_do_canal(req, bundle, quando)
-
-    # 3. a âncora (#34)
     ref, degrau, n_maduros = ancora(posts, inscritos, req.sector, quando, bundle.ancora)
+    return {"quando": quando, "posts": posts, "inscritos": inscritos, "ref": ref,
+            "degrau": degrau, "n_maduros": n_maduros}  # fmt: skip
 
-    # 4. a capa (F11): a da marca ou a imagem do criativo; sem ela, blocos ausentes
+
+def passo_prever(req: PredictionRequest, bundle: Bundle, ctx: dict, ext: dict) -> dict:
+    """Tool 3, a única fonte do número: features (a função do treino), número, intervalo e flag."""
     c = req.creative
-    capa = req.cover or (c.arquivo if c.tipo == "imagem" else None)
-    if capa is not None and encoder is None:
-        encoder = _encoder()
-    valores, embeddings, capa_ausente = extras_da_capa(capa, bundle, encoder)
-
-    # 5. as features, com a mesma função do treino
-    ausentes = {b: "sem capa" for b in capa_ausente if b in bundle.extras}
+    ausentes = {b: "sem capa" for b in ext["capa_ausente"] if b in bundle.extras}
     ausentes |= {  # um bloco do pacote que esta tool ainda não extrai: ausente, e o flag diz
         b: "bloco ainda não extraído pela tool" for b in bundle.extras if b not in BLOCOS_DA_CAPA
     }
     novo = {
-        "published_at": quando,
+        "published_at": ctx["quando"],
         "caption": req.caption,  # dado, nunca instrução: só vira feature calculada
         "sector": req.sector,
         "duration_s": c.duration_s,
-        "extras": valores,
+        "extras": ext["valores"],
         "extras_ausentes": ausentes,
-        "embeddings": embeddings,
+        "embeddings": ext["embeddings"],
     }
-    x = features_de_um_short(bundle, posts, novo)
+    x = features_de_um_short(bundle, ctx["posts"], novo)
     if c.tipo == "video" and c.duration_s is None:
         nao_extraido_duracao = ["a duração (duração não informada)"]
     else:
         nao_extraido_duracao = []
     nao_extraido = [f"o bloco {b}" for b in x.attrs["extracao_falhou"] if b not in BLOCOS_DA_CAPA]
-    extracao_falhou = (["a capa"] if capa_ausente else []) + nao_extraido_duracao + nao_extraido
+    extracao_falhou = (["a capa"] if ext["capa_ausente"] else []) + nao_extraido_duracao
+    extracao_falhou += nao_extraido
 
-    # 6. o número (modelo pontual, #40) e o intervalo (CQR)
-    numero, lo_log, hi_log = prever_intervalo(bundle, x, ref, degrau)
+    # o número (modelo pontual, #40) e o intervalo (CQR)
+    numero, lo_log, hi_log = prever_intervalo(bundle, x, ctx["ref"], ctx["degrau"])
     lo_c, hi_c = em_curtidas(lo_log, hi_log)
-    pred = max(expm1(numero), 0.0)
 
-    # 7. o flag; fora do regime avaliado (#34) é sempre canal_novo
-    n_flag = n_maduros
-    if degrau != "mediana_do_canal":
-        n_flag = min(n_maduros, bundle.limiares_flag["min_posts"] - 1)
+    # o flag; fora do regime avaliado (#34) é sempre canal_novo
+    n_flag = ctx["n_maduros"]
+    if ctx["degrau"] != "mediana_do_canal":
+        n_flag = min(ctx["n_maduros"], bundle.limiares_flag["min_posts"] - 1)
     flag = confidence_flag(
         hi_log - lo_log, n_flag, extracao_falhou, None, req.planned_datetime, bundle.limiares_flag
     )
+    return {"x": x, "numero": numero, "lo_c": float(lo_c), "hi_c": float(hi_c),
+            "pred": max(expm1(numero), 0.0), "flag": flag}  # fmt: skip
 
-    # 8. os fatores, só dos blocos aprovados como argumento (#36, F7)
+
+def passo_explicar(
+    req: PredictionRequest, bundle: Bundle, ctx: dict, ext: dict, prev: dict
+) -> PredictionResponse:
+    """Tool 4, a explicação: os fatores aprovados (#36, F7), os comparáveis e o template (#17)."""
     cfg = carregar_cfg_explicacao()
+    x = prev["x"]
     drivers = top_drivers(bundle.modelo, x, None, cfg, aprovados=_aprovados(cfg, bundle, x))
-
-    # 9. os comparáveis
-    comparaveis, ressalva = _comparaveis(embeddings.get("thumb"), req.sector, quando)
-
-    # 10 e 11. a explicação por template e o resto do contrato
+    comparaveis, ressalva = _comparaveis(ext["embeddings"].get("thumb"), req.sector, ctx["quando"])
+    pred, lo_c, hi_c, flag = prev["pred"], prev["lo_c"], prev["hi_c"], prev["flag"]
     return PredictionResponse(
         predicted_metric=pred,
-        interval_low=float(lo_c),
-        interval_high=float(hi_c),
-        relative_to_channel=float(np.exp(numero - ref)),
+        interval_low=lo_c,
+        interval_high=hi_c,
+        relative_to_channel=float(np.exp(prev["numero"] - ctx["ref"])),
         confidence_flag=flag,
         top_drivers=drivers,
         comparables=comparaveis,
-        explanation=_explicacao(pred, float(lo_c), float(hi_c), drivers, flag, ressalva, bundle),
+        explanation=_explicacao(pred, lo_c, hi_c, drivers, flag, ressalva, bundle),
         features_used=list(bundle.features),
         model_version={k: v for k, v in model_version(bundle).items() if k != "calibracao"},
     )

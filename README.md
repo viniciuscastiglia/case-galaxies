@@ -66,7 +66,7 @@ Data card completo: [`docs/DATA_CARD.md`](docs/DATA_CARD.md) (v1, com a v2 do mo
 ```mermaid
 flowchart LR
     C["Agente Nexus (Galaxies)<br/>ou Claude Code"] -->|MCP, stdio| S["servidor_mcp<br/>prever_criativo · comparar_criativos"]
-    L["agente.py: create_agent<br/>(LLM com as mesmas 2 tools)"] --> GR["agente.py: grafo fixo<br/>extrair → prever → explicar → responder"]
+    L["agente.py: create_agent<br/>(LLM com as mesmas 2 tools)"] --> GR["agente.py: grafo fixo<br/>extrair → contexto → prever → explicar → responder"]
     S --> F["previsao.prever_criativo<br/>(função pura, Pydantic na entrada e na saída)"]
     GR --> F
     GR --> E["explicador.py<br/>LLM só narra · validador · template"]
@@ -81,8 +81,8 @@ flowchart LR
   âncora do canal, capa, features (as mesmas funções do treino), número e intervalo, flag, fatores. O
   `comparar_criativos` ordena os criativos do mesmo canal e dá P(B > A) de cada par.
 - **Dois adaptadores em volta dela:** o servidor MCP (`servidor_mcp.py`, sem LLM: a explicação é o template, #17) e o
-  agente LangGraph (`agente.py`): um grafo fixo (extrair → prever → explicar → responder, estado em JSON com a
-  `trilha`) e um `create_agent` que só escolhe qual das duas tools chamar e com que pedido. Testes provam que o
+  agente LangGraph (`agente.py`): um grafo fixo (extrair → contexto → prever → explicar → responder, cada nó
+  chamando o mesmo passo que a função chama; estado em JSON com a `trilha`) e um `create_agent` que só escolhe qual das duas tools chamar e com que pedido. Testes provam que o
   número do MCP, do grafo e do agente é o da função, que é o do modelo.
 - **Onde o LLM entra:** na narração da explicação, no grafo e só para Shorts já publicados (#15): o `explicador.py`
   manda ao LLM um payload fechado (número, intervalo, motivos do flag, fatores, comparáveis; nunca a legenda), e um
@@ -373,8 +373,9 @@ rótulo difere (seção 8). Por isso a comparação é de ordem de grandeza e de
   conservadora (aula 6.3, Tool 5).
 - **A v2 não tem teste próprio:** o modelo de uso foi retreinado com dados até maio de 2026, gastando os meses do
   teste da v1; o número do teste é o do modelo de janeiro, e a cobertura da v2 só vale na calibração (#33).
-- **O agente:** o grafo chama a função inteira no nó `prever`, sem nós separados para extração e contexto; o
-  explicador por LLM só roda com Shorts publicados (free tier) e não foi avaliado com o LLM real em escala.
+- **O explicador por LLM:** só roda com Shorts publicados (free tier). Com o Gemini real, nos 6 Shorts da demo, 6 de
+  6 explicações passaram no validador na 1ª tentativa; o validador confere números, fatores e termos, mas não a
+  redação ("reduz a previsão em 23% a mais" passou). Não foi avaliado em escala.
 - **Fora do modelo:** a transcrição e o idioma da fala (#35), a clusterização dos descritores (a rubrica tem campos
   fixos, F38), o detector de objetos (o produto em close ficou na rubrica, #31), a leitura do texto na capa (só a
   detecção: o PaddleOCR não instala na Stack 2026) e o baseline de regressão sobre os inscritos (os inscritos são os

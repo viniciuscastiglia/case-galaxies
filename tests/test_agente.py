@@ -106,13 +106,13 @@ def test_stream_updates_emite_os_nos_na_ordem_fixa(pacote, capa):  # noqa: F811
     grafo = _grafo(pacote)
     entrada = {"pedido": PredictionRequest.model_validate(_pedido(capa)).model_dump(mode="json")}
     nos = [no for upd in grafo.stream(entrada, _config(), stream_mode="updates") for no in upd]
-    assert nos == ["extrair", "prever", "explicar", "responder"] == list(NOS)
+    assert nos == ["extrair", "contexto", "prever", "explicar", "responder"] == list(NOS)
     estado = grafo.get_state(_config()).values
     assert [t.split(":")[0] for t in estado["trilha"]] == nos
     assert estado["trilha"][0] == "extrair: capa da marca"
     # 6.2, EC3: o estado é JSON puro (o checkpointer serializa sem objetos Pydantic)
     assert json.loads(json.dumps(estado)) == estado
-    assert len(list(grafo.get_state_history(_config()))) == len(nos) + 2  # antes, entrada e 4 nós
+    assert len(list(grafo.get_state_history(_config()))) == len(nos) + 2  # antes, entrada e 5 nós
 
 
 def test_criativo_so_texto_pula_a_extracao_e_sai_com_extracao_falhou(pacote):  # noqa: F811
@@ -151,7 +151,7 @@ def test_explicar_recebe_a_resposta_o_llm_e_o_publicado(pacote, capa):  # noqa: 
         "fonte": "template",
         "problemas": [],
     }
-    assert saida["trilha"][2] == "explicar: fonte template"
+    assert saida["trilha"][3] == "explicar: fonte template"
 
 
 def test_explicacao_que_muda_o_numero_nao_chega_a_resposta(pacote, capa):  # noqa: F811

@@ -73,7 +73,7 @@ Data card completo: [`DATA_CARD.md`](DATA_CARD.md). Base congelada v1 (`data/bas
   entre 30.983 criativos (só a primeira cópia vira linha de treino e de teste). Fonte: DATA_CARD.md.
 - **Antes de jul/2021:** 336 Shorts ficam só no histórico do canal (decisão #2).
 - **Modelo de uso (v2):** treino até 31/05/2026 e calibração em 3.825 posts de 01/07 a 14/09/2026 (decisão #33, run
-  `5373921a`). A contagem de Shorts de treino da v2 não ficou registrada no run.
+  `5373921a`). Cerca de 25 mil Shorts canônicos com rótulo, de 70 canais, publicados até 31/05/2026 (a frase de proveniência de cada resposta da tool, arredondada a dois algarismos).
 - **Termos dos dados:** YouTube API Services Terms of Service e Developer Policies. Uso educacional e interno,
   sem redistribuição. Os dados brutos são apagados em 30/10/2026 (DATA_CARD.md, "Licença e termos").
 
