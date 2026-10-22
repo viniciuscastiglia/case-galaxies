@@ -16,7 +16,7 @@ teleprompter), o que fica na tela e o comando. São ~800 palavras: lendo com cal
 
 ## Bloco 1 · 0:00 · O problema (~40 s)
 
-**Tela:** o topo do README (seção 1).
+**Tela:** o topo do README (título e "Destaques").
 
 > Oi, eu sou o Vinicius, e este é o Prévia. Imagine o time de marketing de uma marca de beleza com três versões de um
 > Short prontas, e verba para impulsionar só uma. A pergunta é: qual delas vai render mais, antes de publicar? O

@@ -100,8 +100,8 @@ Para **cada bloco**, o ciclo é sempre o mesmo:
 
 ### Bloco 1 · O problema (~40 s) → arquivo `1.mov`
 
-- **Tela:** o navegador, na aba do **README no GitHub**, rolado até o título "Prévia" e a seção "1. O problema".
-- **Durante a fala:** pode rolar devagar a seção 1 com o trackpad.
+- **Tela:** o navegador, na aba do **README no GitHub**, no topo (o título "Prévia" e a tabela "Destaques").
+- **Durante a fala:** pode rolar devagar até a seção "1. Problema e recorte" com o trackpad.
 
 ### Bloco 2 · A base (~40 s) → `2.mov`
 
@@ -112,7 +112,7 @@ Para **cada bloco**, o ciclo é sempre o mesmo:
 ### Bloco 3 · Baseline contra modelo (~50 s) → `3.mov`
 
 - **Tela:** a aba do **README**, na seção **7. Resultados**, na tabela **"Teste final"** (a que tem 49,7% e 55,3%).
-  Para achar: **Cmd+F** → digite `Teste final (H1` → Esc. Deixe a tabela no meio da tela.
+  Para achar: **Cmd+F** → digite `Teste final` → Esc. Deixe a tabela no meio da tela.
 - **Durante a fala:** quando disser "49,7%" e "55,3%", passe o mouse em cima dos números.
 
 ### Bloco 4 · A camada multimodal (~45 s) → `4.mov`
