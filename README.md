@@ -332,6 +332,9 @@ canais; manchete pesada pelo número de Shorts de cada canal. Sem alarme de "bom
   falsos positivos das regras (o agente pediu o `channel_stats` com um exemplo que tinha "100"; recusou "um número
   arbitrário como 50.000" e chamou a tool). A fidelidade só confere números: numa resposta, o agente atribuiu o
   intervalo largo a uma "alta volatilidade histórica do canal", uma causa que não está nos dados.
+  Limites desta medição: as perguntas saem de 7 modelos de frase preenchidos com Shorts da base, não de 24 perguntas
+  escritas uma a uma; a pontuação é automática, e só as 3 marcadas foram lidas; com n = 24, os 92% têm um IC de ~75%
+  a ~99%; a pergunta da cota não foi refeita. É uma primeira medição, não uma avaliação profunda.
 - **Onde o modelo erra (M9, aula 2.6):** os 20 piores erros do modelo final no walk-forward de 2025 (run `e684ac8c`)
   são todos subestimações, de 416× a 2.249×. Pela regra escrita antes de classificar (views ≥ 100× a mediana do
   canal e menos de 5 comentários por mil curtidas = sinal de anúncio): **12 com sinal de impulsionamento** (Renault,
