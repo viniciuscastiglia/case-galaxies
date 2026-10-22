@@ -87,9 +87,7 @@ rm -f data/shorts.duckdb data/*.parquet data/cota*.json data/amostra_multimodal.
 rm -rf data/logs data/thumbs data/emb_thumb_v1 data/cache data/vlm data/golden data/videos data/ablacao media/ artefatos/
 ```
 
-<!-- V: decidir até 30/10 o que fazer com o MLflow (`mlflow.db` e `mlruns/`): ele guarda as métricas agregadas,
-que o README cita pelo run id, e as previsões por `post_id` (`previsoes.json`), que são dado derivado da API. Uma
-opção é apagar só os `previsoes.json` e manter as métricas. -->
+**MLflow até 30/10:** o `mlflow.db` e o `mlruns/` ficam fora do git. Eles guardam as métricas agregadas, que o README cita pelo run id, e as previsões por `post_id` (`previsoes.json`), que são dado derivado da API: em 30/10, os `previsoes.json` são apagados e as métricas ficam.
 
 ## Coleta
 
@@ -203,9 +201,7 @@ Escritos pelo Vinicius em 08/10 (exercício da aula 1.8).
    feature no treino, e na hora da previsão a gente fixa o valor em 30. Outra saída é treinar só com rótulos de idade
    parecida, mas isso joga fora muitos dados. A escolha sai de um experimento no módulo 3.
 
-<!-- V: os números dos itens 1 e 3 são de 08/10. Na v1: no item 1, a beleza tem 50% de marcas (eram 74%) e o
-automotivo, 83% de criadores; no item 3, a base de desenvolvimento tem mediana de 636 dias e 85% com mais de 300.
-Atualizar com as suas palavras, e o item 3 com o resultado da H5 -->
+**Atualização da v1 (21/10):** os números dos itens 1 e 3 são de 08/10. Na base congelada v1, a beleza tem 50% de marcas e o automotivo, 83% de criadores; a base de desenvolvimento tem rótulos com mediana de 636 dias, 85% com mais de 300. A idade do rótulo entrou como controle, fixada em 30 dias na previsão (H5: `mae_log` −0,018 [−0,028; −0,007]).
 
 4. **Capa da data da coleta.** (complemento do Claude, a revisar) A thumbnail é a de outubro de 2026, e o canal
    pode tê-la trocado depois da publicação. Na previsão, a capa de A e B é a que a marca escolher.
