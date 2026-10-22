@@ -17,7 +17,7 @@ siglip:                             # embeddings visuais (aula 4.4); só no proc
   ckpt: "google/siglip2-base-patch16-224"   # ~1,5 GB, 768 dimensões, CPU (~20 thumbnails/s no M4)
   versao: 1                         # mudou o recorte, o modelo ou as sondas: suba a versão
   lote: 256
-  sondas:                           # a lista inicial da 4.4 para beleza, automotivo e "todos"; a validar
+  sondas:                           # a lista inicial da 4.4; validação de 21/10 na seção `validacao`: só 4 passam (configs/explicacao.yaml)
     rosto: "um close do rosto de uma pessoa"
     maquiagem: "uma pessoa aplicando maquiagem"
     batom: "um close de batom nos lábios"

@@ -1,0 +1,26 @@
+# Robustez a seeds (22/10, depois do teste; só o desenvolvimento, nada aqui troca o modelo): o modelo final sem a capa.
+# Modelo final (#39, 21/10): o que a régua da #27 aprovou na abertura. Opção A sem o histórico (H2 não fica) e sem o
+# texto (H4 não fica), + a capa (H7), + a idade do rótulo como controle (H5, fixada em 30 na previsão), com a Huber
+# (H11). Antes do teste, uma conferência no desenvolvimento contra a H11 (run bfba1020), com a regra escrita antes.
+nome: final_sem_capa_s2
+hipotese: robustez_seeds
+descricao: "Robustez a seeds (aulas 2.6, erro comum 5; 3.2, erro comum 2): o modelo final sem a capa, seed 2"
+features: [hora_local, dia_semana_local, feriado, idade_canal_dias,
+           duracao_s, setor, target_age_days]
+lacuna_dias: 30       # princípio 2 e decisão #11
+val_dias: 180         # validação temporal do early stopping (3.4)
+seed: 2
+max_arvores: 5000
+paciencia: 100
+lgbm:
+  objective: huber
+  alpha: 1.0          # o δ da Huber (#32, H11)
+  learning_rate: 0.05
+  num_leaves: 15
+  min_data_in_leaf: 20
+  feature_fraction: 0.9
+  bagging_fraction: 0.8
+  bagging_freq: 1
+  lambda_l2: 1.0
+fixar:
+  target_age_days: 30

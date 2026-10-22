@@ -1,0 +1,17 @@
+# Segundo baseline (aula 3.2, "se o boosting não vence um random forest com defaults, desconfie"; 22/10, depois do
+# teste; só o desenvolvimento, nada aqui troca o modelo): as mesmas linhas e features do modelo final, num random
+# forest do scikit-learn com os defaults.
+nome: random_forest
+hipotese: robustez_rf
+descricao: "Random forest com os defaults, nas features do modelo final (3.2)"
+features: [hora_local, dia_semana_local, feriado, idade_canal_dias,
+           duracao_s, setor, target_age_days,
+           sonda_*, thumb_brilho, thumb_contraste, thumb_saturacao, thumb_colorfulness]
+lacuna_dias: 30
+seed: 0
+modelo: random_forest
+pca:
+  thumb: 16
+extras: [sondas_thumb, aparencia_thumb]
+fixar:
+  target_age_days: 30

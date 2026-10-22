@@ -383,3 +383,9 @@ def test_ic_por_canal_recusa_tabela_vazia_ou_canal_nan():
         ic_por_canal(len, pd.DataFrame({"channel_id": []}), n_boot=10)
     with pytest.raises(ValueError, match="channel_id"):
         ic_por_canal(len, pd.DataFrame({"channel_id": ["a", None]}), n_boot=10)
+
+
+def test_faixa_do_canal_escalar_devolve_str():
+    """A tool chama com um Short só: a resposta tem de ser texto, não um array 0-d."""
+    f = faixa_do_canal(5.0, 4.0, 6.0, 7.0)
+    assert f == "na média" and isinstance(f, str)

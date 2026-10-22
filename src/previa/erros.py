@@ -20,7 +20,15 @@ import pandas as pd
 
 from previa.coletor import DADOS
 from previa.dados import carregar_base
-from previa.experimento import EXPERIMENTO, hash_base, ler_duracoes, preparar
+from previa.experimento import (
+    EXPERIMENTO,
+    conferir_cortes,
+    data_de_corte,
+    hash_base,
+    ler_duracoes,
+    preparar,
+    resolver_run,
+)
 from previa.splits import ler_avaliacao
 
 CATEGORIAS = (
@@ -96,7 +104,9 @@ def tabela_do_run(run_id: str) -> pd.DataFrame:
     """As previsões do walk-forward do run, com y, o canal e as colunas dos cortes."""
     mlflow.set_experiment(EXPERIMENTO)
     base = carregar_base()  # sem o período de teste
-    if (h := mlflow.get_run(run_id).data.tags.get("hash_base")) != hash_base(base):
+    tags = dict(mlflow.get_run(run_id).data.tags)
+    conferir_cortes({run_id: tags}, data_de_corte(ler_avaliacao()))  # F22, como o `comparar`
+    if (h := tags.get("hash_base")) != hash_base(base):
         raise ValueError(f"o run usou a base {h}, e a atual é {hash_base(base)}: rode-o de novo")
     prev = mlflow.load_table("previsoes.json", run_ids=[run_id])
     prev = prev[prev["avaliacao"] == "walk_forward"]
@@ -118,7 +128,7 @@ def main(argv=None) -> int:
     if len(argv) != 1:
         print("uso: python -m previa.erros RUN_ID", file=sys.stderr)
         return 2
-    run_id = argv[0]
+    run_id = resolver_run(argv[0])
     t = tabela_do_run(run_id)
     cortes = []
     for col in CORTES:

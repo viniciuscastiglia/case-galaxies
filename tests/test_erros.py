@@ -88,3 +88,20 @@ def test_origem_do_canal_separa_a_busca():
     assert r.loc["fora da busca", "n"] == 2 and r.loc["fora da busca", "canais"] == 2
     assert r.loc["busca", "mae"] == pytest.approx((0.5 + 2.0) / 2)
     assert r.loc["fora da busca", "vies"] == pytest.approx(-1.0)
+
+
+def test_erros_confere_os_cortes(monkeypatch):
+    import previa.erros as erros
+    from previa.splits import ler_avaliacao
+
+    class FakeRun:
+        def __init__(self, run_id):
+            self.data = type("Dados", (), {"tags": {"hash_base": "h", "data_corte": "2024-07-01"}})
+
+    monkeypatch.setattr(erros.mlflow, "set_experiment", lambda nome: None)
+    monkeypatch.setattr(erros.mlflow, "get_run", FakeRun)
+    monkeypatch.setattr(erros, "carregar_base", lambda: pd.DataFrame())
+    monkeypatch.setattr(erros, "hash_base", lambda b: "h")
+    monkeypatch.setattr(erros, "ler_avaliacao", ler_avaliacao)
+    with pytest.raises(ValueError, match="data_corte"):
+        erros.tabela_do_run("A")

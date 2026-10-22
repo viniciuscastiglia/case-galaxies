@@ -309,3 +309,17 @@ def test_k_escolhido_e_o_de_maior_manchete():
     assert k_escolhido(painel) == (10, 0.55)
     with pytest.raises(ValueError, match="p_ultimos"):
         k_escolhido(painel[["p_madura"]])
+
+
+def test_k_escolhido_nao_depende_da_ordem_das_colunas():
+    a = {"p_ultimos_10": {"manchete_janela_peso_posts": 0.55},
+         "p_ultimos_3": {"manchete_janela_peso_posts": 0.55}}  # fmt: skip
+    for ordem in (["p_ultimos_10", "p_ultimos_3"], ["p_ultimos_3", "p_ultimos_10"]):
+        assert k_escolhido(pd.DataFrame(a)[ordem]) == (3, 0.55)  # empate: o menor k
+
+
+def test_k_escolhido_recusa_nan():
+    painel = pd.DataFrame({"p_ultimos_3": {"manchete_janela_peso_posts": float("nan")},
+                           "p_ultimos_10": {"manchete_janela_peso_posts": 0.5}})  # fmt: skip
+    with pytest.raises(ValueError, match="NaN"):
+        k_escolhido(painel)

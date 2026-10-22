@@ -27,6 +27,7 @@ Uso: uv run python -m previa.experimento configs/experimentos/opcao_a.yaml
 import argparse
 import hashlib
 import json
+import re
 import subprocess
 import sys
 import warnings
@@ -67,7 +68,11 @@ EXPERIMENTO = "previa-curtidas"
 SETORES = ["automotivo", "beleza"]
 FIXOS = {"verbosity": -1, "deterministic": True, "force_row_wise": True}  # 2.5: determinismo
 NAO_METRICA = ("arvores", "previsoes", "dobras", "importancia")  # o que não é float (registrar)
-LIMITE_IMPORTANCIA = 0.5  # 2.2: uma feature com mais da metade do ganho é "importância dominante"
+
+
+def limite_de_importancia() -> float:
+    """O alarme da 2.2 ("importância dominante"), de `configs/avaliacao.yaml`."""
+    return float(ler_avaliacao()["alarme_importancia"])
 
 
 @dataclass
@@ -92,6 +97,8 @@ class Config:
     extras: list[str] = field(default_factory=list)
     so_amostra: bool = False  # avaliar só nos Shorts da amostra multimodal (H8, 4.8)
     ruido: int = 0  # controle negativo (2.6): `ruido_1`..`ruido_N`, sem relação com o alvo
+    # "lightgbm" (o do projeto) ou "random_forest": o segundo baseline da 3.2, com os defaults
+    modelo: str = "lightgbm"
 
 
 def ler_config(caminho) -> Config:
@@ -309,9 +316,24 @@ def prever_absoluto(modelo, x: pd.DataFrame, ref: pd.Series, cfg: Config) -> np.
 
 
 def treinar_gbm(d, idx, cfg: Config, features=None):
-    """Early stopping nos últimos `val_dias` de `idx`; refit em `idx` inteiro (aula 3.4)."""
+    """Early stopping nos últimos `val_dias` de `idx`; refit em `idx` inteiro (aula 3.4).
+
+    Com `cfg.modelo == "random_forest"`, um `RandomForestRegressor` com os defaults do scikit-learn
+    (e `random_state = seed`) nas mesmas linhas e features, sem early stopping: o segundo baseline
+    da 3.2 ("se o boosting não vence um random forest com defaults, desconfie"). O nº devolvido é o
+    de árvores.
+    """
     features, y = features or cfg.features, coluna_alvo(cfg)
     tr = d.loc[linhas_de_treino(d, idx, cfg)].sort_values("published_at", kind="stable")
+    if cfg.modelo == "random_forest":
+        from sklearn.ensemble import RandomForestRegressor
+
+        rf = RandomForestRegressor(random_state=cfg.seed, n_jobs=-1).fit(tr[features], tr[y])
+        # prever com uma thread: com várias, a soma das árvores muda de ordem e o número também,
+        # na última casa (a seed fixa tem de reproduzir a métrica)
+        return rf.set_params(n_jobs=1), int(rf.n_estimators)
+    if cfg.modelo != "lightgbm":
+        raise ValueError(f"modelo desconhecido: {cfg.modelo!r} ('lightgbm' ou 'random_forest')")
     corte = tr["published_at"].max() - pd.Timedelta(days=cfg.val_dias)
     ajuste, val = tr[tr["published_at"] <= corte], tr[tr["published_at"] > corte]
     params = {**cfg.lgbm, **FIXOS, "seed": cfg.seed}
@@ -465,15 +487,22 @@ def importancia_por_ganho(modelos) -> pd.Series:
     """
     ganho = pd.Series(dtype=float)
     for m in modelos:
-        por_modelo = pd.Series(m.feature_importance("gain"), index=m.feature_name())
+        if hasattr(m, "feature_importances_"):  # random forest: a redução de impureza (3.2)
+            por_modelo = pd.Series(m.feature_importances_, index=m.feature_names_in_)
+        else:
+            por_modelo = pd.Series(m.feature_importance("gain"), index=m.feature_name())
         ganho = ganho.add(por_modelo, fill_value=0.0)
     if not ganho.sum() > 0:
         raise ValueError("importância por ganho: nenhum split nos modelos (ganho total zero)")
     return (ganho / ganho.sum()).sort_values(ascending=False, kind="stable")
 
 
-def avisar_importancia_dominante(resultado: dict, limite=LIMITE_IMPORTANCIA) -> None:
-    """Avisa quando uma feature concentra mais de `limite` do ganho em alguma avaliação (2.2)."""
+def avisar_importancia_dominante(resultado: dict, limite: float | None = None) -> None:
+    """Avisa quando uma feature concentra mais de `limite` do ganho em alguma avaliação (2.2).
+
+    Sem `limite`, o `alarme_importancia` de `configs/avaliacao.yaml`.
+    """
+    limite = limite_de_importancia() if limite is None else limite
     for avaliacao, r in resultado.items():
         if r["importancia_maior_fatia"] > limite:
             warnings.warn(
@@ -544,7 +573,7 @@ def rodar(
     """
     d = tabela_da_config(cfg, base, duracoes, cfg_av, extras, min_posts)
     base_feats = expandir_features(cfg.features, d.columns)
-    validar_tabela_de_treino(d, base_feats)  # o contrato, antes de qualquer fit (F15; 1.8, 3.5)
+    validar_tabela_de_treino(d, base_feats, cfg.lacuna_dias)  # o contrato, antes de qualquer fit
     for nome, bloco in (extras or {}).items():  # senão o tratamento vira o controle (4.8, erro 4)
         if not set(bloco.columns) & set(base_feats):
             raise ValueError(f"bloco extra {nome}: nenhuma coluna dele está nas features da config")
@@ -637,7 +666,9 @@ def painel_do_run(run_id: str, n_boot=2000, seed=0, min_posts=3) -> pd.DataFrame
     """
     mlflow.set_experiment(EXPERIMENTO)  # o load_table procura no experimento ativo
     base = carregar_base()
-    do_run = mlflow.get_run(run_id).data.tags.get("hash_base")
+    tags = dict(mlflow.get_run(run_id).data.tags)
+    conferir_cortes({run_id: tags}, data_de_corte(ler_avaliacao()))  # F22, como o `comparar`
+    do_run = tags.get("hash_base")
     if do_run != hash_base(base):
         raise ValueError(f"o run não usou a base atual ({hash_base(base)}): {do_run}; rode de novo")
     prev = mlflow.load_table("previsoes.json", run_ids=[run_id])
@@ -689,8 +720,9 @@ def conferir_cortes(tags: dict[str, dict], corte_atual: str) -> None:
 def registrar(cfg: Config, caminho, resultado, base, tags=None, cfg_av=None) -> str:
     """Um run no MLflow: tags de rastreio, params, a config inteira e as métricas.
 
-    Grava a data de corte (`data_corte`) e o `gap_dias` do `cfg_av` (sem ele, o do projeto), o
-    `avaliacao.yaml` cru (`avaliacao.json`) e a importância por ganho (`importancia_gain.json`).
+    Grava a data de corte (`data_corte`) e o `gap_dias` do `cfg_av` (sem ele, o do projeto), a
+    avaliação que o run USOU (`avaliacao.json`, o `cfg_av` com as datas em texto; antes era o
+    arquivo de `configs/`, que pode ser outro) e a importância por ganho (`importancia_gain.json`).
     """
     cfg_av = ler_avaliacao() if cfg_av is None else cfg_av
     mlflow.set_experiment(EXPERIMENTO)
@@ -714,7 +746,7 @@ def registrar(cfg: Config, caminho, resultado, base, tags=None, cfg_av=None) -> 
         params |= {f"{a}_arvores": ",".join(map(str, r["arvores"])) for a, r in resultado.items()}
         mlflow.log_params(params)
         mlflow.log_dict(asdict(cfg), "config.json")
-        mlflow.log_dict(avaliacao_crua(), "avaliacao.json")
+        mlflow.log_dict(json.loads(json.dumps(cfg_av, default=str)), "avaliacao.json")
         mlflow.log_dict(
             {a: r["importancia"].to_dict() for a, r in resultado.items()}, "importancia_gain.json"
         )
@@ -724,6 +756,21 @@ def registrar(cfg: Config, caminho, resultado, base, tags=None, cfg_av=None) -> 
         mlflow.log_table(tabela_de_previsoes(resultado), "previsoes.json")
         mlflow.log_params({f"pca_{b}": n for b, n in cfg.pca.items()})
         return run.info.run_id
+
+
+def resolver_run(prefixo: str) -> str:
+    """O id completo do único run que começa com `prefixo` (os documentos citam 8 caracteres)."""
+    if not re.fullmatch(r"[0-9a-f]{4,32}", prefixo):
+        raise ValueError(f"prefixo de run inválido: {prefixo!r} (de 4 a 32 hexadecimais)")
+    achados = mlflow.search_runs(
+        search_all_experiments=True, filter_string=f"attributes.run_id LIKE '{prefixo}%'"
+    )
+    ids = list(achados["run_id"]) if len(achados) else []
+    if not ids:
+        raise ValueError(f"nenhum run com o id começando em {prefixo!r}")
+    if len(ids) > 1:
+        raise ValueError(f"prefixo {prefixo!r} ambíguo: {len(ids)} runs ({', '.join(ids)})")
+    return ids[0]
 
 
 def comparar(run_a: str, run_b: str, n_boot=2000, seed=0, min_posts=3) -> pd.DataFrame:
@@ -747,15 +794,17 @@ def main(argv=None) -> int:
     argv = list(sys.argv[1:] if argv is None else argv)
     if argv[:1] == ["comparar"]:  # uv run python -m previa.experimento comparar RUN_A RUN_B
         cfg_b = ler_config_baselines()
-        r = comparar(argv[1], argv[2], cfg_b["n_boot"], cfg_b["seed"], cfg_b["min_posts"])
+        a, b = resolver_run(argv[1]), resolver_run(argv[2])
+        r = comparar(a, b, cfg_b["n_boot"], cfg_b["seed"], cfg_b["min_posts"])
         print(r.round(4).to_string())
-        print(f"\ncomando: uv run python -m previa.experimento comparar {argv[1]} {argv[2]}")
+        print(f"\ncomando: uv run python -m previa.experimento comparar {a} {b}")
         return 0
     if argv[:1] == ["painel"]:  # uv run python -m previa.experimento painel RUN_ID
         cfg_b = ler_config_baselines()
-        r = painel_do_run(argv[1], cfg_b["n_boot"], cfg_b["seed"], cfg_b["min_posts"])
+        run = resolver_run(argv[1])
+        r = painel_do_run(run, cfg_b["n_boot"], cfg_b["seed"], cfg_b["min_posts"])
         print(r.round(4).to_string())
-        print(f"\ncomando: uv run python -m previa.experimento painel {argv[1]}")
+        print(f"\ncomando: uv run python -m previa.experimento painel {run}")
         return 0
     parser = argparse.ArgumentParser(prog="python -m previa.experimento")
     parser.add_argument("config")

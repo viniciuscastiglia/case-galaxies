@@ -20,7 +20,6 @@ from previa.caminhos import CONFIGS
 from previa.esquema import validar_tabela_de_treino
 from previa.experimento import (
     EXPERIMENTO,
-    LIMITE_IMPORTANCIA,
     aplicar_pca,
     avaliar,
     avisar_importancia_dominante,
@@ -30,11 +29,14 @@ from previa.experimento import (
     ganho_entre,
     hash_base,
     ler_config,
+    limite_de_importancia,
     linhas_de_treino,
     painel,
     painel_das_previsoes,
+    painel_do_run,
     preparar,
     registrar,
+    resolver_run,
     rodar,
     tabela_de_previsoes,
     treinar_gbm,
@@ -174,6 +176,36 @@ def test_gbm_early_stopping_refit_e_seed(cfg_av, cfg):
     assert m1.num_trees() == n1  # o refit usa o nº de árvores do early stopping
     x = d.loc[idx[:50], cfg.features]
     np.testing.assert_array_equal(m1.predict(x), m2.predict(x))  # a seed reproduz
+
+
+def test_random_forest_com_defaults_nas_mesmas_linhas(cfg_av, cfg):
+    """3.2: o random forest com os defaults é o segundo baseline do boosting."""
+    from dataclasses import replace
+
+    from sklearn.ensemble import RandomForestRegressor
+
+    base, dur = _base()
+    d = preparar(base, dur, cfg_av, lacuna_dias=30)
+    idx = d.index[d["linha"] & (d["published_at"] < pd.Timestamp("2024-12-01", tz="UTC"))]
+    rf = replace(cfg, modelo="random_forest")
+    m1, n1 = treinar_gbm(d, idx, rf)
+    m2, _ = treinar_gbm(d, idx, rf)
+    assert isinstance(m1, RandomForestRegressor) and n1 == m1.n_estimators == 100  # defaults
+    x = d.loc[idx[:50], cfg.features]
+    np.testing.assert_array_equal(m1.predict(x), m2.predict(x))  # a seed reproduz
+    r = rodar(rf, base, dur, cfg_av, n_boot=50, seed=0)
+    for avaliacao in ("walk_forward", "canal_novo"):
+        assert r[avaliacao]["importancia"].sum() == pytest.approx(1.0)
+        assert np.isfinite(r[avaliacao]["mae_log_modelo"])
+
+
+def test_modelo_desconhecido_levanta(cfg_av, cfg):
+    from dataclasses import replace
+
+    base, dur = _base()
+    d = preparar(base, dur, cfg_av, lacuna_dias=30)
+    with pytest.raises(ValueError, match="modelo desconhecido"):
+        treinar_gbm(d, d.index[d["linha"]], replace(cfg, modelo="xgboost"))
 
 
 def test_folds_respeitam_o_tempo_e_os_canais(cfg_av):
@@ -599,7 +631,7 @@ def test_importancia_soma_1_e_pega_a_feature_vazada(cfg_av, cfg):
     r = rodar(cfg, base, dur, cfg_av, n_boot=100, seed=0, extras={"vazada": vazada})
     for avaliacao in ("walk_forward", "canal_novo"):
         assert r[avaliacao]["importancia"].index[0] == "vazada"
-        assert r[avaliacao]["importancia_maior_fatia"] > LIMITE_IMPORTANCIA
+        assert r[avaliacao]["importancia_maior_fatia"] > limite_de_importancia()
     with pytest.warns(UserWarning, match="vazada"):
         avisar_importancia_dominante(r)
 
@@ -609,7 +641,7 @@ def test_alarme_de_importancia_so_acima_do_limite():
         imp = pd.Series({"vazada": fatia, "outra": 1 - fatia})
         return {"walk_forward": {"importancia": imp, "importancia_maior_fatia": fatia}}
 
-    assert LIMITE_IMPORTANCIA == 0.5  # 2.2: "importância dominante"
+    assert limite_de_importancia() == 0.5  # 2.2: "importância dominante"
     with pytest.warns(UserWarning, match=r"walk_forward.*vazada.*0\.80"):
         avisar_importancia_dominante(res(0.8))
     with warnings.catch_warnings():
@@ -629,9 +661,7 @@ def test_registrar_grava_corte_e_avaliacao(cfg_av, cfg, mlflow_temporario):
     arquivos = {f.path for f in client.list_artifacts(run_id)}
     assert {"avaliacao.json", "importancia_gain.json", "config.json"} <= arquivos
     cru = mlflow.artifacts.load_dict(f"runs:/{run_id}/avaliacao.json")
-    assert cru == json.loads(
-        json.dumps(yaml.safe_load((CONFIGS / "avaliacao.yaml").read_text(encoding="utf-8")))
-    )  # o arquivo cru, como estava na hora do run
+    assert cru == json.loads(json.dumps(cfg_av, default=str))  # a avaliação que o run USOU
     gain = mlflow.artifacts.load_dict(f"runs:/{run_id}/importancia_gain.json")
     assert set(gain) == {"walk_forward", "canal_novo"}
     for fatias in gain.values():
@@ -703,14 +733,15 @@ def test_rodar_valida_a_tabela_de_treino(cfg_av, cfg, monkeypatch):
 
     chamadas = []
 
-    def espiao(d, features):
-        chamadas.append((d, list(features)))
-        return validar_tabela_de_treino(d, features)  # o contrato de verdade, não um dublê
+    def espiao(d, features, lacuna_dias=None):
+        chamadas.append((d, list(features), lacuna_dias))
+        return validar_tabela_de_treino(d, features, lacuna_dias)  # o contrato de verdade
 
     monkeypatch.setattr(exp, "validar_tabela_de_treino", espiao)
     base, dur = _base_com_nan_legitimos()
     rodar(cfg, base, dur, cfg_av, n_boot=100, seed=0)
     assert len(chamadas) == 1 and chamadas[0][1] == cfg.features
+    assert chamadas[0][2] == cfg.lacuna_dias  # e a lacuna de maturação passou no contrato
     treino = chamadas[0][0].query("linha")
     for coluna in ("hist_ultimo_ts", "hist_mediana", "hist_desvio", "duracao_s"):
         assert treino[coluna].isna().any(), coluna  # o nulo estava lá e o contrato o aceitou
@@ -826,3 +857,45 @@ def test_config_h10_muda_so_os_detectores():
     assert h10["features"][: len(h7["features"])] == h7["features"]
     assert h10["features"][len(h7["features"]) :] == ["det_*"]
     assert h10["extras"] == [*h7["extras"], "det_thumb"]
+
+
+def test_limite_de_importancia_vem_da_config():
+    cru = yaml.safe_load((CONFIGS / "avaliacao.yaml").read_text(encoding="utf-8"))
+    assert cru["alarme_importancia"] == 0.5 == limite_de_importancia()
+
+
+def test_resolver_run_prefixo_unico_ambiguo_e_inexistente(mlflow_temporario, monkeypatch):
+    import previa.experimento as exp
+
+    mlflow.set_experiment(EXPERIMENTO)
+    with mlflow.start_run() as run:
+        pass
+    rid = run.info.run_id
+    assert resolver_run(rid[:8]) == rid
+    assert resolver_run(rid) == rid
+    with pytest.raises(ValueError, match="nenhum run"):
+        resolver_run("ffffffff" if not rid.startswith("ffffffff") else "eeeeeeee")
+    with pytest.raises(ValueError, match="prefixo"):
+        resolver_run("x'; drop")
+    falso = pd.DataFrame({"run_id": ["abcd1234aaaa", "abcd1234bbbb"]})
+    monkeypatch.setattr(exp.mlflow, "search_runs", lambda **kw: falso)
+    with pytest.raises(ValueError, match="ambíguo: 2 runs"):
+        resolver_run("abcd1234")
+
+
+def test_painel_do_run_confere_os_cortes(cfg_av, monkeypatch):
+    import previa.experimento as exp
+
+    base, dur = _base()
+
+    class FakeRun:
+        def __init__(self, run_id):
+            tags = {"hash_base": hash_base(base), "data_corte": "2024-07-01"}
+            self.data = type("Dados", (), {"tags": tags})
+
+    monkeypatch.setattr(exp.mlflow, "set_experiment", lambda nome: None)
+    monkeypatch.setattr(exp.mlflow, "get_run", FakeRun)
+    monkeypatch.setattr(exp, "carregar_base", lambda: base)
+    monkeypatch.setattr(exp, "ler_avaliacao", lambda: cfg_av)
+    with pytest.raises(ValueError, match="data_corte"):
+        painel_do_run("A", n_boot=10)

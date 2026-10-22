@@ -111,17 +111,33 @@ class TabelaTreino(pa.DataFrameModel):
         return ultimo.isna() | (ultimo < df["published_at"])
 
 
-def validar_tabela_de_treino(d: pd.DataFrame, features: list[str]) -> None:
+def validar_tabela_de_treino(
+    d: pd.DataFrame, features: list[str], lacuna_dias: int | None = None
+) -> None:
     """O contrato da tabela de treino nas linhas de treino (`d["linha"]`), antes de qualquer fit.
 
     Valida a `TabelaTreino` (`lazy=True`: todas as falhas de uma vez, `SchemaErrors`) e confere que
     cada feature existe, é numérica e não tem ±inf, só nas linhas de treino. NaN pode: o LightGBM
     trata como ausente (aula 3.5). Falha nunca silenciosa (princípio 7): `ValueError` com os nomes.
+    Com `lacuna_dias`, também confere que o último post do histórico tem ao menos essa idade.
     """
     if "linha" not in d.columns:
         raise ValueError("a tabela de treino não tem a coluna `linha` (rode o preparar)")
     treino = d[d["linha"]]
+    if treino.empty:  # um contrato que passa sem linhas não conferiu nada (princípio 7)
+        raise ValueError("a tabela de treino não tem nenhuma linha de treino (`linha` toda False)")
     TabelaTreino.validate(treino, lazy=True)
+    if (
+        lacuna_dias is not None
+    ):  # princípio 2: o histórico só com posts maduros (30 dias, inclusive)
+        limite = treino["published_at"] - pd.Timedelta(days=lacuna_dias)
+        ultimo = treino["hist_ultimo_ts"]
+        imaturos = int((ultimo.notna() & (ultimo > limite)).sum())
+        if imaturos:
+            raise ValueError(
+                f"{imaturos} linhas de treino usam no histórico um post com menos de "
+                f"{lacuna_dias} dias (a lacuna de maturação)"
+            )
     ausentes = [f for f in features if f not in d.columns]
     if ausentes:
         raise ValueError(f"features fora da tabela de treino: {ausentes}")

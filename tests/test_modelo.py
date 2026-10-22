@@ -293,15 +293,15 @@ def test_bundle_valida_a_tabela_de_treino(base, cfg, cfg_av, monkeypatch):
 
     chamadas = []
 
-    def espiao(d, features):
-        chamadas.append(list(features))
-        return validar_tabela_de_treino(d, features)
+    def espiao(d, features, lacuna_dias=None):
+        chamadas.append((list(features), lacuna_dias))
+        return validar_tabela_de_treino(d, features, lacuna_dias)
 
     monkeypatch.setattr(modelo, "validar_tabela_de_treino", espiao)
     b, dur, emb = _partes(base)
     treinar_bundle(cfg, b, dur, cfg_av, emb)
-    assert chamadas == [cfg.features]
-    assert not any(c.startswith("titulo_pc") for c in chamadas[0])
+    assert chamadas == [(cfg.features, cfg.lacuna_dias)]
+    assert not any(c.startswith("titulo_pc") for c in chamadas[0][0])
 
 
 def test_bundle_recusa_a_tabela_que_quebra_o_contrato(base, cfg, cfg_av):

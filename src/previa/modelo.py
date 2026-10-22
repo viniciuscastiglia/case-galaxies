@@ -114,7 +114,7 @@ def treinar_bundle(
         base, duracoes, cfg_av, cfg.lacuna_dias, min_posts_alvo=cfg.min_posts_alvo, extras=extras
     )
     base_feats = expandir_features(cfg.features, d.columns)  # curinga sem coluna levanta
-    validar_tabela_de_treino(d, base_feats)  # o mesmo contrato do runner (F15; 1.8, 3.5)
+    validar_tabela_de_treino(d, base_feats, cfg.lacuna_dias)  # o contrato do runner (F15; 1.8, 3.5)
     tr = d.index[d["linha"] & (d["published_at"] < fim_do_treino(cfg_av))]
     dobra, feats, pcas = d.loc[tr].copy(), list(base_feats), {}
     for bloco, n_comp in cfg.pca.items():

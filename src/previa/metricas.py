@@ -106,7 +106,8 @@ def faixa_do_canal(v, p25, p75, p95):
     if np.isnan(v[~sem]).any():  # falha nunca silenciosa (princípio 7)
         raise ValueError("faixa_do_canal: valor NaN em linha com histórico (filtre antes)")
     faixas = np.select([v < p25, v <= p75, v <= p95], FAIXAS[:3], default=FAIXAS[3])
-    return np.where(sem, SEM_HISTORICO, faixas)
+    saida = np.where(sem, SEM_HISTORICO, faixas)
+    return str(saida.item()) if saida.ndim == 0 else saida  # um Short só (a tool): texto
 
 
 def f1_faixas_canal(y, p, p25, p75, p95):

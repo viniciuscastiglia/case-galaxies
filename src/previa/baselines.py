@@ -208,7 +208,10 @@ def k_escolhido(painel) -> tuple[int, float]:
     colunas = [c for c in painel.columns if c.startswith("p_ultimos_")]
     if not colunas:
         raise ValueError("k_escolhido: o painel não tem colunas p_ultimos_k")
+    colunas = sorted(colunas, key=lambda c: int(c.removeprefix("p_ultimos_")))  # empate: menor k
     manchetes = painel.loc["manchete_janela_peso_posts", colunas].astype(float)
+    if manchetes.isna().any():  # o idxmax pularia o NaN em silêncio (princípio 7)
+        raise ValueError(f"k_escolhido: manchete NaN em {list(manchetes[manchetes.isna()].index)}")
     melhor = manchetes.idxmax()
     return int(melhor.removeprefix("p_ultimos_")), float(manchetes[melhor])
 

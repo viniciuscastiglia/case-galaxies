@@ -36,11 +36,12 @@ def mapa_do_previa(features: list[str]) -> dict[str, str]:
 
 
 def main() -> int:
+    from previa.caminhos import CONFIGS
     from previa.dados import carregar_base
     from previa.experimento import ler_config, ler_duracoes, preparar
     from previa.splits import ler_avaliacao
 
-    cfg = ler_config("configs/experimentos/opcao_a_manuais.yaml")
+    cfg = ler_config(CONFIGS / "experimentos" / "opcao_a_manuais.yaml")
     d = preparar(carregar_base(), ler_duracoes(), ler_avaliacao(), cfg.lacuna_dias)
     d["cad_ultimo_ts"] = d["published_at"] - pd.to_timedelta(d["dias_desde_ultimo"], "D")
     d = d[d["linha"]]

@@ -271,3 +271,20 @@ def test_tabela_de_treino_recusa_feature_ausente_nao_numerica_ou_infinita():
         validar_tabela_de_treino(inf, ["hist_n", "hist_mediana"])
     fora_do_treino = inf.assign(linha=[True, False, True])  # o inf está numa linha que não treina
     validar_tabela_de_treino(fora_do_treino, ["hist_n", "hist_mediana"])
+
+
+def test_tabela_de_treino_sem_linhas_de_treino_levanta():
+    d = _tabela_de_treino().assign(linha=False)
+    with pytest.raises(ValueError, match="nenhuma linha de treino"):
+        validar_tabela_de_treino(d, ["hist_n"])
+
+
+def test_tabela_de_treino_exige_a_lacuna():
+    """O histórico usa só posts maduros (princípio 2): o último post usado tem 30+ dias."""
+    d = _tabela_de_treino()  # o post de 10/03 usa o de 20/02, só 18 dias antes
+    validar_tabela_de_treino(d, ["hist_n"])  # sem a lacuna, passa
+    with pytest.raises(ValueError, match="lacuna"):
+        validar_tabela_de_treino(d, ["hist_n"], lacuna_dias=30)
+    ok = d.copy()
+    ok.loc[2, "hist_ultimo_ts"] = pd.Timestamp("2026-02-08T09:00Z")  # 30 dias exatos: entra
+    validar_tabela_de_treino(ok, ["hist_n"], lacuna_dias=30)

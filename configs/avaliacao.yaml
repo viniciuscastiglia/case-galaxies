@@ -26,6 +26,9 @@ canal_novo:
   n_grupos: 4
   seed: 0
 
+# Alarme da aula 2.2: uma feature com mais desta fatia do ganho é "importância dominante" (confira vazamento)
+alarme_importancia: 0.5
+
 # Teste final (F16; hub, troubleshooting "bom demais"): acima disto, procure vazamento antes de comemorar
 final:
   ganho_minimo: 0.03       # #5: ganho da manchete sobre o baseline no cenário temporal
