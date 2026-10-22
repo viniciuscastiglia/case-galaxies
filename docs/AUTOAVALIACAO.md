@@ -41,9 +41,9 @@ na ordem e no agrupamento dele (núcleo, depois "ir além").
 | :--- | :--- | :--- |
 | Recebe criativo + contexto e devolve previsão, intervalo, ranking e justificativa | **feito** | `previsao.prever_criativo` e `previsao.comparar_criativos` (`4aec332`): número do modelo com o intervalo do CQR (M6), flag, `top_drivers` (M8), comparáveis, explicação por template e, na comparação, o ranking e P(B > A) de cada par (6.3); testes em `tests/test_previsao.py`. O intervalo mede 76,5% no teste (F41) |
 | Função Python documentada com contrato Pydantic (`predicted_metric`, `interval_low/high`, `confidence_flag`, `relative_to_channel`, `top_drivers`, `explanation`, `comparables`) | **feito** | Pydantic na base (`esquema.py:18,26`: `ChannelStats`, `Post`) e o contrato da tool. A1 feita em 21/10 (decisão de 21/10, `src/previa/previsao.py`, `tests/test_previsao.py`). O contrato da tool é a A1 (`.superpowers/sdd/2026-10-20-a1/caso_a_mao.md`, F19, F20, #34). `V:` o contrato é seu |
-| Servidor MCP funcionando (Inspector ou cliente) | **falta** | não há servidor. O README (`README.md:126-130`) cita `previa.servidor_mcp`, que não existe. A2 é do Claude (#38); `fastmcp==3.4.7` e `mcp==1.30.0` estão no plano. Só vale "feito" depois de rodar no Inspector ou no `fastmcp.Client` |
-| Agente LangGraph com tools de extração, histórico/comparáveis, predição, explicabilidade e ordenação | **falta** | não há `StateGraph` nem `create_agent` em `src/`. Só `langchain-google-genai==4.4.0` está fixado (`376dada`). A6 depende da A1 |
-| O número vem sempre do modelo, com teste que prova | **parcial** | a invariante é a A7 (`expm1(nível + q50 cru)`, grafo == função == MCP) e não existe. Hoje só a paridade treino/uso: `test_paridade_treino_uso` (`tests/test_modelo.py:97`). `V:` a invariante é sua |
+| Servidor MCP funcionando (Inspector ou cliente) | **feito** | `src/previa/servidor_mcp.py` (`8ca876b`): 2 tools, 3 resources e o prompt; 13 testes com o `fastmcp.Client` em memória (`tests/test_servidor_mcp.py`); fumaça por stdio com o pacote real e o golden (`previa.demo --mcp`: "igual ao da função: True") |
+| Agente LangGraph com tools de extração, histórico/comparáveis, predição, explicabilidade e ordenação | **parcial** | `src/previa/agente.py` (`6594d9e`): grafo fixo extrair → prever → explicar → responder (estado JSON, `trilha`, `InMemorySaver`) e `create_agent` com as 2 tools no nível do pedido; o explicador da A4 (`explicador.py`) com validador. Parcial: extração, contexto e predição ficam dentro de um nó (`prever_criativo`), não em tools separadas |
+| O número vem sempre do modelo, com teste que prova | **feito** | a invariante (A7): o número do MCP, do grafo e do agente é o da função e o `expm1` do modelo (`tests/test_servidor_mcp.py`, `tests/test_agente.py`); a injeção na legenda não muda o número |
 | Explicação validada: só cita números e fatores da saída do modelo | **falta** | o validador é da A4 (AUDITORIA 3, "A4"). `top_drivers` (M8) existe e é testado (`tests/test_drivers.py:53-146`), mas não há explicador nem validador. `PREENCHER:` aprovação na 1ª tentativa e fidelidade do juiz (F8) |
 
 ## 2 · Modelo preditivo treinado
@@ -131,7 +131,7 @@ Núcleo: 6 + 5 + 7 + 4 + 9 = 31 itens. Ir além: 6 itens. As camadas e as 5 dica
 | Falta | 14 |
 | **Total** | **37** |
 
-Atualização de 21/10 (noite): teste final, intervalo (M6), flag medido no teste, contrato A1 e pacote no MLflow passaram a "feito"; o agente, o servidor MCP, o explicador e as tools seguem como estavam (em andamento). A contagem de `PREENCHER:` abaixo é a da primeira passada e está defasada.
+Atualização de 21/10 (noite): teste final, intervalo (M6), flag medido no teste, contrato A1 e pacote no MLflow passaram a "feito"; depois, o servidor MCP, o agente (A6), o explicador (A4), a demo e a M9 entraram (`8ca876b` a `fb709dc`). A contagem de `PREENCHER:` abaixo é a da primeira passada e está defasada.
 
 Os `PREENCHER:` e os `V:` aparecem dentro de linhas de qualquer status. Contagem por ocorrência neste arquivo:
 `PREENCHER:` 25; `V:` 12.
