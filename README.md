@@ -400,7 +400,12 @@ rótulo difere (seção 8). Por isso a comparação é de ordem de grandeza e de
   chamada); o índice dos comparáveis usa só a capa, sem o título; não há what-if (a Tool 5 só ordena); não há o
   dogfooding com o `MultiServerMCPClient`, nem o teste no Claude Code e no Inspector (o MCP foi testado com o cliente
   do FastMCP, em memória e por stdio); e a instalação não foi testada do zero numa máquina limpa (o CI roda os
-  testes num clone limpo a cada push).
+  testes num clone limpo a cada push); também ficaram de fora a repetição das comparações decisivas com outras
+  seeds (F5; tudo usa a seed 0), o limiar do detector de cortes calibrado com rótulos (F6; foi à mão, e o bloco de
+  vídeo não entrou no modelo), o juiz da explicação de outra família de LLM (F8), a sanidade com um canal fictício por
+  faixa de tamanho (F12), o relatório de experimento no template do hub (F28; as hipóteses e os resultados estão no
+  `HIPOTESES.md` e na seção 7) e o random forest como segundo baseline (F36). As seções 4 a 7 da auditoria não foram
+  cruzadas de novo com o código final.
 - **Fora do modelo:** a transcrição e o idioma da fala (#35), a clusterização dos descritores (a rubrica tem campos
   fixos, F38), o detector de objetos (o produto em close ficou na rubrica, #31), a leitura do texto na capa (só a
   detecção: o PaddleOCR não instala na Stack 2026) e o baseline de regressão sobre os inscritos (os inscritos são os
