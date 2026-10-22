@@ -6,31 +6,22 @@ As decisões tomadas vão para `docs/DECISOES.md`; o histórico, para `docs/DIAR
 
 ## Agora
 
-- **Checkpoint da troca de conta (21/10, ~21h10).** Leia também `docs/RETOMADA.md`.
-- **No `main` e no GitHub:** os lotes 1 e 2 (até `d28ce86`). **No branch `feat/lote-noite-2`, commitado e revisado,
-  sem merge:** A1 (`schemas.py`), flag, âncora, capa, o modelo final (#39), a M6 (`intervalo.py`, `final.py`,
-  `modelo.py`), o `prever_criativo` (`previsao.py`) e o índice dos comparáveis (`indice.py`), a correção do pickle
-  (`a98075b`), e os registros de #39, #40, datas da v2, o teste final e a v2.
-- **Resultados (no `DECISOES.md`):** teste final aberto UMA vez (run `6b1f7e77`; NÃO rodar de novo): H1 cumprida
-  (+5,6 [+3,6; +7,1] temporal; +3,5 [+1,9; +4,9] canal novo); cobertura 76,5% (beleza 71%, cai por mês); o flag separa
-  o erro. Modelo de uso: v2.
-- **Em voo quando a sessão parou (arquivos NÃO commitados; revisar antes de commitar):**
-  1. o servidor MCP e os testes da A7: o subagente TERMINOU (595 testes verdes; relatório
-     `.superpowers/sdd/2026-10-21-tool/report-mcp.md`), falta o review (`src/previa/servidor_mcp.py`, `configs/mcp.yaml`, `tests/test_servidor_mcp.py`
-     e a seção "Usar pelo MCP" do README; brief em `.superpowers/sdd/2026-10-21-tool/brief-mcp.md`);
-  2. os documentos com os números: o subagente TERMINOU (README 5 a 8, `MODEL_CARD.md`, `AUTOAVALIACAO.md`,
-     `DATA_CARD.md`; relatório em `.superpowers/sdd/2026-10-21-tool/report-docs.md`); faltam PREENCHER sem fonte
-     (mae_log e Spearman do teste estão no run `6b1f7e77` do MLflow); 7.075 avaliados × 7.265 do split = canônicos ×
-     todas as linhas, conferir a frase;
-  3. o retreino da v2 depois da correção do pickle: FEITO (run `5373921a`, em `artefatos/`; o `de922be7` ficou com o
-     pickle `__main__`, não usar); registrar no `DECISOES.md`.
-- **Próximo passo, nesta ordem:** (1) conferir os três itens acima, revisar e commitar; (2) `uv run python -m
-  previa.indice` (índice dos comparáveis, depois da v2 nova) e um teste de fumaça do `prever_criativo` com o pacote
-  real e um Short do golden; (3) colocar no `configs/mcp.yaml` o texto da A2 do Vinicius (as descrições de
-  `prever_criativo` e `comparar_criativos` e as 3 mensagens de erro); (4) o Vinicius reescreve as seções 1, 7 e 8 do
-  README; (5) a A6 (grafo) só se sobrar tempo, senão vira limitação; (6) suíte + ruff, review final, merge no `main` e
-  push com o ok dele; (7) `/fechar-sessao` (diário, memória); entrega até 23h59.
-- **Pendente do Vinicius:** A2 (texto); README 1, 7 e 8; o ok do merge.
+- **Checkpoint (21/10, ~21h20; a sessão nova da conta trocada).** No branch `feat/lote-noite-2`, commitados e
+  verdes (596 testes): o servidor MCP e os testes da A7 (`8ca876b`), os documentos com os números do teste e a v2
+  `5373921a` (`3657a52`), a A2 escrita pelo Claude (`1729f84`; o Vinicius delegou às 21h15 e estuda depois). Índice dos
+  comparáveis gerado; fumaça do MCP por stdio com o pacote real ok (`.superpowers/sdd/2026-10-21-tool/fumaca.md`);
+  golden com a v2: cobertura 24/30, par-a-par 41/58 (`golden.md` na mesma pasta). O main e o GitHub seguem nos lotes 1
+  e 2. Teste final aberto UMA vez (run `6b1f7e77`): NÃO rodar `previa.final` de novo.
+- **Decisão do Vinicius (~21h20):** A6, A4 e M9 entram, feitas pelo Claude; ele estuda depois da entrega.
+- **Em voo:** dois subagentes em paralelo, sem git: A4 (`src/previa/explicador.py`, brief e relatório em
+  `.superpowers/sdd/2026-10-21-agente/`) e A6 (`src/previa/agente.py`, idem). M9 com o Claude: pré-triagem dos 20 piores
+  do modelo final no walk-forward (`data/erros/piores_e684ac8c.csv`, run `e684ac8c`).
+- **Próximo passo, nesta ordem:** (1) revisar e commitar A4 e A6 (integrar o nó `explicar` da A6 com a A4); (2) M9 no
+  README; (3) README 7 e 8 (do Claude, o Vinicius reescreve depois), tirar os `<!-- -->` e os `PREENCHER` (o hub manda
+  apagar antes de entregar), AUTOAVALIACAO; (4) suíte + ruff + review final; (5) merge no `main` e push com o ok dele;
+  (6) `/fechar-sessao`. **Corte às 23h15:** o que não estiver verde fica fora do merge e vira limitação; push até
+  ~23h40.
+- **Pendente do Vinicius:** como a liga recebe a entrega (o repositório no GitHub é privado); o ok do merge e do push.
 
 ## Como funciona
 
